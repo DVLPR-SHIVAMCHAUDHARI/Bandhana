@@ -65,11 +65,13 @@ class ProfileCard extends StatelessWidget {
                     color: Colors.pinkAccent,
                     borderRadius: BorderRadius.circular(20.r),
                   ),
-                  child: const Text(
-                    "Pro User",
+                  child: Text(
+                    "☆ Pro User",
                     style: TextStyle(
                       color: Colors.white,
+                      fontFamily: Typo.medium,
                       fontWeight: FontWeight.bold,
+                      fontSize: 10.sp,
                     ),
                   ),
                 ),
@@ -77,7 +79,7 @@ class ProfileCard extends StatelessWidget {
                 Text(
                   "70% Match",
                   style: TextStyle(
-                    color: Colors.greenAccent,
+                    color: Colors.white,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
                   ),
@@ -91,7 +93,8 @@ class ProfileCard extends StatelessWidget {
             Text(
               "Ananya Pandey, 35",
               style: TextStyle(
-                fontSize: 24.sp,
+                fontSize: 28.sp,
+                fontFamily: Typo.playfairDisplayRegular,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -149,7 +152,10 @@ class ProfileCard extends StatelessWidget {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      router.goNamed(Routes.profileDetail.name);
+                      router.goNamed(
+                        Routes.profileDetail.name,
+                        pathParameters: {"mode": ProfileMode.viewOther.name},
+                      );
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -189,7 +195,11 @@ class ProfileCard extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(color: Colors.white, fontSize: 12.sp),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12.sp,
+          fontFamily: Typo.medium,
+        ),
       ),
     );
   }

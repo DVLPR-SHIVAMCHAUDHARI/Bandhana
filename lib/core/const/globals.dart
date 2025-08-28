@@ -16,6 +16,8 @@ import 'package:bandhana/features/Profile/pages/message_requested_screen.dart';
 import 'package:bandhana/features/Profile/pages/profile_detail_screen.dart';
 import 'package:bandhana/features/Registration/pages/registration_screen.dart';
 import 'package:bandhana/features/Requests/pages/request_screen.dart';
+import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
+import 'package:bandhana/features/Subscription/pages/choose_your_plans_screen.dart';
 import 'package:bandhana/features/navbar/pages/navbar.dart';
 import 'package:bandhana/features/profileSetup/pages/profile_setup_screen.dart';
 import 'package:bandhana/features/splashScreen/page/splash_screen.dart';
@@ -44,7 +46,15 @@ enum Routes {
   chat,
   profileDetail,
   messageRequested,
+  choosePlan,
 }
+
+enum ProfileMode {
+  viewOther, // viewing someone's profile → Show Interest
+  incomingRequest, // user received a request → Accept/Reject
+}
+
+enum ProfileType { pro, normal }
 
 Logger logger = Logger();
 TokenServices token = TokenServices();
@@ -120,19 +130,20 @@ GoRouter router = GoRouter(
       ],
     ),
     GoRoute(
-      path: "/profileDetail",
+      path: "/profileDetail/:mode",
       builder: (context, state) => BlocProvider(
         create: (context) => ProfileDetailBloc(),
-        child: ProfileDetailedScreen(),
+        child: ProfileDetailedScreen(
+          mode: state.pathParameters['mode'] ?? "viewOther",
+        ),
       ),
       name: Routes.profileDetail.name,
-      routes: [
-        GoRoute(
-          path: "/messageRequested",
-          builder: (context, state) => MessageRequestedScreen(),
-          name: Routes.messageRequested.name,
-        ),
-      ],
+      routes: [],
+    ),
+    GoRoute(
+      path: "/messageRequested",
+      builder: (context, state) => MessageRequestedScreen(),
+      name: Routes.messageRequested.name,
     ),
     GoRoute(
       path: "/register",
@@ -166,6 +177,14 @@ GoRouter router = GoRouter(
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: "/choosePlan",
+      builder: (context, state) => BlocProvider(
+        create: (context) => SubscriptionBloc(),
+        child: ChooseYourPlanScreen(),
+      ),
+      name: Routes.choosePlan.name,
     ),
   ],
 );

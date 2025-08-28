@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:image_picker/image_picker.dart';
 
 abstract class ProfileSetupEvent extends Equatable {
   @override

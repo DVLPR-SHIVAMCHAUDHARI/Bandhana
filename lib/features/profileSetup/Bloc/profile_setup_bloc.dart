@@ -19,7 +19,7 @@ class ProfileSetupBloc extends Bloc<ProfileSetupEvent, ProfileSetupState> {
   void _pickImages(PickImageEvent event, Emitter emit) async {
     emit(PickImageLoadingState());
     try {
-      final List<XFile>? picked = await _picker.pickMultiImage();
+      final List<XFile> picked = await _picker.pickMultiImage();
       if (picked != null && picked.isNotEmpty) {
         images.addAll(picked);
         emit(PickImageLoadedState(List.from(images)));

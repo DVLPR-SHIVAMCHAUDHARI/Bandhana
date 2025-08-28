@@ -21,4 +21,5 @@ class Urls {
   static String igOnboarding1 = "assets/images/splash-1.png";
   static String igOnboarding2 = "assets/images/splash-2.png";
   static String igOnboarding3 = "assets/images/splash-3.png";
+  static String igRequestBg = "assets/images/requestBg.png";
 }

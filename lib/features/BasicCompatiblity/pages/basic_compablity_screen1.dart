@@ -35,7 +35,7 @@ class _BasicCompablityScreen1State extends State<BasicCompablityScreen1> {
   String inchesToFeet(int inches) {
     final feet = inches ~/ 12;
     final inch = inches % 12;
-    return "$feet'${inch}\"";
+    return "$feet'$inch\"";
   }
 
   @override

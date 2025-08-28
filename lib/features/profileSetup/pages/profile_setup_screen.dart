@@ -16,7 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
-  ProfileSetupScreen({super.key});
+  const ProfileSetupScreen({super.key});
 
   @override
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -185,7 +185,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   AppDropdown<String>(
                     title: "Education",
                     hint: "Select your highest education level",
-                    value: bloc.profileData["education"] ?? null,
+                    value: bloc.profileData["education"],
                     items: educationList,
                     onChanged: (val) => bloc.add(
                       UpdateFieldEvent(field: "education", value: val),

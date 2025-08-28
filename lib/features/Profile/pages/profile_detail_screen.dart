@@ -12,7 +12,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileDetailedScreen extends StatelessWidget {
-  const ProfileDetailedScreen({super.key});
+  const ProfileDetailedScreen({super.key, required this.mode});
+  final String mode;
 
   @override
   Widget build(BuildContext context) {
@@ -295,42 +296,79 @@ class ProfileDetailedScreen extends StatelessWidget {
             color: Colors.white,
             boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => CompatibilityDialog(),
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: AppColors.primary),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r),
+          child: mode == ProfileMode.viewOther.name
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => CompatibilityDialog(),
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: AppColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 24.w,
+                            vertical: 14.h,
+                          ),
+                        ),
+                        child: Text(
+                          "Check Match",
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontFamily: Typo.bold,
+                            fontSize: 16.sp,
+                          ),
+                        ),
+                      ),
                     ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 24.w,
-                      vertical: 14.h,
+                    10.widthBox,
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          router.pushNamed(Routes.messageRequested.name);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 24.r,
+                                offset: Offset(4, 8),
+                                color: AppColors.primaryOpacity,
+                              ),
+                            ],
+                            gradient: AppColors.buttonGradient,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 32.w,
+                            vertical: 14.h,
+                          ),
+                          child: Text(
+                            textAlign: TextAlign.center,
+                            "Show Interest",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: Typo.bold,
+                              fontSize: 16.sp,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    "Check Match",
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontFamily: Typo.bold,
-                      fontSize: 16.sp,
-                    ),
-                  ),
-                ),
-              ),
-              10.widthBox,
-              Expanded(
-                child: InkWell(
+                  ],
+                )
+              : InkWell(
                   onTap: () {
-                    router.pushNamed(Routes.messageRequested.name);
+                    ProfileType.normal.name == "normal"
+                        ? router.pushNamed(Routes.choosePlan.name)
+                        : router.pushNamed(Routes.chat.name);
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -350,7 +388,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                     ),
                     child: Text(
                       textAlign: TextAlign.center,
-                      "Show Interest",
+                      "Accept Request",
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: Typo.bold,
@@ -359,9 +397,6 @@ class ProfileDetailedScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );

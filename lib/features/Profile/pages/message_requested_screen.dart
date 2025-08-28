@@ -127,6 +127,5 @@ class MessageRequestedScreen extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }
