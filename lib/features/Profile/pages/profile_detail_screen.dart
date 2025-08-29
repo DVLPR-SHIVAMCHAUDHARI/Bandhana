@@ -368,7 +368,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                   onTap: () {
                     ProfileType.normal.name == "normal"
                         ? router.pushNamed(Routes.choosePlan.name)
-                        : router.pushNamed(Routes.chat.name);
+                        : router.pushNamed(Routes.chatList.name);
                   },
                   child: Container(
                     decoration: BoxDecoration(

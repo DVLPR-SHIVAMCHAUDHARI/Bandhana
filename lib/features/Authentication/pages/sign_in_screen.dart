@@ -4,6 +4,7 @@ import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
 import 'package:bandhana/core/sharedWidgets/background_widget.dart';
 import 'package:bandhana/core/sharedWidgets/primary_button.dart';
+import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -65,14 +66,21 @@ class _SigninScreenState extends State<SigninScreen> {
                 ),
 
                 40.verticalSpace,
-
-                AppTextField(
-                  title: "Mobile No.",
-                  hint: "Mobile No.",
-                  controller: phoneController,
-                  keyboardType: TextInputType.phone,
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    "Enter Mobile No.",
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontSize: 14.sp,
+                      fontFamily: Typo.semiBold,
+                    ),
+                  ),
                 ),
-
+                10.verticalSpace,
+                PhoneNumberField(
+                  controller: phoneController,
+                  initialCountryCode: "+91",
+                ),
                 24.verticalSpace,
 
                 PrimaryButton(

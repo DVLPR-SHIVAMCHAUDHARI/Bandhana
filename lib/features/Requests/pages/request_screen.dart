@@ -24,12 +24,6 @@ class RequestScreen extends StatelessWidget {
           ),
         ),
 
-        leading: IconButton(
-          onPressed: () {
-            router.goNamed(Routes.homescreen.name);
-          },
-          icon: Icon(Icons.arrow_back_ios),
-        ),
         centerTitle: false,
       ),
       body: SafeArea(

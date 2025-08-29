@@ -21,7 +21,7 @@ class DiscoverScreen extends StatelessWidget {
             fontFamily: Typo.bold,
           ),
         ),
-        leading: const BackButton(color: Colors.black),
+
         backgroundColor: Colors.white,
         elevation: 0,
       ),

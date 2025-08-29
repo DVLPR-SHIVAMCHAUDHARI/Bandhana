@@ -1,6 +1,7 @@
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:bandhana/features/Home/pages/appMenu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -16,7 +17,12 @@ class Navbar extends StatelessWidget {
     BottomNavigationBarItem(icon: Icon(Icons.people), label: "Requests"),
   ];
 
-  final List<String> routes = ["/homescreen", "/discover", "/chat", "/request"];
+  final List<String> routes = [
+    "/homescreen",
+    "/discover",
+    "/chatList",
+    "/request",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +32,7 @@ class Navbar extends StatelessWidget {
     if (selectedIndex == -1) selectedIndex = 0;
 
     return Scaffold(
+      endDrawer: AppMenuDrawer(),
       body: Stack(
         children: [
           child,

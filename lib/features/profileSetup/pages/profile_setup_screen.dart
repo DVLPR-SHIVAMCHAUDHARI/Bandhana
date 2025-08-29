@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/saveNextButton.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
@@ -252,6 +251,16 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     onChanged: (val) => bloc.add(
                       UpdateFieldEvent(field: "workLocation", value: val),
                     ),
+                  ),
+                  16.verticalSpace,
+
+                  AppTextField(
+                    lines: 4,
+                    title: "Native Location",
+                    hint: "Enter your Native address",
+                    controller: workLocationController,
+                    onChanged: (val) =>
+                        bloc.add(UpdateFieldEvent(field: "Native", value: val)),
                   ),
                   16.verticalSpace,
 

@@ -1,3 +1,4 @@
+import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
 import 'package:bandhana/features/Subscription/bloc/subscription_event.dart';
@@ -24,7 +25,7 @@ class ChooseYourPlanScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           appBar: AppBar(
             elevation: 0,
-            backgroundColor: const Color(0xFFE94F64),
+            backgroundColor: AppColors.primary,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               onPressed: () => Navigator.pop(context),
@@ -201,7 +202,7 @@ class ChooseYourPlanScreen extends StatelessWidget {
                             // TODO: Handle proceed
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFE94F64),
+                            backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),

@@ -202,6 +202,7 @@ class CompatibilityDialog extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.r),
                       ),
+
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                     ),
                     onPressed: () {

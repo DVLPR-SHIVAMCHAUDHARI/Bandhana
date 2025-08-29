@@ -1,9 +1,12 @@
 import 'package:bandhana/core/services/tokenservice.dart';
+import 'package:bandhana/features/About&Info/pages/about_screen.dart';
+import 'package:bandhana/features/About&Info/pages/privacy_policy_screen.dart';
 import 'package:bandhana/features/Authentication/pages/otp_verification_screen.dart';
 import 'package:bandhana/features/Authentication/pages/sign_in_screen.dart';
 import 'package:bandhana/features/Authentication/pages/signup_screen.dart';
 import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_screen1.dart';
 import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_screen2.dart';
+import 'package:bandhana/features/Chat/pages/chat_list_screen.dart';
 import 'package:bandhana/features/Chat/pages/chat_screen.dart';
 import 'package:bandhana/features/Discover/pages/discover_screen.dart';
 import 'package:bandhana/features/DocumentVerification/pages/document_verification_screen.dart';
@@ -19,6 +22,8 @@ import 'package:bandhana/features/Requests/pages/request_screen.dart';
 import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
 import 'package:bandhana/features/Subscription/pages/choose_your_plans_screen.dart';
 import 'package:bandhana/features/navbar/pages/navbar.dart';
+import 'package:bandhana/features/profileSetup/Bloc/profile_setup_bloc.dart';
+import 'package:bandhana/features/profileSetup/pages/my_profile_screen.dart';
 import 'package:bandhana/features/profileSetup/pages/profile_setup_screen.dart';
 import 'package:bandhana/features/splashScreen/page/splash_screen.dart';
 import 'package:flutter/widgets.dart';
@@ -43,10 +48,14 @@ enum Routes {
   homescreen,
   discover,
   request,
-  chat,
+  chatList,
   profileDetail,
   messageRequested,
   choosePlan,
+  myProfile,
+  privacyPolicy,
+  about,
+  chat,
 }
 
 enum ProfileMode {
@@ -64,7 +73,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 BuildContext get appContext => navigatorKey.currentState!.context;
 
 GoRouter router = GoRouter(
-  initialLocation: "/homescreen",
+  // initialLocation: "/homescreen",
   routes: [
     GoRoute(
       path: "/",
@@ -118,9 +127,10 @@ GoRouter router = GoRouter(
           name: Routes.discover.name,
         ),
         GoRoute(
-          path: "/chat",
-          builder: (context, state) => ChatScreen(),
-          name: Routes.chat.name,
+          path: "/chatList",
+          builder: (context, state) => ChatListScreen(),
+          name: Routes.chatList.name,
+          routes: [],
         ),
         GoRoute(
           path: "/request",
@@ -138,7 +148,6 @@ GoRouter router = GoRouter(
         ),
       ),
       name: Routes.profileDetail.name,
-      routes: [],
     ),
     GoRoute(
       path: "/messageRequested",
@@ -179,12 +188,36 @@ GoRouter router = GoRouter(
       ],
     ),
     GoRoute(
+      path: "/chat",
+      builder: (context, state) => ChatScreen(),
+      name: Routes.chat.name,
+    ),
+    GoRoute(
       path: "/choosePlan",
       builder: (context, state) => BlocProvider(
         create: (context) => SubscriptionBloc(),
         child: ChooseYourPlanScreen(),
       ),
       name: Routes.choosePlan.name,
+    ),
+    GoRoute(
+      path: "/myProfile",
+      builder: (context, state) => BlocProvider(
+        create: (context) => ProfileSetupBloc(),
+        child: MyProfileScreen(),
+      ),
+      name: Routes.myProfile.name,
+    ),
+    GoRoute(
+      path: "/privayPolicy",
+      builder: (context, state) => PrivacyPolicyScreen(),
+
+      name: Routes.privacyPolicy.name,
+    ),
+    GoRoute(
+      path: "/about",
+      builder: (context, state) => AboutScreen(),
+      name: Routes.about.name,
     ),
   ],
 );

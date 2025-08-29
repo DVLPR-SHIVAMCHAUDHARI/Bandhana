@@ -7,6 +7,8 @@ import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
 import 'package:bandhana/core/sharedWidgets/background_widget.dart';
 import 'package:bandhana/core/sharedWidgets/primary_button.dart';
+import 'package:bandhana/features/About&Info/pages/privacy_policy_screen.dart';
+import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,6 +23,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   TextEditingController nameField = TextEditingController();
   TextEditingController numberField = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
   static bool isSelected = false;
   @override
   Widget build(BuildContext context) {
@@ -62,11 +65,20 @@ class _SignupScreenState extends State<SignupScreen> {
 
               AppTextField(title: 'Name', hint: "Name", controller: nameField),
               16.verticalSpace,
-              AppTextField(
-                controller: numberField,
-                title: "Mobile No.",
-                hint: "Mobile No.",
-                keyboardType: TextInputType.phone,
+              Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  "Enter Mobile No.",
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontSize: 14.sp,
+                    fontFamily: Typo.semiBold,
+                  ),
+                ),
+              ),
+              10.verticalSpace,
+              PhoneNumberField(
+                controller: phoneController,
+                initialCountryCode: "+91",
               ),
 
               16.verticalSpace,
@@ -88,33 +100,23 @@ class _SignupScreenState extends State<SignupScreen> {
                       },
                     ),
                   ),
-                  Expanded(
-                    child: RichText(
-                      textAlign: TextAlign.start,
-                      text: TextSpan(
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontFamily: Typo.regular,
-                          color: Colors.black87,
-                        ),
-                        children: [
-                          const TextSpan(text: "I agree to the "),
-                          TextSpan(
-                            text: "Terms",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          const TextSpan(text: " & "),
-                          TextSpan(
-                            text: "Privacy Policy",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
+
+                  Text(
+                    "I agree to the ",
+                    style: TextStyle(fontSize: 14, color: Colors.black),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      router.pushNamed(Routes.privacyPolicy.name);
+                    },
+                    child: Text(
+                      "Terms & Privacy Policy",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.primary,
                       ),
                     ),
                   ),

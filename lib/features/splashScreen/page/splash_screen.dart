@@ -2,6 +2,7 @@ import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/numberextension.dart';
+import 'package:bandhana/core/services/local_db_sevice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,22 +15,33 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool isAnimate = false;
+
   @override
   void initState() {
-    animate();
     super.initState();
+    animate();
   }
 
-  bool isAnimate = false;
   animate() async {
-    await Future.delayed(Duration(milliseconds: 800), () {
+    // first animation fade
+    await Future.delayed(const Duration(milliseconds: 800), () {
       setState(() {
         isAnimate = true;
       });
     });
-    await Future.delayed(Duration(milliseconds: 1600), () {
+
+    // wait for splash display
+    await Future.delayed(const Duration(milliseconds: 1600));
+
+    // check user onboarding
+    bool isFirstTime = await LocalDbService.instance.checkUserComesFirstTime();
+
+    if (isFirstTime) {
       router.goNamed(Routes.onboard.name);
-    });
+    } else {
+      router.goNamed(Routes.signin.name);
+    }
   }
 
   @override
@@ -45,7 +57,6 @@ class _SplashScreenState extends State<SplashScreen> {
           gradient: isAnimate ? AppColors.splashGradient : null,
           color: isAnimate ? null : Colors.white,
         ),
-
         width: double.infinity,
         child: Stack(
           children: [
@@ -93,9 +104,8 @@ class _SplashScreenState extends State<SplashScreen> {
               bottom: 35.h,
               left: 0,
               right: 0,
-
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 1200),
+                duration: const Duration(milliseconds: 1200),
                 opacity: isAnimate ? 1.0 : 0,
                 child: SvgPicture.asset(
                   Urls.icSplashDesignLogo,

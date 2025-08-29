@@ -12,6 +12,7 @@ class Urls {
   static String icHomepageIc = "assets/icons/homepageIc.svg";
   static String icZodiac1 = "assets/icons/zodiac1.svg";
   static String icZodiac2 = "assets/icons/zodiac2.svg";
+  static String icEdit = "assets/icons/icEdit.svg";
   static String icAnimationHeartWhite =
       "assets/icons/animationHeartLogoWhite.svg";
 

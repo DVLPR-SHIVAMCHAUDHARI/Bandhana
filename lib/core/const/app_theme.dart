@@ -33,6 +33,32 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.primaryOpacity,
+
+      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      border: OutlineInputBorder(
+        gapPadding: BorderSide.strokeAlignCenter,
+        borderRadius: BorderRadius.circular(16).r,
+        borderSide: BorderSide(color: AppColors.primary),
+      ),
+      focusedBorder: OutlineInputBorder(
+        gapPadding: BorderSide.strokeAlignCenter,
+        borderRadius: BorderRadius.circular(16).r,
+        borderSide: BorderSide(color: AppColors.primary),
+      ),
+      errorBorder: OutlineInputBorder(
+        gapPadding: BorderSide.strokeAlignCenter,
+        borderRadius: BorderRadius.circular(16).r,
+        borderSide: BorderSide(color: AppColors.primary),
+      ),
+      enabledBorder: OutlineInputBorder(
+        gapPadding: BorderSide.strokeAlignCenter,
+        borderRadius: BorderRadius.circular(16).r,
+        borderSide: BorderSide(color: AppColors.primary),
+      ),
+    ),
   );
 
   /// Dark Theme
@@ -66,6 +92,32 @@ class AppTheme {
           color: Colors.black,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.primaryOpacity,
+
+      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      border: OutlineInputBorder(
+        gapPadding: BorderSide.strokeAlignCenter,
+        borderRadius: BorderRadius.circular(16).r,
+        borderSide: BorderSide(color: AppColors.primary),
+      ),
+      focusedBorder: OutlineInputBorder(
+        gapPadding: BorderSide.strokeAlignCenter,
+        borderRadius: BorderRadius.circular(16).r,
+        borderSide: BorderSide(color: AppColors.primary),
+      ),
+      errorBorder: OutlineInputBorder(
+        gapPadding: BorderSide.strokeAlignCenter,
+        borderRadius: BorderRadius.circular(16).r,
+        borderSide: BorderSide(color: AppColors.primary),
+      ),
+      enabledBorder: OutlineInputBorder(
+        gapPadding: BorderSide.strokeAlignCenter,
+        borderRadius: BorderRadius.circular(16).r,
+        borderSide: BorderSide(color: AppColors.primary),
       ),
     ),
   );
