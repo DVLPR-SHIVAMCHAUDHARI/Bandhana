@@ -43,78 +43,69 @@ class _HomeAnimationScreenState extends State<HomeAnimationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: BackgroundWidgetLinear(
-          top: 78,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(24.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                230.verticalSpace,
+      body: BackgroundWidgetLinear(
+        top: 150.h,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            230.verticalSpace,
 
-                /// Rotating Ring
-                Transform.rotate(
-                  angle: -pi / 25.50,
-                  child: SizedBox(
-                    height: 61.h,
-                    width: 75.w,
-                    child: SvgPicture.asset(
-                      Urls.icRing,
-                      height: 61.h,
-                      width: 75.w,
-                    ),
-                  ),
-                ),
-
-                10.verticalSpace,
-
-                /// Title
-                Text(
-                  "Love is a journey.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
-                    fontSize: 30.sp,
-                    fontFamily: Typo.playfairDisplayItalic,
-                    color: Colors.white,
-                  ),
-                ),
-
-                20.verticalSpace,
-
-                /// Subtitle
-                Text(
-                  "We’re finding those who walk in rhythm with your values and heart. 💞",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontFamily: Typo.medium,
-                    color: Colors.white,
-                  ),
-                ),
-
-                288.verticalSpace,
-
-                /// Heart Animation (indicator)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (index) {
-                    return AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: SvgPicture.asset(
-                        index == selectedIndex
-                            ? Urls.icAnimationHeartWhite
-                            : Urls.icAnimationHeart,
-                        key: ValueKey(index == selectedIndex),
-                      ).marginHorizontal(5),
-                    );
-                  }),
-                ),
-              ],
+            /// Rotating Ring
+            Transform.rotate(
+              angle: -pi / 25.50,
+              child: SizedBox(
+                height: 61.h,
+                width: 75.w,
+                child: SvgPicture.asset(Urls.icRing, height: 61.h, width: 75.w),
+              ),
             ),
-          ),
+
+            10.verticalSpace,
+
+            /// Title
+            Text(
+              "Love is a journey.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                fontSize: 30.sp,
+                fontFamily: Typo.playfairDisplayItalic,
+                color: Colors.white,
+              ),
+            ),
+
+            20.verticalSpace,
+
+            /// Subtitle
+            Text(
+              "We’re finding those who walk in rhythm with your values and heart. 💞",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontFamily: Typo.medium,
+                color: Colors.white,
+              ),
+            ),
+
+            288.verticalSpace,
+
+            /// Heart Animation (indicator)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (index) {
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: SvgPicture.asset(
+                    index == selectedIndex
+                        ? Urls.icAnimationHeartWhite
+                        : Urls.icAnimationHeart,
+                    key: ValueKey(index == selectedIndex),
+                  ).marginHorizontal(5),
+                );
+              }),
+            ),
+          ],
         ),
       ),
     );

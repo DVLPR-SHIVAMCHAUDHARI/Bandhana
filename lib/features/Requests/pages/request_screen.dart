@@ -173,7 +173,7 @@ class RequestCard extends StatelessWidget {
                   ),
                   child: Text(
                     textAlign: TextAlign.center,
-                    "Skip",
+                    "Reject",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: Typo.semiBold,

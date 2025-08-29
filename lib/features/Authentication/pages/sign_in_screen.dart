@@ -32,16 +32,7 @@ class _SigninScreenState extends State<SigninScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: InkWell(
-                    onTap: () {
-                      context.pop();
-                    },
-                    child: const Icon(Icons.arrow_back),
-                  ),
-                ),
-                26.verticalSpace,
+                40.verticalSpace,
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -86,7 +77,7 @@ class _SigninScreenState extends State<SigninScreen> {
                 PrimaryButton(
                   text: "Sign In",
                   onPressed: () {
-                    router.goNamed(Routes.welcome.name);
+                    router.goNamed(Routes.homescreen.name);
                   },
                 ),
 

@@ -209,7 +209,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Registration"),
-        leading: const BackButton(color: Colors.black),
+        leading: BackButton(
+          color: Colors.black,
+          onPressed: () => router.goNamed(Routes.signin.name),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black,

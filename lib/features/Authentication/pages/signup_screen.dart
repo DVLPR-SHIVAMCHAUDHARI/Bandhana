@@ -138,7 +138,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 children: [
                   const Text("Already a member? "),
                   GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, "/signin"),
+                    onTap: () => router.goNamed(Routes.signin.name),
                     child: Text(
                       "Sign In",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(

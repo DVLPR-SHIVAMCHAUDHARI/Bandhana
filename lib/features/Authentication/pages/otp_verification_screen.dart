@@ -29,12 +29,7 @@ class OtpVerificationScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  icon: const Icon(Icons.arrow_back),
-                ),
+                BackButton(),
                 18.verticalSpace,
                 Text(
                   "OTP Verification",
