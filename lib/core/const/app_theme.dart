@@ -8,6 +8,7 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     primaryColor: AppColors.primary,
+    appBarTheme: AppBarTheme(backgroundColor: AppColors.white),
     scaffoldBackgroundColor: Colors.white,
     textTheme: TextTheme(
       headlineLarge: TextStyle(
@@ -66,6 +67,8 @@ class AppTheme {
     brightness: Brightness.dark,
     primaryColor: AppColors.primary,
     scaffoldBackgroundColor: Colors.black,
+    appBarTheme: AppBarTheme(backgroundColor: AppColors.primary),
+
     textTheme: TextTheme(
       headlineLarge: TextStyle(
         fontSize: 32.sp,

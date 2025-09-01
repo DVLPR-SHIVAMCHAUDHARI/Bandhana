@@ -1,14 +1,12 @@
 import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
 import 'package:bandhana/core/sharedWidgets/background_widget.dart';
 import 'package:bandhana/core/sharedWidgets/primary_button.dart';
 import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
 
 class SigninScreen extends StatefulWidget {
   const SigninScreen({super.key});
@@ -57,18 +55,9 @@ class _SigninScreenState extends State<SigninScreen> {
                 ),
 
                 40.verticalSpace,
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "Enter Mobile No.",
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontSize: 14.sp,
-                      fontFamily: Typo.semiBold,
-                    ),
-                  ),
-                ),
-                10.verticalSpace,
+
                 PhoneNumberField(
+                  title: "Enter Mobile No.",
                   controller: phoneController,
                   initialCountryCode: "+91",
                 ),

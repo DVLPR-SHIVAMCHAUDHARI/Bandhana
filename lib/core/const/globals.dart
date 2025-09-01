@@ -17,14 +17,15 @@ import 'package:bandhana/features/Onboarding/pages/onboarding_screen.dart';
 import 'package:bandhana/features/Profile/bloc/profile_detail_bloc.dart';
 import 'package:bandhana/features/Profile/pages/message_requested_screen.dart';
 import 'package:bandhana/features/Profile/pages/profile_detail_screen.dart';
+import 'package:bandhana/features/Registration/pages/family_details_screen.dart';
 import 'package:bandhana/features/Registration/pages/registration_screen.dart';
 import 'package:bandhana/features/Requests/pages/request_screen.dart';
 import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
 import 'package:bandhana/features/Subscription/pages/choose_your_plans_screen.dart';
 import 'package:bandhana/features/navbar/pages/navbar.dart';
-import 'package:bandhana/features/profileSetup/Bloc/profile_setup_bloc.dart';
-import 'package:bandhana/features/profileSetup/pages/my_profile_screen.dart';
-import 'package:bandhana/features/profileSetup/pages/profile_setup_screen.dart';
+import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc.dart';
+import 'package:bandhana/features/Registration/pages/my_profile_screen.dart';
+import 'package:bandhana/features/Registration/pages/profile_setup_screen.dart';
 import 'package:bandhana/features/splashScreen/page/splash_screen.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,6 +57,7 @@ enum Routes {
   privacyPolicy,
   about,
   chat,
+  familyDetails,
 }
 
 enum ProfileMode {
@@ -165,19 +167,26 @@ GoRouter router = GoRouter(
           name: Routes.profilesetup.name,
           routes: [
             GoRoute(
-              path: "docVerification",
-              builder: (context, state) => DocumentVerificationScreen(),
-              name: Routes.docVerification.name,
+              path: "familyDetails",
+              builder: (context, state) => FamilyDetailsScreen(),
+              name: Routes.familyDetails.name,
               routes: [
                 GoRoute(
-                  path: "compatablity1",
-                  builder: (context, state) => BasicCompablityScreen1(),
-                  name: Routes.compatablity1.name,
+                  path: "docVerification",
+                  builder: (context, state) => DocumentVerificationScreen(),
+                  name: Routes.docVerification.name,
                   routes: [
                     GoRoute(
-                      path: "compatablity2",
-                      builder: (context, state) => BasicCompablityScreen2(),
-                      name: Routes.compatablity2.name,
+                      path: "compatablity1",
+                      builder: (context, state) => BasicCompablityScreen1(),
+                      name: Routes.compatablity1.name,
+                      routes: [
+                        GoRoute(
+                          path: "compatablity2",
+                          builder: (context, state) => BasicCompablityScreen2(),
+                          name: Routes.compatablity2.name,
+                        ),
+                      ],
                     ),
                   ],
                 ),

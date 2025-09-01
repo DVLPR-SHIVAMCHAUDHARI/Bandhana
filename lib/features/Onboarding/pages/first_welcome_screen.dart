@@ -26,7 +26,7 @@ class FirstWelcomeScreen extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: InkWell(
                     onTap: () {
-                      context.pop();
+                      router.goNamed(Routes.otp.name);
                     },
                     child: const Icon(Icons.arrow_back),
                   ),

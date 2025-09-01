@@ -9,7 +9,6 @@ import 'package:bandhana/features/Authentication/Bloc/OtpBloc/otp_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pinput/pinput.dart';
 
 class OtpVerificationScreen extends StatelessWidget {

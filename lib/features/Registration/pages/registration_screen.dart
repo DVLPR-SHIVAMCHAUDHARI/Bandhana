@@ -32,7 +32,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String? birthPlace;
   String? zodiac;
   String? religion;
+  String? caste;
+  String? kul;
+  String? motherTongue;
+
   String? maritalStatus;
+  String? bloodGroup;
+  String? disablity;
 
   // Date & Time
   DateTime? dob;
@@ -294,11 +300,52 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 16.verticalSpace,
 
                 AppDropdown(
-                  title: "Religion, Caste",
-                  hint: "Religion, Caste",
+                  title: "Religion",
+                  hint: "Religion",
                   items: ["Hindu", "Muslim"],
                   value: religion,
                   onChanged: (v) => setState(() => religion = v),
+                ),
+                16.verticalSpace,
+                AppDropdown(
+                  title: "Caste",
+                  hint: "Caste",
+                  items: ["Kunbi", "Maratha"],
+                  value: caste,
+                  onChanged: (v) => setState(() => caste = v),
+                ),
+                16.verticalSpace,
+                AppDropdown(
+                  title: "Mother Tongue",
+                  hint: "Mother Tongue",
+                  items: [
+                    "Marathi",
+                    "Hindi",
+                    "English",
+                    "Gujarati",
+                    "Kannada",
+                    "Tamil",
+                    "Telugu",
+                    "Malayalam",
+                    "Punjabi",
+                    "Bengali",
+                    "Urdu",
+                    "Konkani",
+                    "Sindhi",
+                    "Oriya (Odia)",
+                    "Assamese",
+                    "Rajasthani",
+                    "Haryanvi",
+                    "Kashmiri",
+                    "Nepali",
+                    "Bhojpuri",
+                    "Tulu",
+                    "Manipuri",
+                    "Santhali",
+                    "Other",
+                  ],
+                  value: motherTongue,
+                  onChanged: (v) => setState(() => motherTongue = v),
                 ),
                 16.verticalSpace,
 
@@ -308,6 +355,51 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   items: ["Single", "Married"],
                   value: maritalStatus,
                   onChanged: (v) => setState(() => maritalStatus = v),
+                ),
+                16.verticalSpace,
+
+                AppDropdown(
+                  title: "Blood group",
+                  hint: "B+ve",
+                  items: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+                  value: bloodGroup,
+                  onChanged: (v) => setState(() => bloodGroup = v),
+                ),
+                16.verticalSpace,
+                AppDropdown(
+                  title: "Disablity",
+                  hint: "No",
+                  items: ["no", "yes"],
+                  value: disablity,
+                  onChanged: (v) => setState(() => disablity = v),
+                ),
+                16.verticalSpace,
+
+                disablity == "yes"
+                    ? AppTextField(
+                        title: "Specify Disablity (if yes)",
+                        hint: "disablity",
+                      )
+                    : SizedBox.shrink(),
+                16.verticalSpace,
+
+                AppDropdown(
+                  title: "Kul(clan)",
+                  hint: "Kul(clan)",
+                  items: [
+                    "Kashyap",
+                    "Gautam",
+                    "Vasishta",
+                    "Jamadagni",
+                    "Atri",
+                    "Bharadwaj",
+                    "Agastya",
+                    "Kaushik",
+                    "Gar",
+                    "Shandilya",
+                  ],
+                  value: kul,
+                  onChanged: (v) => setState(() => kul = v),
                 ),
                 16.verticalSpace,
 

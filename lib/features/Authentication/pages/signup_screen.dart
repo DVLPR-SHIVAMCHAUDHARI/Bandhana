@@ -7,7 +7,6 @@ import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
 import 'package:bandhana/core/sharedWidgets/background_widget.dart';
 import 'package:bandhana/core/sharedWidgets/primary_button.dart';
-import 'package:bandhana/features/About&Info/pages/privacy_policy_screen.dart';
 import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -65,18 +64,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
               AppTextField(title: 'Name', hint: "Name", controller: nameField),
               16.verticalSpace,
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  "Enter Mobile No.",
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontSize: 14.sp,
-                    fontFamily: Typo.semiBold,
-                  ),
-                ),
-              ),
-              10.verticalSpace,
+
               PhoneNumberField(
+                title: "Enter Mobile No.",
                 controller: phoneController,
                 initialCountryCode: "+91",
               ),

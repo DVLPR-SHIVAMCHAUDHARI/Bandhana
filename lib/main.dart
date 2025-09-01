@@ -1,7 +1,6 @@
 import 'package:bandhana/core/const/app_theme.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/services/local_db_sevice.dart';
-import 'package:bandhana/core/services/tokenservice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -23,7 +22,7 @@ class Bandhana extends StatelessWidget {
           color: Colors.white,
           title: "Bandhana",
           theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
+          // darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.system,
           debugShowCheckedModeBanner: false,
           routerConfig: router,
