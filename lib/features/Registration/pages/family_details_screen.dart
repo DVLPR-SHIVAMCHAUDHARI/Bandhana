@@ -49,154 +49,156 @@ class _FamilyDetailsScreenState extends State<FamilyDetailsScreen> {
           style: TextStyle(fontSize: 24.sp, fontFamily: Typo.bold),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            20.verticalSpace,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              20.verticalSpace,
 
-            // ✅ Form Fields
-            AppTextField(
-              title: "Father's Name",
-              hint: "Father's name",
-              // controller: bioController,
-              onChanged: (val) {},
-            ),
-            16.verticalSpace,
-            AppTextField(
-              title: "Father's Occupation",
-              hint: "Occupation",
-              // controller: ageController,
-              keyboardType: TextInputType.number,
-              onChanged: (val) {},
-            ),
-            16.verticalSpace,
-            PhoneNumberField(
-              title: "Father's Contact",
-              controller: fathersPhoneField,
-              initialCountryCode: "+91",
-            ),
-            16.verticalSpace,
-            AppTextField(
-              title: "Mother's Name",
-              hint: "Mother's name",
-              // controller: bioController,
-              onChanged: (val) {},
-            ),
-            16.verticalSpace,
-            AppTextField(
-              title: "Mother's Occupation",
-              hint: "Occupation",
-              // controller: ageController,
-              keyboardType: TextInputType.number,
-              onChanged: (val) {},
-            ),
+              // ✅ Form Fields
+              AppTextField(
+                title: "Father's Name",
+                hint: "Father's name",
+                // controller: bioController,
+                onChanged: (val) {},
+              ),
+              16.verticalSpace,
+              AppTextField(
+                title: "Father's Occupation",
+                hint: "Occupation",
+                // controller: ageController,
+                keyboardType: TextInputType.number,
+                onChanged: (val) {},
+              ),
+              16.verticalSpace,
+              PhoneNumberField(
+                title: "Father's Contact",
+                controller: fathersPhoneField,
+                initialCountryCode: "+91",
+              ),
+              16.verticalSpace,
+              AppTextField(
+                title: "Mother's Name",
+                hint: "Mother's name",
+                // controller: bioController,
+                onChanged: (val) {},
+              ),
+              16.verticalSpace,
+              AppTextField(
+                title: "Mother's Occupation",
+                hint: "Occupation",
+                // controller: ageController,
+                keyboardType: TextInputType.number,
+                onChanged: (val) {},
+              ),
 
-            16.verticalSpace,
-            PhoneNumberField(
-              title: "Mothers's Contact",
-              controller: mothersPhoneField,
-              initialCountryCode: "+91",
-            ),
+              16.verticalSpace,
+              PhoneNumberField(
+                title: "Mothers's Contact",
+                controller: mothersPhoneField,
+                initialCountryCode: "+91",
+              ),
 
-            16.verticalSpace,
+              16.verticalSpace,
 
-            AppDropdown<String>(
-              title: "Number of Brothers",
-              hint: "Select brothers count",
-              items: siblingCount,
-              value: selectedBrothers,
-              onChanged: (value) {
-                selectedBrothers = value;
-              },
-            ),
-            16.verticalSpace,
-            AppDropdown<String>(
-              title: "Number of Sisters",
-              hint: "Select sisters count",
-              items: siblingCount,
-              value: selectedSisters,
-              onChanged: (value) {
-                selectedSisters = value;
-              },
-            ),
-            16.verticalSpace,
-            AppDropdown<String>(
-              title: "Family Type",
-              hint: "Select family type",
-              items: familyTypes,
-              value: selectedFamilyType,
-              onChanged: (value) {
-                selectedFamilyType = value;
-              },
-            ),
-            16.verticalSpace,
-            AppDropdown<String>(
-              title: "Family Status",
-              hint: "Select family status",
-              items: familyStatus,
-              value: selectedFamilyStatus,
-              onChanged: (value) {
-                selectedFamilyStatus = value;
-              },
-            ),
-            16.verticalSpace,
-            AppDropdown<String>(
-              title: "Family Values",
-              hint: "Select family values",
-              items: familyValues,
-              value: selectedFamilyValues,
-              onChanged: (value) {
-                selectedFamilyValues = value;
-              },
-            ),
-            16.verticalSpace,
-            AppTextField(
-              title: "Maternal Uncle’s (Mama) Name",
-              hint: "Enter maternal uncle’s name",
-              keyboardType: TextInputType.name,
-              onChanged: (val) {
-                // save to state
-              },
-            ),
-            16.verticalSpace,
-            AppTextField(
-              title: "Maternal Uncle’s Village",
-              hint: "Enter maternal uncle’s village",
-              keyboardType: TextInputType.text,
-              onChanged: (val) {
-                // save to state
-              },
-            ),
-            16.verticalSpace,
-            AppTextField(
-              title: "Mama’s Kul",
-              hint: "Enter mama’s kul",
-              keyboardType: TextInputType.text,
-              onChanged: (val) {
-                // save to state
-              },
-            ),
-            16.verticalSpace,
-            AppTextField(
-              lines: 4,
-              title: "Relatives / Family References (Surnames)",
-              hint: "Enter relatives or family references",
-              keyboardType: TextInputType.multiline,
-              onChanged: (val) {
-                // save to state
-              },
-            ),
-            30.verticalSpace,
+              AppDropdown<String>(
+                title: "Number of Brothers",
+                hint: "Select brothers count",
+                items: siblingCount,
+                value: selectedBrothers,
+                onChanged: (value) {
+                  selectedBrothers = value;
+                },
+              ),
+              16.verticalSpace,
+              AppDropdown<String>(
+                title: "Number of Sisters",
+                hint: "Select sisters count",
+                items: siblingCount,
+                value: selectedSisters,
+                onChanged: (value) {
+                  selectedSisters = value;
+                },
+              ),
+              16.verticalSpace,
+              AppDropdown<String>(
+                title: "Family Type",
+                hint: "Select family type",
+                items: familyTypes,
+                value: selectedFamilyType,
+                onChanged: (value) {
+                  selectedFamilyType = value;
+                },
+              ),
+              16.verticalSpace,
+              AppDropdown<String>(
+                title: "Family Status",
+                hint: "Select family status",
+                items: familyStatus,
+                value: selectedFamilyStatus,
+                onChanged: (value) {
+                  selectedFamilyStatus = value;
+                },
+              ),
+              16.verticalSpace,
+              AppDropdown<String>(
+                title: "Family Values",
+                hint: "Select family values",
+                items: familyValues,
+                value: selectedFamilyValues,
+                onChanged: (value) {
+                  selectedFamilyValues = value;
+                },
+              ),
+              16.verticalSpace,
+              AppTextField(
+                title: "Maternal Uncle’s (Mama) Name",
+                hint: "Enter maternal uncle’s name",
+                keyboardType: TextInputType.name,
+                onChanged: (val) {
+                  // save to state
+                },
+              ),
+              16.verticalSpace,
+              AppTextField(
+                title: "Maternal Uncle’s Village",
+                hint: "Enter maternal uncle’s village",
+                keyboardType: TextInputType.text,
+                onChanged: (val) {
+                  // save to state
+                },
+              ),
+              16.verticalSpace,
+              AppTextField(
+                title: "Mama’s Kul",
+                hint: "Enter mama’s kul",
+                keyboardType: TextInputType.text,
+                onChanged: (val) {
+                  // save to state
+                },
+              ),
+              16.verticalSpace,
+              AppTextField(
+                lines: 4,
+                title: "Relatives / Family References (Surnames)",
+                hint: "Enter relatives or family references",
+                keyboardType: TextInputType.multiline,
+                onChanged: (val) {
+                  // save to state
+                },
+              ),
+              30.verticalSpace,
 
-            SaveandNextButtons(
-              onNext: () {
-                router.goNamed(Routes.docVerification.name);
-              },
-            ),
-            30.verticalSpace,
-          ],
+              SaveandNextButtons(
+                onNext: () {
+                  router.goNamed(Routes.docVerification.name);
+                },
+              ),
+              30.verticalSpace,
+            ],
+          ),
         ),
       ),
     );
