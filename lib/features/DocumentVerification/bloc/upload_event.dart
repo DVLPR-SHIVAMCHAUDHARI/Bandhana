@@ -1,15 +1,16 @@
-import 'package:equatable/equatable.dart';
-import 'dart:io';
+abstract class UploadEvent {}
 
-abstract class UploadEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
+class UploadFromCamera extends UploadEvent {
+  final String docType;
+  UploadFromCamera(this.docType);
 }
 
-class PickFileEvent extends UploadEvent {
-  final String docType; // so we know which tile triggered it
-  PickFileEvent(this.docType);
+class UploadFromGallery extends UploadEvent {
+  final String docType;
+  UploadFromGallery(this.docType);
+}
 
-  @override
-  List<Object?> get props => [docType];
+class UploadFromFile extends UploadEvent {
+  final String docType;
+  UploadFromFile(this.docType);
 }

@@ -1,15 +1,34 @@
-import 'package:equatable/equatable.dart';
 import 'dart:io';
 
-class UploadState extends Equatable {
-  final Map<String, File?> pickedFiles; // store per document type
-
+abstract class UploadState {
+  final Map<String, File?> pickedFiles;
   const UploadState({this.pickedFiles = const {}});
+}
 
-  UploadState copyWith({Map<String, File?>? pickedFiles}) {
-    return UploadState(pickedFiles: pickedFiles ?? this.pickedFiles);
-  }
+class UploadInitial extends UploadState {
+  const UploadInitial() : super(pickedFiles: const {});
+}
 
-  @override
-  List<Object?> get props => [pickedFiles];
+class UploadInProgress extends UploadState {
+  const UploadInProgress(Map<String, File?> pickedFiles)
+    : super(pickedFiles: pickedFiles);
+}
+
+class UploadSuccess extends UploadState {
+  const UploadSuccess(Map<String, File?> pickedFiles)
+    : super(pickedFiles: pickedFiles);
+}
+
+class UploadPermissionDenied extends UploadState {
+  final String permission;
+  const UploadPermissionDenied(this.permission, Map<String, File?> pickedFiles)
+    : super(pickedFiles: pickedFiles);
+}
+
+class UploadPermissionPermanentlyDenied extends UploadState {
+  final String permission;
+  const UploadPermissionPermanentlyDenied(
+    this.permission,
+    Map<String, File?> pickedFiles,
+  ) : super(pickedFiles: pickedFiles);
 }

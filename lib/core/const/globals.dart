@@ -1,3 +1,4 @@
+import 'package:bandhana/core/services/request_permission_service.dart';
 import 'package:bandhana/core/services/tokenservice.dart';
 import 'package:bandhana/features/About&Info/pages/about_screen.dart';
 import 'package:bandhana/features/About&Info/pages/privacy_policy_screen.dart';
@@ -68,6 +69,7 @@ enum ProfileMode {
 enum ProfileType { pro, normal }
 
 Logger logger = Logger();
+RequestPermission permission = RequestPermission();
 TokenServices token = TokenServices();
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
