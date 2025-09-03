@@ -26,6 +26,7 @@ class DiscoverScreen extends StatelessWidget {
         elevation: 0,
       ),
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
           physics: ClampingScrollPhysics(),
           child: Column(

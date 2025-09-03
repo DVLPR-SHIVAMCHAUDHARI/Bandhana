@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/typography.dart';
@@ -16,8 +18,8 @@ class SigninScreen extends StatefulWidget {
 }
 
 class _SigninScreenState extends State<SigninScreen> {
-  final phoneController = TextEditingController();
-  final passwordController = TextEditingController();
+  var selectedCode = '+91';
+  var phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -60,13 +62,20 @@ class _SigninScreenState extends State<SigninScreen> {
                   title: "Enter Mobile No.",
                   controller: phoneController,
                   initialCountryCode: "+91",
+                  onCountryChanged: (p0) => selectedCode = p0,
                 ),
                 24.verticalSpace,
 
                 PrimaryButton(
                   text: "Sign In",
                   onPressed: () {
-                    router.goNamed(Routes.homescreen.name);
+                    final number = "$selectedCode${phoneController.text}";
+                    log(number);
+
+                    router.goNamed(
+                      Routes.otp.name,
+                      pathParameters: {"number": number, "prev": "signin"},
+                    );
                   },
                 ),
 

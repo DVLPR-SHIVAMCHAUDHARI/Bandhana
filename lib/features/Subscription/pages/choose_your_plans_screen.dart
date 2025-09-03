@@ -1,4 +1,5 @@
 import 'package:bandhana/core/const/app_colors.dart';
+import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
 import 'package:bandhana/features/Subscription/bloc/subscription_event.dart';
@@ -6,9 +7,81 @@ import 'package:bandhana/features/Subscription/bloc/subscription_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-class ChooseYourPlanScreen extends StatelessWidget {
+class ChooseYourPlanScreen extends StatefulWidget {
   const ChooseYourPlanScreen({super.key});
+
+  @override
+  State<ChooseYourPlanScreen> createState() => _ChooseYourPlanScreenState();
+}
+
+class _ChooseYourPlanScreenState extends State<ChooseYourPlanScreen> {
+  late Razorpay _razorpay;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _razorpay = Razorpay();
+
+    // Register callbacks
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear(); // Removes all listeners
+    super.dispose();
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    // Payment successful
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Payment Successful: ${response.paymentId}")),
+    );
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Payment failed
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Payment Failed: ${response.code} - ${response.message}"),
+      ),
+    );
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // External wallet selected
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("External Wallet: ${response.walletName}")),
+    );
+  }
+
+  void openCheckout({required amount}) {
+    var options = {
+      'key': 'rzp_test_RD5iHzm0q2ERFa', // Replace with your Razorpay key
+      'amount': amount, // Amount in paise (₹500.00)
+      'name': 'Bandhana',
+      'description': 'Test Payment',
+      'prefill': {
+        'contact': '9021262585',
+        'email': 'dev.shivamchaudhari@gmail.com',
+      },
+      'external': {
+        'wallets': ['paytm'],
+      },
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +101,7 @@ class ChooseYourPlanScreen extends StatelessWidget {
             backgroundColor: AppColors.primary,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(),
             ),
             title: const Text(
               "Subscription",
@@ -199,6 +272,16 @@ class ChooseYourPlanScreen extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
+                            if (state is SwitchPlanState) {
+                              openCheckout(
+                                amount: state.selectedIndex == 0
+                                    ? "29900"
+                                    : "249900",
+                              );
+                            } else {
+                              openCheckout(amount: 29900);
+                            }
+
                             // TODO: Handle proceed
                           },
                           style: ElevatedButton.styleFrom(

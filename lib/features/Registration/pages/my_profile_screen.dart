@@ -1,8 +1,9 @@
+import 'dart:io';
+
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/numberextension.dart';
-import 'package:bandhana/core/const/saveNextButton.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
 import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
@@ -15,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -69,6 +69,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       body: BlocBuilder<ProfileSetupBloc, ProfileSetupState>(
         builder: (context, state) {
           var bloc = context.read<ProfileSetupBloc>();
+          List images = [];
+          if (state is PickImageLoadedState) images = state.images;
           return SingleChildScrollView(
             physics: ClampingScrollPhysics(),
             child: Column(
@@ -96,19 +98,26 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         backgroundColor: Colors.white,
                         radius: 48.r,
                         child: CircleAvatar(
-                          backgroundImage: CachedNetworkImageProvider(
-                            "https://m.media-amazon.com/images/M/MV5BMTY1MDUyMjI1N15BMl5BanBnXkFtZTYwMjg4MjA0._V1_FMjpg_UX1000_.jpg",
-                          ),
+                          backgroundImage: images.isNotEmpty
+                              ? FileImage(File(images[0].path))
+                              : CachedNetworkImageProvider(
+                                  "https://m.media-amazon.com/images/M/MV5BMTY1MDUyMjI1N15BMl5BanBnXkFtZTYwMjg4MjA0._V1_FMjpg_UX1000_.jpg",
+                                ),
                           radius: 46.r,
 
                           child: Align(
                             alignment: Alignment.topRight,
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 15,
-                              child: SvgPicture.asset(
-                                Urls.icEdit,
-                                height: 14.h,
+                            child: InkWell(
+                              onTap: () {
+                                bloc.add(PickImageEvent());
+                              },
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 15,
+                                child: SvgPicture.asset(
+                                  Urls.icEdit,
+                                  height: 14.h,
+                                ),
                               ),
                             ),
                           ),
@@ -168,25 +177,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     ),
                     10.verticalSpace,
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ...List.generate(5, (index) {
+                    Wrap(
+                      spacing: 10,
+                      children: List.generate(5, (index) {
+                        if (index < images.length) {
                           return Stack(
                             children: [
                               Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 5,
-                                ),
                                 width: 64.w,
-                                height: 58.h.w,
+                                height: 58.h,
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: AppColors.primary),
                                   borderRadius: BorderRadius.circular(12),
                                   image: DecorationImage(
-                                    image: CachedNetworkImageProvider(
-                                      'https://m.media-amazon.com/images/M/MV5BMTY1MDUyMjI1N15BMl5BanBnXkFtZTYwMjg4MjA0._V1_FMjpg_UX1000_.jpg',
-                                    ),
+                                    image: FileImage(File(images[index].path)),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -195,8 +198,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 right: 0,
                                 top: 0,
                                 child: GestureDetector(
-                                  onTap: () {},
-
+                                  onTap: () =>
+                                      bloc.add(RemoveImageEvent(index)),
                                   child: Container(
                                     decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
@@ -212,9 +215,26 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               ),
                             ],
                           );
-                        }),
-                      ],
+                        } else {
+                          return GestureDetector(
+                            onTap: () => bloc.add(PickImageEvent()),
+                            child: Container(
+                              width: 64.w,
+                              height: 58.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.primary),
+                              ),
+                              child: Icon(
+                                Icons.add_a_photo,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          );
+                        }
+                      }),
                     ),
+
                     16.verticalSpace,
                     AppTextField(
                       title: "About You(Bio)",

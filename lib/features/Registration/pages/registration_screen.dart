@@ -33,7 +33,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String? zodiac;
   String? religion;
   String? caste;
-  String? kul;
+  final TextEditingController kul = TextEditingController();
   String? motherTongue;
 
   String? maritalStatus;
@@ -383,23 +383,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     : SizedBox.shrink(),
                 16.verticalSpace,
 
-                AppDropdown(
+                AppTextField(
                   title: "Kul(clan)",
-                  hint: "Kul(clan)",
-                  items: [
-                    "Kashyap",
-                    "Gautam",
-                    "Vasishta",
-                    "Jamadagni",
-                    "Atri",
-                    "Bharadwaj",
-                    "Agastya",
-                    "Kaushik",
-                    "Gar",
-                    "Shandilya",
-                  ],
-                  value: kul,
-                  onChanged: (v) => setState(() => kul = v),
+                  hint: "Kul/gotra",
+                  controller: kul,
+                  keyboardType: TextInputType.phone,
                 ),
                 16.verticalSpace,
 

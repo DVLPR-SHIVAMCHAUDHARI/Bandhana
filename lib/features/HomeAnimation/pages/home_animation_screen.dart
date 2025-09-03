@@ -24,12 +24,12 @@ class _HomeAnimationScreenState extends State<HomeAnimationScreen> {
   void initState() {
     super.initState();
 
-    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 400), (timer) {
       setState(() {
         selectedIndex = (selectedIndex + 1) % 3;
       });
     });
-    Future.delayed((Duration(milliseconds: 2000)), () {
+    Future.delayed((Duration(milliseconds: 1500)), () {
       router.goNamed(Routes.homescreen.name);
     });
   }

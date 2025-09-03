@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
@@ -21,8 +23,9 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   TextEditingController nameField = TextEditingController();
-  TextEditingController numberField = TextEditingController();
+
   TextEditingController phoneController = TextEditingController();
+  var selectedCode = "+91";
   static bool isSelected = false;
   @override
   Widget build(BuildContext context) {
@@ -117,7 +120,13 @@ class _SignupScreenState extends State<SignupScreen> {
               PrimaryButton(
                 text: "Sign Up",
                 onPressed: () {
-                  router.goNamed(Routes.otp.name);
+                  final number = "$selectedCode${phoneController.text}";
+                  log(number);
+
+                  router.goNamed(
+                    Routes.otp.name,
+                    pathParameters: {"number": number, "prev": "signup"},
+                  );
                 },
               ),
 

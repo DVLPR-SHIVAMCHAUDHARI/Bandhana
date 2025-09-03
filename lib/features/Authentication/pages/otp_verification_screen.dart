@@ -12,7 +12,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pinput/pinput.dart';
 
 class OtpVerificationScreen extends StatelessWidget {
-  const OtpVerificationScreen({super.key});
+  OtpVerificationScreen({super.key, required this.number, required this.prev});
+  var number;
+  var prev;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,13 @@ class OtpVerificationScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BackButton(),
+                BackButton(
+                  onPressed: () {
+                    prev == "signin"
+                        ? router.goNamed(Routes.signin.name)
+                        : router.goNamed(Routes.signup.name);
+                  },
+                ),
                 18.verticalSpace,
                 Text(
                   "OTP Verification",
@@ -41,10 +49,37 @@ class OtpVerificationScreen extends StatelessWidget {
 
                 8.verticalSpace,
                 Text(
-                  "We’ve sent a verification code to your email address. Please enter the code below to complete your account setup. +91 1234567890",
+                  "We’ve sent a verification code to $number. Please enter the code below to complete your account setup. ",
                   style: TextStyle(fontFamily: Typo.regular, fontSize: 16.sp),
                   textAlign: TextAlign.start,
                 ).paddingHorizontal(10.w),
+                10.verticalSpace,
+                Row(
+                  children: [
+                    Text(
+                      "Wrong number?",
+                      style: TextStyle(
+                        fontFamily: Typo.regular,
+                        fontSize: 16.sp,
+                      ),
+                      textAlign: TextAlign.start,
+                    ).paddingHorizontal(10.w),
+                    InkWell(
+                      onTap: () {
+                        router.goNamed(Routes.signin.name);
+                      },
+                      child: Text(
+                        "edit",
+                        style: TextStyle(
+                          fontFamily: Typo.semiBold,
+                          fontSize: 16.sp,
+                          color: Colors.blue,
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                  ],
+                ),
 
                 40.verticalSpace,
                 Align(

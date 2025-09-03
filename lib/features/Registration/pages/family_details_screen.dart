@@ -1,14 +1,10 @@
-import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/saveNextButton.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
 import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
 import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FamilyDetailsScreen extends StatefulWidget {
@@ -196,7 +192,6 @@ class _FamilyDetailsScreenState extends State<FamilyDetailsScreen> {
                   router.goNamed(Routes.docVerification.name);
                 },
               ),
-              30.verticalSpace,
             ],
           ),
         ),

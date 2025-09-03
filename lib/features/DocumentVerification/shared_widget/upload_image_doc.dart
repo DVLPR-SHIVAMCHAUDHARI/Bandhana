@@ -1,17 +1,12 @@
-import 'dart:io';
-
 import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/features/DocumentVerification/bloc/upload_bloc.dart';
 import 'package:bandhana/features/DocumentVerification/bloc/upload_event.dart';
 import 'package:bandhana/features/DocumentVerification/bloc/upload_state.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 Widget documentVerificationTile({
   required BuildContext context,

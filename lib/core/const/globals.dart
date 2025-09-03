@@ -77,7 +77,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 BuildContext get appContext => navigatorKey.currentState!.context;
 
 GoRouter router = GoRouter(
-  initialLocation: "/register",
+  initialLocation: "/homescreen",
   routes: [
     GoRoute(
       path: "/",
@@ -100,10 +100,14 @@ GoRouter router = GoRouter(
       name: Routes.signin.name,
       routes: [
         GoRoute(
-          path: "otp",
-          builder: (context, state) => OtpVerificationScreen(),
+          path: "otp/:number/:prev",
+          builder: (context, state) => OtpVerificationScreen(
+            number: state.pathParameters['number'] ?? "",
+            prev: state.pathParameters['prev'] ?? "",
+          ),
           name: Routes.otp.name,
         ),
+
         GoRoute(
           path: "signup",
           builder: (context, state) => SignupScreen(),
@@ -211,6 +215,7 @@ GoRouter router = GoRouter(
       ),
       name: Routes.choosePlan.name,
     ),
+
     GoRoute(
       path: "/myProfile",
       builder: (context, state) => BlocProvider(

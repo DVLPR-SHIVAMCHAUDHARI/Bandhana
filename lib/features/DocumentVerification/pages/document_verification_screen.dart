@@ -1,12 +1,9 @@
-import 'dart:io';
 import 'package:bandhana/features/DocumentVerification/bloc/upload_bloc.dart';
-import 'package:bandhana/features/DocumentVerification/bloc/upload_event.dart';
 import 'package:bandhana/features/DocumentVerification/bloc/upload_state.dart';
 import 'package:bandhana/features/DocumentVerification/shared_widget/upload_image_doc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
