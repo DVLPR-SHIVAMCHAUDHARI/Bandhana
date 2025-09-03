@@ -6,14 +6,15 @@
     android:maxSdkVersion="32"/>
 
     <application
-        <meta-data
-        android:name="com.razorpay.ApiKey"
-        android:value="YOUR_RAZORPAY_KEY"/>
+        
         android:label="bandhana"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config">
+        <meta-data
+        android:name="com.razorpay.ApiKey"
+        android:value="rzp_test_RD5iHzm0q2ERFa"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

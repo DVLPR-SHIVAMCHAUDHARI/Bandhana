@@ -77,7 +77,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 BuildContext get appContext => navigatorKey.currentState!.context;
 
 GoRouter router = GoRouter(
-  initialLocation: "/homescreen",
+  // initialLocation: "/homescreen",
   routes: [
     GoRoute(
       path: "/",
