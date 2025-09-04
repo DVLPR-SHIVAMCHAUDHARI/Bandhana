@@ -106,6 +106,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
+    - family: kugile
+      fonts:
+        - asset: assets/fonts/Kugile_Demo.ttf
     - family: PlayfairDisplayBold
       fonts:
         - asset: assets/fonts/PlayfairDisplay-Bold.ttf

@@ -33,18 +33,36 @@ class _SigninScreenState extends State<SigninScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 40.verticalSpace,
+
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SvgPicture.asset(
-                      Urls.icBandhanaNameLogo,
-                      height: 66.h,
-                      color: Colors.black,
+                    Text(
+                      "Vivah",
+                      style: TextStyle(
+                        fontFamily: Typo.kugile,
+                        fontSize: 35.sp,
+                        color: Color(0xff404040),
+                      ),
                     ),
+                    // SvgPicture.asset(
+                    //   Urls.icBandhanaNameLogo,
+                    //   height: 66.h,
+                    //   color: Colors.black,
+                    // ),
                     8.horizontalSpace,
                     SvgPicture.asset(Urls.icSplashLogo, height: 61.h),
                   ],
+                ),
+                Text(
+                  "Bandhana",
+                  style: TextStyle(
+                    color: Color(0xff404040),
+
+                    fontFamily: Typo.kugile,
+                    fontSize: 38.sp,
+                  ),
                 ),
                 104.verticalSpace,
 

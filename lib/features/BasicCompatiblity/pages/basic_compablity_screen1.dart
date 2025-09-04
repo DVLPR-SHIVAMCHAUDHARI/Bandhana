@@ -274,6 +274,7 @@ class _BasicCompablityScreen1State extends State<BasicCompablityScreen1> {
                     router.pushNamed(Routes.compatablity2.name);
                   },
                 ),
+                10.verticalSpace,
               ],
             ),
           ),

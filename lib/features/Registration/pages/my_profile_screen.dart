@@ -339,32 +339,34 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           );
         },
       ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.all(24),
-        child: SizedBox(
-          height: 58.h,
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {
-              // TODO: Handle proceed
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.r),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: EdgeInsets.all(24),
+          child: SizedBox(
+            height: 58.h,
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // TODO: Handle proceed
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-            child: const Text(
-              "Save & Update",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              child: const Text(
+                "Save & Update",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-        ).marginVertical(10),
+        ),
       ),
     );
   }

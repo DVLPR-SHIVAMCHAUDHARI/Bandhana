@@ -37,64 +37,68 @@ class Navbar extends StatelessWidget {
         children: [
           child,
           Positioned(
-            bottom: 28.h,
+            bottom: 0.h,
             left: 20.w,
             right: 20.w,
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 11.h, horizontal: 20.w),
-              height: 77.h,
-              decoration: BoxDecoration(
-                color: AppColors.navbarFill,
-                borderRadius: BorderRadius.circular(100.r),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(items.length, (index) {
-                  final isSelected = selectedIndex == index;
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(100.r),
-                    onTap: () {
-                      if (!isSelected) {
-                        router.go(routes[index]);
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 10.h,
-                        horizontal: 10.w,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : null,
-                        borderRadius: BorderRadius.circular(100.r),
-                      ),
-                      child: Row(
-                        children: [
-                          if (isSelected) ...[
-                            IconTheme(
-                              data: IconThemeData(
-                                color: isSelected ? Colors.white : Colors.black,
-                                size: 22.sp,
+            child: SafeArea(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 11.h, horizontal: 20.w),
+                height: 77.h,
+                decoration: BoxDecoration(
+                  color: AppColors.navbarFill,
+                  borderRadius: BorderRadius.circular(100.r),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(items.length, (index) {
+                    final isSelected = selectedIndex == index;
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(100.r),
+                      onTap: () {
+                        if (!isSelected) {
+                          router.go(routes[index]);
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10.h,
+                          horizontal: 10.w,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.primary : null,
+                          borderRadius: BorderRadius.circular(100.r),
+                        ),
+                        child: Row(
+                          children: [
+                            if (isSelected) ...[
+                              IconTheme(
+                                data: IconThemeData(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.black,
+                                  size: 22.sp,
+                                ),
+                                child: items[index].icon,
                               ),
-                              child: items[index].icon,
+                              SizedBox(width: 6.w),
+                            ],
+                            Text(
+                              items[index].label!,
+                              style: TextStyle(
+                                fontFamily: Typo.regular,
+                                color: selectedIndex == index
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                            SizedBox(width: 6.w),
                           ],
-                          Text(
-                            items[index].label!,
-                            style: TextStyle(
-                              fontFamily: Typo.regular,
-                              color: selectedIndex == index
-                                  ? Colors.white
-                                  : Colors.black,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
+                ),
               ),
             ),
           ),

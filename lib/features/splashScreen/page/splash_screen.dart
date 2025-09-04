@@ -58,64 +58,66 @@ class _SplashScreenState extends State<SplashScreen> {
           color: isAnimate ? null : Colors.white,
         ),
         width: double.infinity,
-        child: Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: SizedBox(
-                    width: 290.w,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AnimatedOpacity(
-                          duration: const Duration(milliseconds: 1200),
-                          opacity: isAnimate ? 1.0 : 0,
-                          curve: Curves.easeIn,
-                          child: SvgPicture.asset(
-                            Urls.icBandhanaNameLogo,
-                            color: isAnimate ? Colors.white : Colors.black,
-                            height: 66.26.h,
-                            width: 226.08.w,
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: SizedBox(
+                      width: double.infinity.w,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 1200),
+                            opacity: isAnimate ? 1.0 : 0,
+                            curve: Curves.easeIn,
+                            child: SvgPicture.asset(
+                              Urls.icBandhanaNameLogo,
+                              color: isAnimate ? Colors.white : Colors.black,
+                              height: 66.26.h,
+                              width: 226.08.w,
+                            ),
                           ),
-                        ),
-                        2.widthBox,
-                        AnimatedSlide(
-                          duration: const Duration(milliseconds: 1200),
-                          curve: Curves.easeInOut,
-                          offset: isAnimate
-                              ? const Offset(0, -0.2)
-                              : const Offset(-1.5, 0),
-                          child: SvgPicture.asset(
-                            Urls.icSplashLogo,
-                            color: isAnimate ? Colors.white : Colors.black,
-                            height: 61.26.h,
-                            width: 56.08.w,
+                          2.widthBox,
+                          AnimatedSlide(
+                            duration: const Duration(milliseconds: 1200),
+                            curve: Curves.easeInOut,
+                            offset: isAnimate
+                                ? const Offset(0, -0.2)
+                                : const Offset(-1.5, 0),
+                            child: SvgPicture.asset(
+                              Urls.icSplashLogo,
+                              color: isAnimate ? Colors.white : Colors.black,
+                              height: 61.26.h,
+                              width: 56.08.w,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Positioned(
-              bottom: 35.h,
-              left: 0,
-              right: 0,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 1200),
-                opacity: isAnimate ? 1.0 : 0,
-                child: SvgPicture.asset(
-                  Urls.icSplashDesignLogo,
-                  color: isAnimate ? Colors.white : Colors.black,
-                  height: 27.26.h,
-                  width: 320.08.w,
+                ],
+              ),
+              Positioned(
+                bottom: 35.h,
+                left: 0,
+                right: 0,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 1200),
+                  opacity: isAnimate ? 1.0 : 0,
+                  child: SvgPicture.asset(
+                    Urls.icSplashDesignLogo,
+                    color: isAnimate ? Colors.white : Colors.black,
+                    height: 27.26.h,
+                    width: 320.08.w,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

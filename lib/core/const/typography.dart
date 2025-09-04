@@ -7,4 +7,5 @@ class Typo {
   static String semiBold = "SemiBold";
   static String medium = "Medium";
   static String regular = "Regular";
+  static String kugile = "kugile";
 }

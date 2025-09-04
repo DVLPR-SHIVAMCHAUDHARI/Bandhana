@@ -34,6 +34,8 @@ class AppDropdown<T> extends StatelessWidget {
         ),
         10.verticalSpace,
         DropdownButtonFormField<T>(
+          menuMaxHeight: 250.h,
+
           value: value,
           isExpanded: true,
           icon: const Icon(Icons.arrow_drop_down),

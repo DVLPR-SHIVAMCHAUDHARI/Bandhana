@@ -56,13 +56,15 @@ class BackgroundWidget extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            top: 810.h,
 
-            child: SvgPicture.asset(
-              Urls.icSplashDesignLogo,
-              color: AppColors.primary.withOpacity(0.5),
-              height: 27.26.h,
-              width: 320.08.w,
+            top: 800.h,
+            child: SafeArea(
+              child: SvgPicture.asset(
+                Urls.icSplashDesignLogo,
+                color: AppColors.primary.withOpacity(0.5),
+                height: 27.26.h,
+                width: 320.08.w,
+              ),
             ),
           ),
 
@@ -130,13 +132,15 @@ class BackgroundWidgetLinear extends StatelessWidget {
             Positioned(
               left: 0,
               right: 0,
-              top: 810.h,
+              top: 800.h,
 
-              child: SvgPicture.asset(
-                Urls.icSplashDesignLogo,
-                color: AppColors.primary.withOpacity(0.5),
-                height: 27.26.h,
-                width: 320.08.w,
+              child: SafeArea(
+                child: SvgPicture.asset(
+                  Urls.icSplashDesignLogo,
+                  color: AppColors.primary.withOpacity(0.5),
+                  height: 27.26.h,
+                  width: 320.08.w,
+                ),
               ),
             ),
 
