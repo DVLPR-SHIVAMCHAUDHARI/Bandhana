@@ -7,10 +7,18 @@ import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
 import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
+import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
 import 'package:bandhana/features/BasicCompatiblity/repositories/basic_compatiblity_repository.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_event.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_state.dart';
+import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_bloc.dart';
+import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_event.dart';
+import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_state.dart';
+import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
+import 'package:bandhana/features/master_apis/bloc/master_event.dart';
+import 'package:bandhana/features/master_apis/bloc/master_state.dart';
+import 'package:bandhana/features/master_apis/models/education_model.dart';
+import 'package:bandhana/features/master_apis/models/profession_model.dart';
+import 'package:bandhana/features/master_apis/models/salary_model.dart';
+import 'package:bandhana/features/master_apis/models/user_detail_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,26 +33,33 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
-  String? selectedSalaryRange;
+  SalaryModel? selectedSalaryRange;
+  var fullNameController = TextEditingController();
+  var phoneController = TextEditingController();
+  var bioController = TextEditingController();
+  var ageController = TextEditingController();
+  var heightController = TextEditingController();
+  var permanentAddressController = TextEditingController();
+  var workAddressController = TextEditingController();
+  var nativeAddressController = TextEditingController();
 
-  String? selectedProfession;
+  ProfessionModel? selectedProfession;
 
-  String? selectedJobRole;
+  EducationModel? selectedEducation;
 
-  final List<String> educationList = [
-    "High School",
-    "Bachelor",
-    "Master",
-    "PhD",
-  ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    var bloc = context.read<MasterBloc>();
 
-  final List<String> professionList = [
-    "Engineer",
-    "Doctor",
-    "Teacher",
-    "Business",
-    "Other",
-  ];
+    bloc.add(GetProfessionEvent());
+    bloc.add(GetSalaryEvent());
+    bloc.add(GetEducationEvent());
+    bloc.add(GetProfileDetailsEvent());
+  }
+
+  late UserDetailModel profileDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +124,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             alignment: Alignment.topRight,
                             child: InkWell(
                               onTap: () {
-                                bloc.add(PickImageEvent());
+                                bloc.add(
+                                  PickImageEvent(limit: 5 - images.length),
+                                );
                               },
                               child: CircleAvatar(
                                 backgroundColor: Colors.white,
@@ -130,20 +147,58 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "John Doe",
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                          BlocBuilder<MasterBloc, MasterState>(
+                            builder: (context, state) {
+                              if (state is GetProfileDetailsLoadingState) {
+                                return CircularProgressIndicator();
+                              } else if (state
+                                  is GetProfileDetailsLoadedState) {
+                                return Text(
+                                  state.profileDetail.fullname!,
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              } else {
+                                return Text(
+                                  localDb.getUserData()!.fullname,
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              }
+                            },
                           ),
-                          Text(
-                            "Nashik division Maharastra",
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Colors.white,
-                            ),
+                          BlocBuilder<MasterBloc, MasterState>(
+                            builder: (context, state) {
+                              if (state is GetProfileDetailsLoadingState) {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (state
+                                  is GetProfileDetailsLoadedState) {
+                                return Text(
+                                  state.profileDetail.district ?? "",
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              } else if (state is GetProfessionErrorState) {
+                                return Text(
+                                  "",
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              }
+                              return SizedBox();
+                            },
                           ),
                         ],
                       ),
@@ -163,9 +218,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                     ),
                     16.verticalSpace,
-                    AppTextField(title: "Name", hint: "John Doe"),
+                    AppTextField(
+                      title: "Name",
+                      hint: "John Doe",
+                      controller: fullNameController,
+                    ),
                     16.verticalSpace,
-                    AppTextField(title: "Mobile No.", hint: "+91 1234567890"),
+
+                    PhoneNumberField(
+                      title: "Mobile No.",
+                      controller: phoneController,
+                    ),
                     16.verticalSpace,
                     Text(
                       "Upload Photos",
@@ -217,7 +280,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           );
                         } else {
                           return GestureDetector(
-                            onTap: () => bloc.add(PickImageEvent()),
+                            onTap: () => bloc.add(
+                              PickImageEvent(limit: 5 - images.length),
+                            ),
                             child: Container(
                               width: 64.w,
                               height: 58.h,
@@ -239,62 +304,122 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     AppTextField(
                       title: "About You(Bio)",
                       hint: "Write a short bio about yourself",
+                      controller: bioController,
+
                       lines: 4,
                     ),
                     16.verticalSpace,
-                    AppTextField(title: "Age", hint: "Enter your age"),
-                    16.verticalSpace,
-                    AppTextField(title: "Height", hint: "Enter your height"),
-                    16.verticalSpace,
-                    AppDropdown<String>(
-                      title: "Education",
-                      hint: "Select your highest education level",
-                      value: bloc.profileData["education"],
-                      items: educationList,
-                      onChanged: (val) => bloc.add(
-                        UpdateFieldEvent(field: "education", value: val),
-                      ),
+                    AppTextField(
+                      title: "Age",
+                      hint: "Enter your age",
+                      controller: ageController,
                     ),
                     16.verticalSpace,
-                    AppDropdown(
-                      title: 'Profession',
-                      hint: 'select',
-                      items: professions['professions']!,
-                      value: selectedProfession,
-                      onChanged: (val) {
-                        setState(() {
-                          selectedProfession = val.toString();
-                          selectedJobRole =
-                              null; // 🔹 Reset caste when religion changes
-                        });
+                    AppTextField(
+                      title: "Height",
+                      hint: "Enter your height",
+                      controller: heightController,
+                    ),
+                    16.verticalSpace,
+                    BlocBuilder<MasterBloc, MasterState>(
+                      buildWhen: (prev, curr) =>
+                          curr is GetEducationLoadingState ||
+                          curr is GetEducationLoadedState ||
+                          curr is GetEducationErrorState,
+                      builder: (context, state) {
+                        if (state is GetEducationLoadingState) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (state is GetEducationLoadedState) {
+                          return AppDropdown<String>(
+                            title: "Highest Education",
+                            isRequired: true,
+                            hint: "Select Education",
+                            items: state.educations
+                                .map((e) => e.education!)
+                                .toList(),
+                            value: selectedEducation
+                                ?.education, // <-- use selectedEducation
+                            onChanged: (v) {
+                              final selected = state.educations.firstWhere(
+                                (e) => e.education == v,
+                              );
+                              setState(() => selectedEducation = selected);
+                            },
+                          );
+                        } else if (state is GetEducationErrorState) {
+                          return Text("Error: ${state.message}");
+                        }
+                        return const SizedBox.shrink();
                       },
                     ),
-                    25.verticalSpace,
-                    AppDropdown(
-                      title: 'Job role',
-                      hint: 'select',
-                      items: (selectedProfession != null)
-                          ? professions[selectedProfession]!
-                          : [], // ✅ safe fallback
-                      value: selectedJobRole,
-                      onChanged: (val) {
-                        setState(() {
-                          selectedJobRole = val.toString();
-                        });
+                    16.verticalSpace,
+                    BlocBuilder<MasterBloc, MasterState>(
+                      buildWhen: (prev, curr) =>
+                          curr is GetProfessionLoadingState ||
+                          curr is GetProfessionLoadedState ||
+                          curr is GetProfessionErrorState,
+                      builder: (context, state) {
+                        if (state is GetProfessionLoadingState) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (state is GetProfessionLoadedState) {
+                          return AppDropdown<String>(
+                            title: "Profession",
+                            isRequired: true,
+                            hint: "Select profession",
+                            items: state.professions
+                                .map((e) => e.profession!)
+                                .toList(),
+                            value: selectedProfession?.profession,
+                            onChanged: (v) {
+                              final selected = state.professions.firstWhere(
+                                (e) => e.profession == v,
+                              );
+                              setState(() => selectedProfession = selected);
+                            },
+                          );
+                        } else if (state is GetProfessionErrorState) {
+                          return Text("Error: ${state.message}");
+                        }
+                        return const SizedBox.shrink();
                       },
                     ),
 
-                    25.verticalSpace,
                     16.verticalSpace,
-                    AppDropdown(
-                      title: 'Annual Salary',
-                      hint: 'Select Salary Range',
-                      items: annualSalaryRanges,
-                      value: selectedSalaryRange,
-                      onChanged: (val) {
-                        setState(() {
-                          selectedSalaryRange = val.toString();
-                        });
+                    BlocBuilder<MasterBloc, MasterState>(
+                      buildWhen: (prev, curr) =>
+                          curr is GetSalaryLoadingState ||
+                          curr is GetSalaryLoadedState ||
+                          curr is GetSalaryErrorState,
+                      builder: (context, state) {
+                        if (state is GetSalaryLoadingState) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (state is GetSalaryLoadedState) {
+                          return AppDropdown<String>(
+                            title: "Salary Range",
+                            isRequired: true,
+                            hint: "Select Salary",
+                            items: state.salarys
+                                .map((e) => e.salaryRange!)
+                                .toList(),
+                            value: selectedSalaryRange
+                                ?.salaryRange, // <-- use selectedEducation
+                            onChanged: (v) {
+                              final selected = state.salarys.firstWhere(
+                                (e) => e.salaryRange == v,
+                              );
+                              setState(() => selectedSalaryRange = selected);
+                            },
+                          );
+                        } else if (state is GetSalaryErrorState) {
+                          return Text("Error: ${state.message}");
+                        }
+                        return const SizedBox.shrink();
                       },
                     ),
                     16.verticalSpace,
@@ -302,6 +427,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       lines: 4,
                       title: "Permanent Location",
                       hint: "Enter your permanent address",
+                      controller: permanentAddressController,
 
                       onChanged: (val) => bloc.add(
                         UpdateFieldEvent(
@@ -315,6 +441,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       lines: 4,
                       title: "Work Location",
                       hint: "Enter your work address",
+                      controller: workAddressController,
 
                       onChanged: (val) => bloc.add(
                         UpdateFieldEvent(field: "workLocation", value: val),
@@ -325,6 +452,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       lines: 4,
                       title: "Native Location",
                       hint: "Enter your Native address",
+                      controller: nativeAddressController,
 
                       onChanged: (val) => bloc.add(
                         UpdateFieldEvent(field: "workLocation", value: val),

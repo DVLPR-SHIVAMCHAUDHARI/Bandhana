@@ -6,29 +6,36 @@ abstract class UploadState {
 }
 
 class UploadInitial extends UploadState {
-  const UploadInitial() : super(pickedFiles: const {});
-}
-
-class UploadInProgress extends UploadState {
-  const UploadInProgress(Map<String, File?> pickedFiles)
-    : super(pickedFiles: pickedFiles);
+  UploadInitial() : super(pickedFiles: {});
 }
 
 class UploadSuccess extends UploadState {
-  const UploadSuccess(Map<String, File?> pickedFiles)
+  UploadSuccess(Map<String, File?> pickedFiles)
     : super(pickedFiles: pickedFiles);
 }
 
 class UploadPermissionDenied extends UploadState {
-  final String permission;
-  const UploadPermissionDenied(this.permission, Map<String, File?> pickedFiles)
+  final String permissionFor;
+  UploadPermissionDenied(this.permissionFor, Map<String, File?> pickedFiles)
     : super(pickedFiles: pickedFiles);
 }
 
 class UploadPermissionPermanentlyDenied extends UploadState {
-  final String permission;
-  const UploadPermissionPermanentlyDenied(
-    this.permission,
+  final String permissionFor;
+  UploadPermissionPermanentlyDenied(
+    this.permissionFor,
     Map<String, File?> pickedFiles,
   ) : super(pickedFiles: pickedFiles);
+}
+
+class UploadSubmitLoading extends UploadState {}
+
+class UploadSubmitSuccess extends UploadState {
+  final String message;
+  UploadSubmitSuccess(this.message);
+}
+
+class UploadSubmitFailure extends UploadState {
+  final String error;
+  UploadSubmitFailure(this.error);
 }

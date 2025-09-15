@@ -3,8 +3,14 @@ import 'globals.dart';
 
 import 'package:flutter/material.dart';
 
-snackbar({color, title, message, ContentType type = ContentType.failure}) {
-  return ScaffoldMessenger.of(appContext).showSnackBar(
+snackbar(
+  context, {
+  color,
+  title,
+  message,
+  ContentType type = ContentType.failure,
+}) {
+  return ScaffoldMessenger.of(context ?? appContext).showSnackBar(
     SnackBar(
       elevation: 0,
       behavior: SnackBarBehavior.floating,

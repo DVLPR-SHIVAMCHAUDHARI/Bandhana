@@ -57,7 +57,8 @@ class BackgroundWidget extends StatelessWidget {
             left: 0,
             right: 0,
 
-            top: 800.h,
+            // bottom: 0,
+            top: 750.h,
             child: SafeArea(
               child: SvgPicture.asset(
                 Urls.icSplashDesignLogo,
@@ -134,6 +135,7 @@ class BackgroundWidgetLinear extends StatelessWidget {
               right: 0,
               top: 800.h,
 
+              // bottom: 0,
               child: SafeArea(
                 child: SvgPicture.asset(
                   Urls.icSplashDesignLogo,

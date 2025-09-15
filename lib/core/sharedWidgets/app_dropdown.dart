@@ -1,4 +1,5 @@
 import 'package:bandhana/core/const/app_colors.dart';
+import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +10,7 @@ class AppDropdown<T> extends StatelessWidget {
   final T? value;
   final void Function(T?) onChanged;
   final String title;
+  final bool isRequired; // ✅ NEW
 
   const AppDropdown({
     required this.title,
@@ -17,6 +19,7 @@ class AppDropdown<T> extends StatelessWidget {
     required this.items,
     required this.value,
     required this.onChanged,
+    this.isRequired = false, // ✅ default = false
   });
 
   @override
@@ -35,7 +38,6 @@ class AppDropdown<T> extends StatelessWidget {
         10.verticalSpace,
         DropdownButtonFormField<T>(
           menuMaxHeight: 250.h,
-
           value: value,
           isExpanded: true,
           icon: const Icon(Icons.arrow_drop_down),
@@ -45,6 +47,7 @@ class AppDropdown<T> extends StatelessWidget {
             color: Colors.black,
           ),
           decoration: InputDecoration(
+            alignLabelWithHint: true,
             filled: true,
             fillColor: AppColors.primaryOpacity,
             contentPadding: EdgeInsets.symmetric(
@@ -72,7 +75,6 @@ class AppDropdown<T> extends StatelessWidget {
             hint,
             style: TextStyle(
               fontSize: 16.sp,
-
               fontFamily: Typo.semiBold,
               color: Colors.grey[600],
             ),
@@ -85,7 +87,6 @@ class AppDropdown<T> extends StatelessWidget {
                     e.toString(),
                     style: TextStyle(
                       fontSize: 16.sp,
-
                       fontFamily: Typo.semiBold,
                       color: AppColors.black,
                     ),
@@ -94,6 +95,16 @@ class AppDropdown<T> extends StatelessWidget {
               )
               .toList(),
           onChanged: onChanged,
+
+          // ✅ Validator
+          validator: isRequired
+              ? (val) {
+                  if (val == null) {
+                    return "This field is required";
+                  }
+                  return null;
+                }
+              : null,
         ),
       ],
     );

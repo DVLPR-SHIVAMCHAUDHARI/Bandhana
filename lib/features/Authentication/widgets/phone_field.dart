@@ -1,4 +1,5 @@
 import 'package:bandhana/core/const/app_colors.dart';
+import 'package:bandhana/core/const/snack_bar.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,6 +8,7 @@ class PhoneNumberField extends StatefulWidget {
   final TextEditingController controller;
   final String? initialCountryCode;
   final String? title;
+  final String? Function(String?)? validator;
   final void Function(String)? onCountryChanged;
 
   const PhoneNumberField({
@@ -15,6 +17,7 @@ class PhoneNumberField extends StatefulWidget {
     required this.controller,
     this.initialCountryCode = "+91",
     this.onCountryChanged,
+    this.validator,
   });
 
   @override
@@ -56,6 +59,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
         ),
         10.verticalSpace,
         TextFormField(
+          validator: widget.validator,
           controller: widget.controller,
           keyboardType: TextInputType.phone,
           maxLength: 10,

@@ -1,3 +1,4 @@
+import 'package:bandhana/core/services/local_db_sevice.dart';
 import 'package:bandhana/core/services/request_permission_service.dart';
 import 'package:bandhana/core/services/tokenservice.dart';
 import 'package:bandhana/features/About&Info/pages/about_screen.dart';
@@ -5,8 +6,10 @@ import 'package:bandhana/features/About&Info/pages/privacy_policy_screen.dart';
 import 'package:bandhana/features/Authentication/pages/otp_verification_screen.dart';
 import 'package:bandhana/features/Authentication/pages/sign_in_screen.dart';
 import 'package:bandhana/features/Authentication/pages/signup_screen.dart';
+import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_bloc.dart';
 import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_screen1.dart';
 import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_screen2.dart';
+import 'package:bandhana/features/BasicCompatiblity/repositories/basic_compatiblity_repository.dart';
 import 'package:bandhana/features/Chat/pages/chat_list_screen.dart';
 import 'package:bandhana/features/Chat/pages/chat_screen.dart';
 import 'package:bandhana/features/Discover/pages/discover_screen.dart';
@@ -24,7 +27,7 @@ import 'package:bandhana/features/Requests/pages/request_screen.dart';
 import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
 import 'package:bandhana/features/Subscription/pages/choose_your_plans_screen.dart';
 import 'package:bandhana/features/navbar/pages/navbar.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc.dart';
+import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_bloc.dart';
 import 'package:bandhana/features/Registration/pages/my_profile_screen.dart';
 import 'package:bandhana/features/Registration/pages/profile_setup_screen.dart';
 import 'package:bandhana/features/splashScreen/page/splash_screen.dart';
@@ -68,7 +71,11 @@ enum ProfileMode {
 
 enum ProfileType { pro, normal }
 
-Logger logger = Logger();
+final logger = Logger(
+  printer: PrettyPrinter(methodCount: 0, errorMethodCount: 5, printTime: false),
+);
+LocalDbService localDb = LocalDbService();
+
 RequestPermission permission = RequestPermission();
 TokenServices token = TokenServices();
 
@@ -77,7 +84,8 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 BuildContext get appContext => navigatorKey.currentState!.context;
 
 GoRouter router = GoRouter(
-  // initialLocation: "/homescreen",
+  navigatorKey: navigatorKey,
+  // initialLocation: "docVerification",
   routes: [
     GoRoute(
       path: "/",
@@ -107,7 +115,6 @@ GoRouter router = GoRouter(
           ),
           name: Routes.otp.name,
         ),
-
         GoRoute(
           path: "signup",
           builder: (context, state) => SignupScreen(),
@@ -128,7 +135,6 @@ GoRouter router = GoRouter(
           builder: (context, state) => Homescreen(),
           name: Routes.homescreen.name,
         ),
-
         GoRoute(
           path: "/discover",
           builder: (context, state) => DiscoverScreen(),
@@ -138,7 +144,6 @@ GoRouter router = GoRouter(
           path: "/chatList",
           builder: (context, state) => ChatListScreen(),
           name: Routes.chatList.name,
-          routes: [],
         ),
         GoRoute(
           path: "/request",
@@ -183,14 +188,21 @@ GoRouter router = GoRouter(
                   name: Routes.docVerification.name,
                   routes: [
                     GoRoute(
-                      path: "compatablity1",
-                      builder: (context, state) => BasicCompablityScreen1(),
                       name: Routes.compatablity1.name,
+                      path: 'compatablity1',
+                      builder: (context, state) => BlocProvider(
+                        create: (_) => UserPreferencesBloc(),
+                        child: BasicCompablityScreen1(),
+                      ),
+
                       routes: [
                         GoRoute(
-                          path: "compatablity2",
-                          builder: (context, state) => BasicCompablityScreen2(),
                           name: Routes.compatablity2.name,
+                          path: 'compatablity2',
+                          builder: (context, state) => BlocProvider(
+                            create: (_) => UserPreferencesBloc(),
+                            child: BasicCompablityScreen2(),
+                          ),
                         ),
                       ],
                     ),
@@ -215,7 +227,6 @@ GoRouter router = GoRouter(
       ),
       name: Routes.choosePlan.name,
     ),
-
     GoRoute(
       path: "/myProfile",
       builder: (context, state) => BlocProvider(
@@ -225,9 +236,8 @@ GoRouter router = GoRouter(
       name: Routes.myProfile.name,
     ),
     GoRoute(
-      path: "/privayPolicy",
+      path: "/privacyPolicy", // fixed typo (was privayPolicy)
       builder: (context, state) => PrivacyPolicyScreen(),
-
       name: Routes.privacyPolicy.name,
     ),
     GoRoute(

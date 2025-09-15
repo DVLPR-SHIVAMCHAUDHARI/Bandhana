@@ -1,7 +1,12 @@
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/globals.dart';
+import 'package:bandhana/core/const/snack_bar.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_bloc.dart';
+import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_event.dart';
+import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BasicCompablityScreen2 extends StatefulWidget {
@@ -158,31 +163,79 @@ class _BasicCompablityScreen2State extends State<BasicCompablityScreen2> {
 
               30.verticalSpace,
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
+              BlocConsumer<UserPreferencesBloc, UserPreferencesState>(
+                listener: (context, state) {
+                  if (state is LifestylePreferencesSuccess) {
+                    snackbar(
+                      context,
+                      color: Colors.green,
+                      title: "Success",
+                      message: state.message,
+                    );
                     router.goNamed(Routes.homeAnimationScreen.name);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  } else if (state is LifestylePreferencesFailure) {
+                    snackbar(context, message: state.message);
+                  }
+                },
+                builder: (context, state) {
+                  if (state is LifestylePreferencesLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Validate before submitting
+                        if (dietPreference != null &&
+                            smokingHabit != null &&
+                            drinkingHabit != null &&
+                            fitnessActivity != null &&
+                            sleepPattern != null &&
+                            petFriendly != null &&
+                            travelPreference != null &&
+                            dailyRoutine != null) {
+                          final preferences = {
+                            "diet": dietPreference!,
+                            "smoking_habit": smokingHabit!,
+                            "drinking_habit": drinkingHabit!,
+                            "fitness_activity": fitnessActivity!,
+                            "sleep_pattern": sleepPattern!,
+                            "travel_preferences": travelPreference!,
+                            "pet_friendly": petFriendly!,
+                            "daily_routine": dailyRoutine!,
+                          };
+
+                          context.read<UserPreferencesBloc>().add(
+                            SubmitLifestylePreferencesEvent(preferences),
+                          );
+                        } else {
+                          snackbar(
+                            context,
+                            message: "Please select all options.",
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 32.w,
+                          vertical: 14.h,
+                        ),
+                      ),
+                      child: Text(
+                        "Save & Continue",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: Typo.bold,
+                          fontSize: 16.sp,
+                        ),
+                      ),
                     ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 32.w,
-                      vertical: 14.h,
-                    ),
-                  ),
-                  child: Text(
-                    "Save & Continue",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: Typo.bold,
-                      fontSize: 16.sp,
-                    ),
-                  ),
-                ),
+                  );
+                },
               ),
             ],
           ),

@@ -11,12 +11,14 @@ class AppTextField extends StatelessWidget {
   final bool obscureText;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
-  final String? Function(String?)? validator;
+  final bool? isRequired;
+  final validator;
   final int? lines;
   final Function(String)? onChanged; // ✅ Added
 
   const AppTextField({
     super.key,
+    this.validator,
     this.lines,
     required this.title,
     required this.hint,
@@ -25,7 +27,7 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.prefixIcon,
     this.suffixIcon,
-    this.validator,
+    this.isRequired = false,
     this.onChanged, // ✅ Added
   });
 
@@ -47,8 +49,17 @@ class AppTextField extends StatelessWidget {
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
-          validator: validator,
-          onChanged: onChanged, // ✅ Hooked up
+          validator: isRequired == true
+              ? validator ??
+                    (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return "This field is required";
+                      }
+                      return null;
+                    }
+              : null,
+
+          onChanged: onChanged,
           style: TextStyle(
             fontSize: 16.sp,
             fontFamily: Typo.semiBold,

@@ -24,21 +24,54 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   animate() async {
-    // first animation fade
     await Future.delayed(const Duration(milliseconds: 800), () {
       setState(() {
         isAnimate = true;
       });
     });
 
-    // wait for splash display
     await Future.delayed(const Duration(milliseconds: 1600));
 
-    // check user onboarding
+    // Make sure Hive box is initialized
+    await LocalDbService.instance.init();
+
+    // Load token from secure storage
+    await token.load();
+
     bool isFirstTime = await LocalDbService.instance.checkUserComesFirstTime();
 
     if (isFirstTime) {
       router.goNamed(Routes.onboard.name);
+      return;
+    }
+
+    if (token.accessToken != null && token.accessToken!.isNotEmpty) {
+      final user = localDb.getUserData();
+      if (user != null) {
+        if (user.profileDetails == 0) {
+          router.goNamed(Routes.register.name);
+          return;
+        } else if (user.profileSetup == 0) {
+          router.goNamed(Routes.profilesetup.name);
+          return;
+        } else if (user.familyDetails == 0) {
+          router.goNamed(Routes.familyDetails.name);
+          return;
+        } else if (user.partnerDetails == 0) {
+          router.goNamed(Routes.compatablity1.name);
+          return;
+        } else if (user.partnerLifeStyle == 0) {
+          router.goNamed(Routes.compatablity2.name);
+          return;
+        } else if (user.documentVerification == 0) {
+          router.goNamed(Routes.docVerification.name);
+          return;
+        }
+        router.goNamed(Routes.homescreen.name);
+      } else {
+        // Token exists but user not in local DB → force logout or go to signin
+        router.goNamed(Routes.signin.name);
+      }
     } else {
       router.goNamed(Routes.signin.name);
     }

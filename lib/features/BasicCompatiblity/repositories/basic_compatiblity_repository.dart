@@ -1,352 +1,110 @@
-var religionCast = {
-  'religions': [
-    "Hindu",
-    "Muslim",
-    "Christian",
-    "Sikh",
-    "Jain",
-    "Buddhist",
-    "Parsi",
-    "Jewish",
-    "Other",
-  ],
-  "Hindu": [
-    "Brahmin",
-    "Rajput",
-    "Maratha",
-    "Kayastha",
-    "Yadav",
-    "Kurmi",
-    "Patel",
-    "Iyer",
-    "Iyengar",
-    "Nair",
-    "Lingayat",
-  ],
-  "Muslim": [
-    "Sheikh",
-    "Syed",
-    "Pathan",
-    "Ansari",
-    "Qureshi",
-    "Memon",
-    "Khan",
-    "Mughal",
-    "Farooqui",
-    "Usmani",
-    "Other Muslim",
-  ],
-  "Christian": [
-    "Roman Catholic",
-    "Syrian Catholic",
-    "Protestant",
-    "Anglo-Indian",
-    "Scheduled Caste Christian",
-    "Scheduled Tribe Christian",
-    "Pentecostal",
-    "Methodist",
-    "Seventh-day Adventist",
-    "Baptist",
-    "Other Christian",
-  ],
-  "Sikh": [
-    "Jat Sikh",
-    "Khatri Sikh",
-    "Arora Sikh",
-    "Ramgarhia",
-    "Mazhabhi Sikh",
-    "Ravidasia Sikh",
-    "Lubana",
-    "Ahluwalia",
-    "Tonk Kshatriya",
-    "Other Sikh",
-  ],
-  "Jain": [
-    "Digambar",
-    "Shwetambar",
-    "Agarwal Jain",
-    "Porwal Jain",
-    "Oswal Jain",
-    "Humad Jain",
-    "Khandelwal Jain",
-    "Srimal Jain",
-    "Shrimali Jain",
-    "Other Jain",
-  ],
-  "Buddhist": [
-    "Neo-Buddhist",
-    "Ambedkarite",
-    "Mahayana",
-    "Theravada",
-    "Vajrayana",
-    "Tibetan Buddhist",
-    "Navayana",
-    "Other Scheduled Tribe Buddhist",
-    "Other Scheduled Caste Buddhist",
-    "Other Buddhist",
-  ],
-  "Parsi": [
-    "Irani",
-    "Shahenshahi",
-    "Kadmi",
-    "Fasli",
-    "Athornan",
-    "Behdin",
-    "Sanai",
-    "Dastur",
-    "Other Zoroastrian",
-    "Other Parsi",
-  ],
-  "Jewish": [
-    "Cochin Jew",
-    "Baghdadi Jew",
-    "Bene Israel",
-    "Ashkenazi Jew",
-    "Sephardic Jew",
-    "Mizrahi Jew",
-    "Yemenite Jew",
-    "Maghrebi Jew",
-    "Karaite",
-    "Other Jewish",
-  ],
-  "Other": [
-    "Tribal",
-    "Inter-caste",
-    "Inter-religion",
-    "Atheist",
-    "Spiritual",
-    "No Religion",
-    "Other Community 1",
-    "Other Community 2",
-    "Other Community 3",
-    "Other Community",
-  ],
-};
+import 'package:bandhana/core/const/globals.dart';
+import 'package:bandhana/core/services/local_db_sevice.dart';
+import 'package:bandhana/core/const/user_model.dart';
+import 'package:bandhana/core/repository/repository.dart';
 
-List education_levels = [
-  "No Formal Education",
-  "Primary School",
-  "Middle School (Class 5–8)",
-  "High School (10th Pass)",
-  "Higher Secondary (12th Pass)",
-  "Diploma / ITI / Polytechnic",
-  "Undergraduate (Bachelor’s Degree)",
-  "Postgraduate (Master’s Degree)",
-  "Doctorate (Ph.D.)",
-  "Post Doctorate / Research",
-];
+class UserPreferencesRepository extends Repository {
+  /// Submit user preferences like age range, height, education, profession, etc.
+  Future<Map<String, dynamic>> submitPreferences(
+    Map<String, dynamic> preferences,
+  ) async {
+    try {
+      final response = await dio.post(
+        "/profile/partner-expectations",
+        data: preferences,
+      );
 
-var professions = {
-  "professions": [
-    "Healthcare & Medical",
-    "Engineering & Technology",
-    "Education & Research",
-    "Business & Finance",
-    "Law & Governance",
-    "Creative & Media",
-    "Skilled Trades & Services",
-    "Corporate & Management",
-    "Science & Environment",
-    "Other Professions",
-  ],
-  "Healthcare & Medical": [
-    "Doctor",
-    "Nurse",
-    "Pharmacist",
-    "Surgeon",
-    "Physiotherapist",
-    "Dentist",
-    "Lab Technician",
-    "Radiologist",
-    "Paramedic",
-    "Psychologist",
-  ],
-  "Engineering & Technology": [
-    "Software Engineer",
-    "Web Developer",
-    "Mobile App Developer",
-    "Data Scientist",
-    "AI/ML Engineer",
-    "Civil Engineer",
-    "Mechanical Engineer",
-    "Electrical Engineer",
-    "Electronics Engineer",
-    "Cloud Engineer",
-  ],
-  "Education & Research": [
-    "Teacher",
-    "Professor",
-    "Lecturer",
-    "Researcher",
-    "Principal",
-    "Tutor",
-    "Scientist",
-    "Education Consultant",
-    "Librarian",
-    "Academic Writer",
-  ],
-  "Business & Finance": [
-    "Accountant",
-    "Banker",
-    "Financial Analyst",
-    "Investment Banker",
-    "Business Analyst",
-    "Tax Consultant",
-    "Auditor",
-    "Entrepreneur",
-    "Sales Executive",
-    "HR Manager",
-  ],
-  "Law & Governance": [
-    "Lawyer",
-    "Judge",
-    "Legal Advisor",
-    "Police Officer",
-    "IAS/IPS Officer",
-    "Politician",
-    "Government Officer",
-    "Clerk",
-    "Customs Officer",
-    "Military Officer",
-  ],
-  "Creative & Media": [
-    "Actor",
-    "Singer",
-    "Dancer",
-    "Photographer",
-    "Journalist",
-    "Writer",
-    "Graphic Designer",
-    "Fashion Designer",
-    "Video Editor",
-    "Content Creator",
-  ],
-  "Skilled Trades & Services": [
-    "Carpenter",
-    "Plumber",
-    "Electrician",
-    "Driver",
-    "Mechanic",
-    "Tailor",
-    "Chef",
-    "Barber",
-    "Farmer",
-    "Security Guard",
-  ],
-  "Corporate & Management": [
-    "CEO",
-    "Manager",
-    "Project Manager",
-    "Product Manager",
-    "Marketing Manager",
-    "Operations Manager",
-    "Business Consultant",
-    "Supply Chain Manager",
-    "Customer Support Executive",
-    "Recruiter",
-  ],
-  "Science & Environment": [
-    "Environmental Scientist",
-    "Biologist",
-    "Chemist",
-    "Physicist",
-    "Geologist",
-    "Meteorologist",
-    "Astronomer",
-    "Agricultural Scientist",
-    "Marine Biologist",
-    "Lab Researcher",
-  ],
-  "Other Professions": [
-    "Social Worker",
-    "NGO Worker",
-    "Priest / Religious Leader",
-    "Tour Guide",
-    "Athlete",
-    "Coach / Trainer",
-    "Pilot",
-    "Cabin Crew",
-    "Astronaut",
-    "Freelance Worker",
-  ],
-};
+      if (response.data['Response']['Status']['StatusCode'] == "0") {
+        _updatePreferencesFlag();
 
-final List<String> annualSalaryRanges = [
-  "₹1,00,000 - ₹3,00,000 per annum",
-  "₹3,00,000 - ₹5,00,000 per annum",
-  "₹5,00,000 - ₹7,00,000 per annum",
-  "₹7,00,000 - ₹10,00,000 per annum",
-  "₹10,00,000 - ₹15,00,000 per annum",
-  "₹15,00,000 - ₹20,00,000 per annum",
-  "₹20,00,000 - ₹30,00,000 per annum",
-  "₹30,00,000 - ₹50,00,000 per annum",
-  "₹50,00,000 - ₹1,00,00,000 per annum",
-  "₹1,00,00,000+ per annum",
-];
+        return {
+          "message": response.data['Response']['Status']['DisplayText'],
+          "status": "success",
+        };
+      } else {
+        return {
+          "message": response.data['Response']['Status']['DisplayText'],
+          "status": "failure",
+        };
+      }
+    } catch (e) {
+      logger.e(e);
+      return {"message": "An error occurred: $e", "status": "error"};
+    }
+  }
 
-final List<String> lifeStyle = [
-  "Vegetarian",
-  "Vegan",
-  "Non-Vegetarian",
-  "Eggetarian",
-  "Occasional Meat Eater",
-  "Alcohol - Never",
-  "Alcohol - Occasionally",
-  "Alcohol - Regularly",
-  "Smoking - Never",
-  "Smoking - Occasionally",
-  "Smoking - Regularly",
-  "Fitness Enthusiast",
-  "Moderately Active",
-  "Sedentary Lifestyle",
-  "Early Riser",
-  "Night Owl",
-  "Minimalist Lifestyle",
-  "Luxury Lifestyle",
-  "Spiritual",
-  "Not Spiritual",
-  "Pet Lover",
-  "Doesn’t prefer pets",
-  "Eco-Friendly / Sustainable Living",
-  "Workaholic",
-  "Balanced Work-Life",
-];
+  Future<Map<String, dynamic>> submitLifestylePreferences(
+    Map<String, dynamic> preferences,
+  ) async {
+    try {
+      final response = await dio.post(
+        "/profile/partner-lifestyle-preferences",
+        data: preferences,
+      );
 
-const List<String> maharashtraDistricts = [
-  "Ahmednagar",
-  "Akola",
-  "Amravati",
-  "Chhatrapati Sambhajinagar",
-  "Beed",
-  "Bhandara",
-  "Buldhana",
-  "Chandrapur",
-  "Dhule",
-  "Gadchiroli",
-  "Gondia",
-  "Hingoli",
-  "Jalgaon",
-  "Jalna",
-  "Kolhapur",
-  "Latur",
-  "Mumbai City",
-  "Mumbai Suburban",
-  "Nagpur",
-  "Nanded",
-  "Nandurbar",
-  "Nashik",
-  "Dharashiv",
-  "Palghar",
-  "Parbhani",
-  "Pune",
-  "Raigad",
-  "Ratnagiri",
-  "Sangli",
-  "Satara",
-  "Sindhudurg",
-  "Solapur",
-  "Thane",
-  "Wardha",
-  "Washim",
-  "Yavatmal",
-];
+      if (response.data['Response']['Status']['StatusCode'] == "0") {
+        _updateLifestylePreferencesFlag();
+        return {
+          "message": response.data['Response']['Status']['DisplayText'],
+          "status": "success",
+        };
+      } else {
+        return {
+          "message": response.data['Response']['Status']['DisplayText'],
+          "status": "failure",
+        };
+      }
+    } catch (e) {
+      logger.e(e);
+      return {"message": "An error occurred: $e", "status": "error"};
+    }
+  }
+}
+
+/// Update local user model to mark preferences submitted
+Future<void> _updateLifestylePreferencesFlag() async {
+  final db = LocalDbService.instance;
+  final currentUser = db.getUserData();
+
+  if (currentUser != null) {
+    final updatedUser = UserModel(
+      mobileNumber: currentUser.mobileNumber,
+      fullname: currentUser.fullname,
+      profileDetails: currentUser.profileDetails,
+      profileSetup: currentUser.profileSetup,
+      documentVerification: currentUser.documentVerification,
+      partnerDetails: currentUser.partnerDetails,
+      partnerLifeStyle: 1,
+      familyDetails: currentUser.familyDetails,
+
+      // track submission
+    );
+
+    await db.saveUserData(updatedUser);
+  }
+}
+
+/// Update local user model to mark preferences submitted
+Future<void> _updatePreferencesFlag() async {
+  final db = LocalDbService.instance;
+  final currentUser = db.getUserData();
+
+  if (currentUser != null) {
+    final updatedUser = UserModel(
+      mobileNumber: currentUser.mobileNumber,
+      fullname: currentUser.fullname,
+      profileDetails: currentUser.profileDetails,
+      profileSetup: currentUser.profileSetup,
+      documentVerification: currentUser.documentVerification,
+      partnerDetails: 1,
+      partnerLifeStyle: currentUser.partnerLifeStyle,
+      familyDetails: currentUser.familyDetails,
+
+      // track submission
+    );
+
+    await db.saveUserData(updatedUser);
+  }
+}
+
+// }

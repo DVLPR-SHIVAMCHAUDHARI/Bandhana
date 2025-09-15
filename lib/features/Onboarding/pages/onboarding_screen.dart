@@ -1,12 +1,11 @@
 import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:bandhana/core/const/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import '../../../core/const/app_colors.dart';
 import '../bloc/onboarding_bloc.dart';
 import '../bloc/onboarding_event.dart';
 import '../bloc/onboarding_state.dart';
@@ -21,50 +20,61 @@ class OnboardingScreen extends StatelessWidget {
       create: (_) => OnboardingBloc(),
       child: BlocBuilder<OnboardingBloc, OnboardingState>(
         builder: (context, state) {
+          final screenHeight = MediaQuery.of(context).size.height;
+          final screenWidth = MediaQuery.of(context).size.width;
+
           return Scaffold(
             body: Stack(
               children: [
+                // Full screen background image
                 Positioned.fill(
                   child: Image.asset(
                     state.currentPage.imagePath,
                     fit: BoxFit.cover,
+                    height: screenHeight,
+                    width: screenWidth,
                   ),
                 ),
 
-                // Content
+                // Bottom content container
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
-                    height: 420.h,
-                    padding: const EdgeInsets.all(24),
+                    height: screenHeight * 0.45,
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 20.h,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(24.r),
                       ),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        25.heightBox,
+                        SizedBox(height: 25.h),
+
                         SvgPicture.asset(
                           Urls.icOnboardingLogo,
                           height: 44.h,
                           width: 63.w,
                         ),
-                        4.heightBox,
+                        SizedBox(height: 4.h),
+
                         Text(
                           state.currentPage.title,
                           style: TextStyle(
                             fontSize: 32.sp,
-
                             color: AppColors.primary,
                             fontFamily: Typo.playfairBold,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        20.heightBox,
+                        SizedBox(height: 20.h),
+
                         Text(
                           state.currentPage.subtitle,
                           style: TextStyle(
@@ -73,8 +83,11 @@ class OnboardingScreen extends StatelessWidget {
                             color: Colors.black54,
                           ),
                           textAlign: TextAlign.center,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        40.heightBox,
+
+                        SizedBox(height: 40.h),
 
                         // Dots indicator
                         Row(
@@ -82,52 +95,60 @@ class OnboardingScreen extends StatelessWidget {
                           children: List.generate(
                             OnboardingRepo.pages.length,
                             (index) => Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: state.currentIndex == index ? 32.w : 8,
-                              height: 8,
+                              margin: EdgeInsets.symmetric(horizontal: 4.w),
+                              width: state.currentIndex == index ? 32.w : 8.w,
+                              height: 8.h,
                               decoration: BoxDecoration(
                                 color: state.currentIndex == index
                                     ? AppColors.primary
                                     : Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(12.r),
                               ),
                             ),
                           ),
                         ),
 
-                        40.heightBox,
+                        SizedBox(height: 40.h),
 
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            minimumSize: Size(double.infinity.w, 58.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.r),
+                        // Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 58.h,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.r),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 32.w),
                             ),
-                          ),
-                          onPressed: () {
-                            state.currentIndex ==
-                                    OnboardingRepo.pages.length - 1
-                                ? router.goNamed(Routes.signup.name)
-                                : context.read<OnboardingBloc>().add(
-                                    NextPageEvent(),
-                                  );
-                          },
-                          child: Text(
-                            state.currentIndex ==
-                                    OnboardingRepo.pages.length - 1
-                                ? "Finish"
-                                : state.currentIndex == 1
-                                ? "Next"
-                                : "Get Started",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: Typo.bold,
-                              fontSize: 16.sp,
+                            onPressed: () {
+                              if (state.currentIndex ==
+                                  OnboardingRepo.pages.length - 1) {
+                                router.goNamed(Routes.signup.name);
+                              } else {
+                                context.read<OnboardingBloc>().add(
+                                  NextPageEvent(),
+                                );
+                              }
+                            },
+                            child: Text(
+                              state.currentIndex ==
+                                      OnboardingRepo.pages.length - 1
+                                  ? "Finish"
+                                  : state.currentIndex == 1
+                                  ? "Next"
+                                  : "Get Started",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: Typo.bold,
+                                fontSize: 16.sp,
+                              ),
                             ),
                           ),
                         ),
-                        30.heightBox,
+
+                        SizedBox(height: 30.h),
                       ],
                     ),
                   ),
@@ -135,17 +156,19 @@ class OnboardingScreen extends StatelessWidget {
 
                 // Skip button
                 Positioned(
-                  top: 40.w,
+                  top: 40.h,
                   right: 16.w,
-                  child: state.currentIndex == 2
+                  child: state.currentIndex == OnboardingRepo.pages.length - 1
                       ? SizedBox.shrink()
                       : TextButton(
-                          onPressed: () {
-                            context.read<OnboardingBloc>().add(SkipEvent());
-                          },
-                          child: const Text(
+                          onPressed: () =>
+                              context.read<OnboardingBloc>().add(SkipEvent()),
+                          child: Text(
                             "Skip",
-                            style: TextStyle(fontSize: 16, color: Colors.black),
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                 ),

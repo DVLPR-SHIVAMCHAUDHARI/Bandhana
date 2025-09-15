@@ -6,7 +6,7 @@ import 'otp_state.dart';
 class OtpBloc extends Bloc<OtpEvent, OtpState> {
   Timer? _timer;
 
-  OtpBloc() : super(const OtpState(remaining: 30, canResend: false)) {
+  OtpBloc() : super(const OtpState(remaining: 60, canResend: false)) {
     on<OtpTimerStarted>(_onTimerStarted);
     on<OtpTick>(_onTick);
   }

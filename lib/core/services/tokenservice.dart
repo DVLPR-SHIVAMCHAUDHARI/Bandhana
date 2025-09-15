@@ -1,40 +1,45 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TokenServices {
-  static final TokenServices _instance = TokenServices.internal();
-  TokenServices.internal();
+  // Singleton pattern
+  static final TokenServices _instance = TokenServices._internal();
   factory TokenServices() => _instance;
+  TokenServices._internal();
 
+  // Local variables
   String? _accessToken;
   String? _username;
-  String? _roleId;
-  int? _locationId;
-  String? _locationName;
 
-  String? get username => _username;
+  // Secure storage
+  final _storage = const FlutterSecureStorage();
+
+  // Keys
+  static const _keyAccess = "x-auth-token";
+  static const _keyRefresh = "refresh-token";
+  static const _keyUsername = "username";
+  static const _keyRole = "roleId";
+  static const _keyLocationId = "locationId";
+  static const _keyLocationName = "locationName";
+
+  // Getters
   String? get accessToken => _accessToken;
-  String? get roleId => _roleId;
-  int? get locationId => _locationId;
-  String? get locationName => _locationName;
+  String? get username => _username;
 
-  final storage = const FlutterSecureStorage();
-
-  /// Store username
-  Future<void> storeUsername({required String username}) async {
-    _username = username;
-    await storage.write(key: 'username', value: username);
+  /// Store tokens
+  Future<void> storeTokens({required String accessToken}) async {
+    _accessToken = accessToken;
+    await _storage.write(key: _keyAccess, value: accessToken);
   }
 
-  /// Store token
-  Future<void> storeToken({required String accessToken}) async {
-    _accessToken = accessToken;
-    await storage.write(key: "x-auth-token", value: accessToken);
+  /// Store username
+  Future<void> storeUsername(String username) async {
+    _username = username;
+    await _storage.write(key: _keyUsername, value: username);
   }
 
   /// Store role
-  Future<void> storeRole({required String roleId}) async {
-    _roleId = roleId;
-    await storage.write(key: "roleId", value: roleId);
+  Future<void> storeRole(String roleId) async {
+    await _storage.write(key: _keyRole, value: roleId);
   }
 
   /// Store location
@@ -42,38 +47,20 @@ class TokenServices {
     required int locationId,
     required String locationName,
   }) async {
-    _locationId = locationId;
-    _locationName = locationName;
-    await storage.write(key: "locationId", value: locationId.toString());
-    await storage.write(key: "locationName", value: locationName);
+    await _storage.write(key: _keyLocationId, value: locationId.toString());
+    await _storage.write(key: _keyLocationName, value: locationName);
   }
 
-  /// Load from secure storage
-  Future<void> loadToken() async {
-    _accessToken = await storage.read(key: "x-auth-token");
-    _username = await storage.read(key: "username");
-
-    final roleString = await storage.read(key: "roleId");
-    _roleId = roleString;
-
-    final locString = await storage.read(key: "locationId");
-    _locationId = locString != null ? int.tryParse(locString) : null;
-
-    _locationName = await storage.read(key: "locationName");
+  /// Load all tokens & user info
+  Future<void> load() async {
+    _accessToken = await _storage.read(key: _keyAccess);
+    _username = await _storage.read(key: _keyUsername);
   }
 
-  /// Delete all
-  Future<void> deleteToken() async {
+  /// Clear everything (logout)
+  Future<void> clear() async {
     _accessToken = null;
     _username = null;
-    _roleId = null;
-    _locationId = null;
-    _locationName = null;
-
-    await storage.delete(key: 'x-auth-token');
-    await storage.delete(key: 'username');
-    await storage.delete(key: 'roleId');
-    await storage.delete(key: 'locationId');
-    await storage.delete(key: 'locationName');
+    await _storage.deleteAll();
   }
 }

@@ -13,6 +13,7 @@ class PickImageLoadingState extends ProfileSetupState {}
 class PickImageLoadedState extends ProfileSetupState {
   final List<XFile> images;
   PickImageLoadedState(this.images);
+
   @override
   List<Object?> get props => [images];
 }
@@ -20,6 +21,7 @@ class PickImageLoadedState extends ProfileSetupState {
 class PickImageFailureState extends ProfileSetupState {
   final String error;
   PickImageFailureState(this.error);
+
   @override
   List<Object?> get props => [error];
 }
@@ -27,6 +29,25 @@ class PickImageFailureState extends ProfileSetupState {
 class ProfileUpdatedState extends ProfileSetupState {
   final Map<String, dynamic> profileData;
   ProfileUpdatedState(this.profileData);
+
   @override
   List<Object?> get props => [profileData];
+}
+
+class ProfileSetupSubmitLoadingState extends ProfileSetupState {}
+
+class ProfileSetupSubmitSuccessState extends ProfileSetupState {
+  final String message;
+  ProfileSetupSubmitSuccessState(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class ProfileSetupSubmitFailureState extends ProfileSetupState {
+  final String error;
+  ProfileSetupSubmitFailureState(this.error);
+
+  @override
+  List<Object?> get props => [error];
 }

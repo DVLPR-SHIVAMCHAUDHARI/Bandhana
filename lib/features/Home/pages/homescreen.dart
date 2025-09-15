@@ -1,5 +1,6 @@
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/asset_urls.dart';
+import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/features/Home/widgets/profile_card.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Homescreen extends StatelessWidget {
-  const Homescreen({super.key});
+  Homescreen({super.key});
+
+  var userdata = localDb.getUserData();
 
   @override
   Widget build(BuildContext context) {
@@ -33,26 +36,31 @@ class Homescreen extends StatelessWidget {
                       child: CircleAvatar(child: Icon(Icons.person)),
                     ),
                     9.horizontalSpace,
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "John Doe",
-                          style: TextStyle(
-                            fontFamily: Typo.semiBold,
-                            color: Colors.white,
-                            fontSize: 14.sp,
+                    GestureDetector(
+                      onTap: () {
+                        router.goNamed(Routes.myProfile.name);
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            userdata!.fullname,
+                            style: TextStyle(
+                              fontFamily: Typo.semiBold,
+                              color: Colors.white,
+                              fontSize: 14.sp,
+                            ),
                           ),
-                        ),
-                        Text(
-                          "Nashik division Maharastra",
-                          style: TextStyle(
-                            fontFamily: Typo.regular,
-                            color: Colors.white,
-                            fontSize: 12.sp,
+                          Text(
+                            "Nashik division Maharastra",
+                            style: TextStyle(
+                              fontFamily: Typo.regular,
+                              color: Colors.white,
+                              fontSize: 12.sp,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

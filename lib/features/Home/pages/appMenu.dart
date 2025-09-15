@@ -116,9 +116,37 @@ class AppMenuDrawer extends StatelessWidget {
                     },
                   ),
                   ListTile(
+                    leading: const Icon(Icons.logout_outlined),
                     title: const Text("Logout"),
-                    onTap: () {
-                      router.goNamed(Routes.signin.name);
+                    onTap: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Confirm Logout"),
+                          content: const Text(
+                            "Are you sure you want to logout?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text("Logout"),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirmed == true) {
+                        await token.clear();
+
+                        final t = token.accessToken;
+                        logger.d("Token after clear: $t"); // should print null
+
+                        router.goNamed(Routes.signin.name);
+                      }
                     },
                   ),
                 ],
