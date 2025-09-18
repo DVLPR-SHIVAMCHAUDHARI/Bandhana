@@ -2,13 +2,31 @@ import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:bandhana/features/master_apis/models/user_detail_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileCard extends StatelessWidget {
-  const ProfileCard({super.key, this.image});
+  const ProfileCard({
+    super.key,
+    this.image,
+    this.age,
+    this.district,
+    this.match,
+    this.name,
+    this.profession,
+    this.hobbies,
+    required this.id,
+  });
   final String? image;
+  final String? id;
+  final String? match;
+  final String? name;
+  final String? age;
+  final String? profession;
+  final String? district;
+  final List? hobbies;
 
   @override
   Widget build(BuildContext context) {
@@ -56,28 +74,28 @@ class ProfileCard extends StatelessWidget {
             // Pro user + Match
             Row(
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 4.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.pinkAccent,
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Text(
-                    "☆ Pro User",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: Typo.medium,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10.sp,
-                    ),
-                  ),
-                ),
+                // Container(
+                //   padding: EdgeInsets.symmetric(
+                //     horizontal: 10.w,
+                //     vertical: 4.h,
+                //   ),
+                //   decoration: BoxDecoration(
+                //     color: Colors.pinkAccent,
+                //     borderRadius: BorderRadius.circular(20.r),
+                //   ),
+                //   child: Text(
+                //     "☆ Pro User",
+                //     style: TextStyle(
+                //       color: Colors.white,
+                //       fontFamily: Typo.medium,
+                //       fontWeight: FontWeight.bold,
+                //       fontSize: 10.sp,
+                //     ),
+                //   ),
+                // ),
                 10.horizontalSpace,
                 Text(
-                  "70% Match",
+                  match ?? "",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14.sp,
@@ -91,7 +109,7 @@ class ProfileCard extends StatelessWidget {
 
             // Name + Age
             Text(
-              "Ananya Pandey, 35",
+              "$name, $age",
               style: TextStyle(
                 fontSize: 28.sp,
                 fontFamily: Typo.playfairDisplayRegular,
@@ -104,7 +122,7 @@ class ProfileCard extends StatelessWidget {
 
             // Occupation + Location
             Text(
-              "Fashion Designer · Nashik",
+              "$profession · $district",
               style: TextStyle(fontSize: 16.sp, color: Colors.white70),
             ),
 
@@ -113,12 +131,10 @@ class ProfileCard extends StatelessWidget {
             // Tags
             Wrap(
               spacing: 8.w,
-
-              children: [
-                _buildTag("#Early bird"),
-                _buildTag("#Fitness enthusiast"),
-                _buildTag("#Non-smoker"),
-              ],
+              children: List.generate(
+                hobbies!.length,
+                (index) => _buildTag("#${hobbies![index]}"),
+              ),
             ),
             20.verticalSpace,
 
@@ -154,7 +170,11 @@ class ProfileCard extends StatelessWidget {
                     onTap: () {
                       router.goNamed(
                         Routes.profileDetail.name,
-                        pathParameters: {"mode": ProfileMode.viewOther.name},
+
+                        pathParameters: {
+                          "mode": ProfileMode.viewOther.name,
+                          "id": id.toString(),
+                        },
                       );
                     },
                     child: Container(

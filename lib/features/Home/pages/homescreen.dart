@@ -2,6 +2,10 @@ import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:bandhana/features/Home/bloc/home_bloc.dart';
+import 'package:bandhana/features/Home/bloc/home_event.dart';
+import 'package:bandhana/features/Home/bloc/home_state.dart';
+import 'package:bandhana/features/Home/models/home_user_model.dart';
 import 'package:bandhana/features/Home/widgets/profile_card.dart';
 import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
 import 'package:bandhana/features/master_apis/bloc/master_event.dart';
@@ -23,9 +27,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // fire both APIs on home load
+    // fire APIs once on home load
     context.read<MasterBloc>().add(GetProfileDetailsEvent());
     context.read<MasterBloc>().add(GetProfileSetupEvent());
+    context.read<HomeBloc>().add(FetchUsersEvent()); // ✅ moved from build
   }
 
   @override
@@ -42,7 +47,57 @@ class _HomeScreenState extends State<HomeScreen> {
                 10.verticalSpace,
                 _buildTitle(),
                 25.verticalSpace,
-                _buildMatchesList(),
+                BlocBuilder<HomeBloc, HomeState>(
+                  builder: (context, state) {
+                    if (state is FetchUsersLoadingState) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) => const ProfileCard(
+                          id: "",
+                          image: "https://i.sstatic.net/GsDIl.jpg",
+                          age: "20",
+                          district: "Nashik",
+                          match: "90% match",
+                          name: "Shivam",
+                          profession: "edfs",
+                          hobbies: [],
+                        ),
+                        itemCount: 10,
+                      );
+                    } else if (state is FetchUserLoadedState) {
+                      final users = state.list;
+                      if (users.isEmpty) {
+                        return const Center(child: Text("No matches found"));
+                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          final user = users[index];
+                          return ProfileCard(
+                            id: user.userId.toString(),
+                            image: user.profileUrl1,
+                            age: user.age?.toString() ?? "-",
+                            district: user.district ?? "-",
+                            match: "${user.matchPercentage ?? 0}% match",
+                            name: user.fullname ?? "Unknown",
+                            profession: user.profession ?? "-",
+                            hobbies: user.hobbies!
+                                .map((e) => e.hobbyName)
+                                .toList(),
+                          );
+                        },
+                      );
+                    } else if (state is FetchUserFailureState) {
+                      return const Center(child: Text("Failed to load users"));
+                    }
+
+                    // ✅ cover initial state explicitly
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
               ],
             ),
           ),
@@ -78,15 +133,17 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               const Icon(Icons.notifications_outlined, color: Colors.white),
               10.horizontalSpace,
-              IconButton.filled(
-                style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.white),
+              Builder(
+                builder: (ctx) => IconButton.filled(
+                  style: const ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(Colors.white),
+                  ),
+                  color: Colors.black,
+                  onPressed: () {
+                    Scaffold.maybeOf(ctx)?.openEndDrawer();
+                  },
+                  icon: const Icon(Icons.menu),
                 ),
-                color: Colors.black,
-                onPressed: () {
-                  Scaffold.of(context).openEndDrawer();
-                },
-                icon: const Icon(Icons.menu),
               ),
             ],
           ),
@@ -106,15 +163,15 @@ class _HomeScreenState extends State<HomeScreen> {
         if (state is GetProfileSetupLoadingState) {
           return _loadingAvatar();
         } else if (state is GetProfileSetupLoadedState) {
-          return CircleAvatar(
-            radius: 21,
-            backgroundImage: state.profileSetup.profileUrl1 != null
-                ? CachedNetworkImageProvider(state.profileSetup.profileUrl1!)
-                : null,
-            child: state.profileSetup.profileUrl1 == null
-                ? const Icon(Icons.person)
-                : null,
-          );
+          final url = state.profileSetup.profileUrl1;
+          if (url != null && url.isNotEmpty) {
+            return CircleAvatar(
+              radius: 21,
+              backgroundImage: CachedNetworkImageProvider(url),
+            );
+          } else {
+            return const CircleAvatar(radius: 21, child: Icon(Icons.person));
+          }
         }
         return const CircleAvatar(radius: 21, child: Icon(Icons.person));
       },
@@ -237,30 +294,6 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.black,
             fontSize: 18.sp,
           ),
-        ),
-      ],
-    );
-  }
-
-  /// 🔹 Matches List (temporary hardcoded)
-  Widget _buildMatchesList() {
-    return Column(
-      children: const [
-        ProfileCard(
-          image:
-              "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202411/ananya-panday-wears-a-rohit-bal-outfit-to-a-wedding-072542900-1x1.jpg",
-        ),
-        ProfileCard(
-          image:
-              "https://static.toiimg.com/thumb/119251396/119251396.jpg?height=746&width=420",
-        ),
-        ProfileCard(
-          image:
-              "https://i.pinimg.com/736x/6f/62/2c/6f622c7f81a2ccdcae10897d5d981e53.jpg",
-        ),
-        ProfileCard(
-          image:
-              "https://i.pinimg.com/736x/4d/b7/66/4db7663736311173d3b3ae36fc4807f9.jpg",
         ),
       ],
     );

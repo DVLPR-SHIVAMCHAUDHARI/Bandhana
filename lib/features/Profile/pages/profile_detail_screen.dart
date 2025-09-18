@@ -12,17 +12,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileDetailedScreen extends StatelessWidget {
-  const ProfileDetailedScreen({super.key, required this.mode});
+  const ProfileDetailedScreen({
+    super.key,
+    required this.mode,
+    required this.id,
+  });
   final String mode;
+  final String id;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ProfileDetailBloc()
-        ..add(
-          // 🔹 initialize first avatar
-          SwitchImageEvent(0),
-        ),
+      create: (_) => ProfileDetailBloc()..add(SwitchImageEvent(0)),
       child: Scaffold(
         body: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),

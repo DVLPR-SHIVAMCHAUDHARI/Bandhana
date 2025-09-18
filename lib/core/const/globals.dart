@@ -13,6 +13,7 @@ import 'package:bandhana/features/Chat/pages/chat_list_screen.dart';
 import 'package:bandhana/features/Chat/pages/chat_screen.dart';
 import 'package:bandhana/features/Discover/pages/discover_screen.dart';
 import 'package:bandhana/features/DocumentVerification/pages/document_verification_screen.dart';
+import 'package:bandhana/features/Home/bloc/home_bloc.dart';
 import 'package:bandhana/features/Home/pages/homescreen.dart';
 import 'package:bandhana/features/HomeAnimation/pages/home_animation_screen.dart';
 import 'package:bandhana/features/Onboarding/pages/first_welcome_screen.dart';
@@ -84,7 +85,7 @@ BuildContext get appContext => navigatorKey.currentState!.context;
 
 GoRouter router = GoRouter(
   navigatorKey: navigatorKey,
-  // initialLocation: "docVerification",
+  // initialLocation: "/register/profilesetup",
   routes: [
     GoRoute(
       path: "/",
@@ -131,7 +132,11 @@ GoRouter router = GoRouter(
       routes: [
         GoRoute(
           path: "/homescreen",
-          builder: (context, state) => HomeScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => HomeBloc(),
+
+            child: HomeScreen(),
+          ),
           name: Routes.homescreen.name,
         ),
         GoRoute(
@@ -152,15 +157,22 @@ GoRouter router = GoRouter(
       ],
     ),
     GoRoute(
-      path: "/profileDetail/:mode",
-      builder: (context, state) => BlocProvider(
-        create: (context) => ProfileDetailBloc(),
-        child: ProfileDetailedScreen(
-          mode: state.pathParameters['mode'] ?? "viewOther",
-        ),
-      ),
+      path: "/profileDetail/:mode/:id",
       name: Routes.profileDetail.name,
+      builder: (context, state) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => ProfileDetailBloc()),
+            BlocProvider(create: (context) => HomeBloc()),
+          ],
+          child: ProfileDetailedScreen(
+            id: state.pathParameters['id'] ?? "1",
+            mode: state.pathParameters['mode'] ?? "viewOther",
+          ),
+        );
+      },
     ),
+
     GoRoute(
       path: "/messageRequested",
       builder: (context, state) => MessageRequestedScreen(),

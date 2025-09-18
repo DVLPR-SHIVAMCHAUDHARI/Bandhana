@@ -21,7 +21,7 @@ class ProfileSetupBloc extends Bloc<ProfileSetupEvent, ProfileSetupState> {
           limit: event.limit ?? 5,
         );
 
-        if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        if (pickedFiles.isNotEmpty) {
           final remainingSlots = 5 - _images.length;
           final filesToAdd = pickedFiles.take(remainingSlots).toList();
           _images.addAll(filesToAdd);

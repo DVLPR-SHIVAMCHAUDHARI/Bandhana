@@ -153,8 +153,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           builder: (context, setupState) {
             // picked images from ProfileSetupBloc (local / selected)
             List pickedImages = [];
-            if (setupState is PickImageLoadedState)
+            if (setupState is PickImageLoadedState) {
               pickedImages = setupState.images;
+            }
 
             // server gallery images from _profileSetup (profileUrl2..profileUrl5)
             final List<String> serverGallery = [

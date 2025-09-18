@@ -153,7 +153,7 @@ class MasterRepo extends Repository {
 
   getProfileDetail() async {
     try {
-      var response = await dio.post("/profile/get-profile-details");
+      var response = await dio.get("/profile/get-profile-details");
 
       if (response.data["Response"]["Status"]["StatusCode"] == "0") {
         return {
@@ -174,7 +174,7 @@ class MasterRepo extends Repository {
 
   getProfileSetup() async {
     try {
-      var response = await dio.post("/profile/get-profile-setup");
+      var response = await dio.get("/profile/get-profile-setup");
 
       if (response.data["Response"]["Status"]["StatusCode"] == "0") {
         return {
