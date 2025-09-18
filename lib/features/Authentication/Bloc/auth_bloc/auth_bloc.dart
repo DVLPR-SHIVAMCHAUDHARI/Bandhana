@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_event.dart';
 import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_state.dart';
@@ -33,6 +35,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       var response = await repo.signIn(number: event.phone);
       if (response["status"] == "success") {
+        log("signin");
         emit(SignInLoadedState(response["message"]));
       } else {
         logger.e(response["status"]);

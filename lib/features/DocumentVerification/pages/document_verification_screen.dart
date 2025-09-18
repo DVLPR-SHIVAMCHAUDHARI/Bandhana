@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/features/DocumentVerification/bloc/upload_bloc.dart';
 import 'package:bandhana/features/DocumentVerification/bloc/upload_event.dart';

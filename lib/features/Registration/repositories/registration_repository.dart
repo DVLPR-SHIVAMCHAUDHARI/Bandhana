@@ -1,7 +1,6 @@
 import 'package:bandhana/core/const/user_model.dart';
 import 'package:bandhana/core/repository/repository.dart';
 import 'package:bandhana/core/services/local_db_sevice.dart';
-import 'package:bandhana/features/Registration/pages/family_details_screen.dart';
 
 class RegistrationRepository extends Repository {
   registerUser({
@@ -137,7 +136,8 @@ Future<void> updateprofileDetailFlag() async {
       profileDetails: 1, //update this
       profileSetup: currentUser.profileSetup,
       documentVerification: currentUser.documentVerification,
-      partnerDetails: currentUser.partnerDetails,
+      partnerExpectations: currentUser.partnerExpectations,
+
       partnerLifeStyle: currentUser.partnerLifeStyle,
       familyDetails: currentUser.familyDetails,
     );

@@ -78,7 +78,8 @@ Future<void> updateFamilyDetailsFlag() async {
     profileDetails: currentUser.profileDetails,
     profileSetup: currentUser.profileSetup,
     documentVerification: currentUser.documentVerification,
-    partnerDetails: currentUser.partnerDetails,
+    partnerExpectations: currentUser.partnerExpectations,
+
     partnerLifeStyle: currentUser.partnerLifeStyle,
     familyDetails: 1, // ✅ update this
   );

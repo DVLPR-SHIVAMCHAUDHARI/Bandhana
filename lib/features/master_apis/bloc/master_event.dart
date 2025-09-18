@@ -78,3 +78,6 @@ class GetFamilyStatusEvent extends MasterEvent {}
 
 //profileDetails
 class GetProfileDetailsEvent extends MasterEvent {}
+
+//profileSetup
+class GetProfileSetupEvent extends MasterEvent {}

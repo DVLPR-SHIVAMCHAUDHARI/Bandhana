@@ -70,7 +70,8 @@ Future<void> updateprofileSetupFlag() async {
       profileDetails: currentUser.profileDetails,
       profileSetup: currentUser.profileSetup,
       documentVerification: 1,
-      partnerDetails: currentUser.partnerDetails,
+      partnerExpectations: currentUser.partnerExpectations,
+
       partnerLifeStyle: currentUser.partnerLifeStyle,
       familyDetails: currentUser.familyDetails,
     );

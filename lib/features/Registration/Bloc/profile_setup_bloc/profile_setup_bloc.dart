@@ -7,7 +7,7 @@ import 'profile_setup_event.dart';
 import 'profile_setup_state.dart';
 
 class ProfileSetupBloc extends Bloc<ProfileSetupEvent, ProfileSetupState> {
-  List<XFile> _images = []; // Bloc-owned image list
+  final List<XFile> _images = []; // Bloc-owned image list
   Map<String, dynamic> profileData = {};
   final ProfileSetupRepository repo = ProfileSetupRepository();
 
@@ -17,7 +17,7 @@ class ProfileSetupBloc extends Bloc<ProfileSetupEvent, ProfileSetupState> {
       try {
         emit(PickImageLoadingState());
         final ImagePicker picker = ImagePicker();
-        final List<XFile>? pickedFiles = await picker.pickMultiImage(
+        final List<XFile> pickedFiles = await picker.pickMultiImage(
           limit: event.limit ?? 5,
         );
 

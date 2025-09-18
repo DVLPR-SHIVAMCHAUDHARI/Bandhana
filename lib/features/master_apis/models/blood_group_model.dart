@@ -1,4 +1,3 @@
-
 class BloodGroupModel {
   int? id;
   String? bloodGroup;
@@ -8,16 +7,16 @@ class BloodGroupModel {
   BloodGroupModel({this.id, this.bloodGroup, this.isDeleted, this.createdAt});
 
   BloodGroupModel.fromJson(Map<String, dynamic> json) {
-    if(json["id"] is int) {
+    if (json["id"] is int) {
       id = json["id"];
     }
-    if(json["blood_group"] is String) {
+    if (json["blood_group"] is String) {
       bloodGroup = json["blood_group"];
     }
-    if(json["is_deleted"] is int) {
+    if (json["is_deleted"] is int) {
       isDeleted = json["is_deleted"];
     }
-    if(json["created_at"] is String) {
+    if (json["created_at"] is String) {
       createdAt = json["created_at"];
     }
   }
@@ -27,11 +26,11 @@ class BloodGroupModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["blood_group"] = bloodGroup;
-    _data["is_deleted"] = isDeleted;
-    _data["created_at"] = createdAt;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["id"] = id;
+    data["blood_group"] = bloodGroup;
+    data["is_deleted"] = isDeleted;
+    data["created_at"] = createdAt;
+    return data;
   }
 }

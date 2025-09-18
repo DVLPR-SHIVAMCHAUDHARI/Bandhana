@@ -1,4 +1,3 @@
-
 class FamilyTypeModel {
   int? id;
   String? familyType;
@@ -8,16 +7,16 @@ class FamilyTypeModel {
   FamilyTypeModel({this.id, this.familyType, this.isDeleted, this.createdAt});
 
   FamilyTypeModel.fromJson(Map<String, dynamic> json) {
-    if(json["id"] is int) {
+    if (json["id"] is int) {
       id = json["id"];
     }
-    if(json["family_type"] is String) {
+    if (json["family_type"] is String) {
       familyType = json["family_type"];
     }
-    if(json["is_deleted"] is int) {
+    if (json["is_deleted"] is int) {
       isDeleted = json["is_deleted"];
     }
-    if(json["created_at"] is String) {
+    if (json["created_at"] is String) {
       createdAt = json["created_at"];
     }
   }
@@ -27,11 +26,11 @@ class FamilyTypeModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["family_type"] = familyType;
-    _data["is_deleted"] = isDeleted;
-    _data["created_at"] = createdAt;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["id"] = id;
+    data["family_type"] = familyType;
+    data["is_deleted"] = isDeleted;
+    data["created_at"] = createdAt;
+    return data;
   }
 }

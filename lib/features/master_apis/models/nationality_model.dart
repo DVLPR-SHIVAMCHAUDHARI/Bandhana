@@ -1,4 +1,3 @@
-
 class NationalityModel {
   int? id;
   String? nationality;
@@ -7,25 +6,32 @@ class NationalityModel {
   int? isDeleted;
   String? createdAt;
 
-  NationalityModel({this.id, this.nationality, this.nationalityCode, this.mobileCode, this.isDeleted, this.createdAt});
+  NationalityModel({
+    this.id,
+    this.nationality,
+    this.nationalityCode,
+    this.mobileCode,
+    this.isDeleted,
+    this.createdAt,
+  });
 
   NationalityModel.fromJson(Map<String, dynamic> json) {
-    if(json["id"] is int) {
+    if (json["id"] is int) {
       id = json["id"];
     }
-    if(json["nationality"] is String) {
+    if (json["nationality"] is String) {
       nationality = json["nationality"];
     }
-    if(json["nationality_code"] is String) {
+    if (json["nationality_code"] is String) {
       nationalityCode = json["nationality_code"];
     }
-    if(json["mobile_code"] is String) {
+    if (json["mobile_code"] is String) {
       mobileCode = json["mobile_code"];
     }
-    if(json["is_deleted"] is int) {
+    if (json["is_deleted"] is int) {
       isDeleted = json["is_deleted"];
     }
-    if(json["created_at"] is String) {
+    if (json["created_at"] is String) {
       createdAt = json["created_at"];
     }
   }
@@ -35,13 +41,13 @@ class NationalityModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["nationality"] = nationality;
-    _data["nationality_code"] = nationalityCode;
-    _data["mobile_code"] = mobileCode;
-    _data["is_deleted"] = isDeleted;
-    _data["created_at"] = createdAt;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["id"] = id;
+    data["nationality"] = nationality;
+    data["nationality_code"] = nationalityCode;
+    data["mobile_code"] = mobileCode;
+    data["is_deleted"] = isDeleted;
+    data["created_at"] = createdAt;
+    return data;
   }
 }

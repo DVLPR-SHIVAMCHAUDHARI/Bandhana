@@ -193,7 +193,7 @@ class OtpVerificationScreen extends StatelessWidget {
                           } else if (user.documentVerification == 0) {
                             router.goNamed(Routes.docVerification.name);
                             return;
-                          } else if (user.partnerDetails == 0) {
+                          } else if (user.partnerExpectations == 0) {
                             router.goNamed(Routes.compatablity1.name);
                             return;
                           } else if (user.partnerLifeStyle == 0) {

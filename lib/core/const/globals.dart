@@ -9,7 +9,6 @@ import 'package:bandhana/features/Authentication/pages/signup_screen.dart';
 import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_bloc.dart';
 import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_screen1.dart';
 import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_screen2.dart';
-import 'package:bandhana/features/BasicCompatiblity/repositories/basic_compatiblity_repository.dart';
 import 'package:bandhana/features/Chat/pages/chat_list_screen.dart';
 import 'package:bandhana/features/Chat/pages/chat_screen.dart';
 import 'package:bandhana/features/Discover/pages/discover_screen.dart';
@@ -132,7 +131,7 @@ GoRouter router = GoRouter(
       routes: [
         GoRoute(
           path: "/homescreen",
-          builder: (context, state) => Homescreen(),
+          builder: (context, state) => HomeScreen(),
           name: Routes.homescreen.name,
         ),
         GoRoute(

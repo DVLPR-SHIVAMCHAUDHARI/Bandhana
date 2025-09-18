@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:bandhana/core/const/user_model.dart';
 import 'package:bandhana/core/services/local_db_sevice.dart';
 import 'package:dio/dio.dart';
@@ -80,7 +79,8 @@ Future<void> updateprofileSetupFlag() async {
       profileDetails: currentUser.profileDetails,
       profileSetup: 1, //uppdate this
       documentVerification: currentUser.documentVerification,
-      partnerDetails: currentUser.partnerDetails,
+      partnerExpectations: currentUser.partnerExpectations,
+
       partnerLifeStyle: currentUser.partnerLifeStyle,
       familyDetails: currentUser.familyDetails,
     );

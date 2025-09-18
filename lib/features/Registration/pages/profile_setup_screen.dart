@@ -7,7 +7,6 @@ import 'package:bandhana/core/const/snack_bar.dart';
 import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
 import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
-import 'package:bandhana/features/BasicCompatiblity/repositories/basic_compatiblity_repository.dart';
 import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_bloc.dart';
 import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_event.dart';
 import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_state.dart';
@@ -20,7 +19,6 @@ import 'package:bandhana/features/master_apis/models/salary_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});

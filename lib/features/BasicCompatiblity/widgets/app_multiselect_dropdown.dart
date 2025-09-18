@@ -20,7 +20,7 @@ class MultiSelectDropdown extends FormField<List<String>> {
                }
              : null,
          builder: (FormFieldState<List<String>> state) {
-           void _openMultiSelectDialog(BuildContext context) async {
+           void openMultiSelectDialog(BuildContext context) async {
              List<String> tempSelected = List.from(state.value ?? []);
 
              final List<String>? results = await showDialog(
@@ -79,7 +79,7 @@ class MultiSelectDropdown extends FormField<List<String>> {
            }
 
            return InkWell(
-             onTap: () => _openMultiSelectDialog(state.context),
+             onTap: () => openMultiSelectDialog(state.context),
              child: InputDecorator(
                decoration: InputDecoration(
                  labelText: hintText,
@@ -110,13 +110,13 @@ class MultiSelectDropdown extends FormField<List<String>> {
                            onChanged(newList);
                          },
                        );
-                     }).toList(),
+                     }),
 
                      /// ✅ Make "Select More +" clickable
                      ActionChip(
                        label: const Text("Select More +"),
                        backgroundColor: AppColors.primaryOpacity,
-                       onPressed: () => _openMultiSelectDialog(state.context),
+                       onPressed: () => openMultiSelectDialog(state.context),
                      ),
                    ],
                  ],

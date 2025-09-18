@@ -6,6 +6,7 @@ import 'package:bandhana/features/master_apis/models/gender_model.dart';
 import 'package:bandhana/features/master_apis/models/hobby_model.dart';
 import 'package:bandhana/features/master_apis/models/marital_model.dart';
 import 'package:bandhana/features/master_apis/models/nationality_model.dart';
+import 'package:bandhana/features/master_apis/models/profile_setup_model.dart';
 import 'package:bandhana/features/master_apis/models/salary_model.dart';
 import 'package:bandhana/features/master_apis/models/state_model.dart';
 import 'package:bandhana/features/master_apis/models/user_detail_model.dart';
@@ -259,29 +260,35 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
     on<GetProfileDetailsEvent>((event, emit) async {
       emit(GetProfileDetailsLoadingState());
       try {
-        UserDetailModel result = await repo.getProfileDetail();
-
-        emit(GetProfileDetailsLoadedState(result));
+        final result = await repo.getProfileDetail();
+        if (result["status"] == "Success") {
+          UserDetailModel model = UserDetailModel.fromJson(result["response"]);
+          emit(GetProfileDetailsLoadedState(model));
+        } else {
+          emit(GetProfileDetailsErrorState(result["response"].toString()));
+        }
       } catch (e) {
         emit(GetProfileDetailsErrorState(e.toString()));
       }
     });
 
+    on<GetProfileSetupEvent>((event, emit) async {
+      emit(GetProfileSetupLoadingState());
+      try {
+        final result = await repo.getProfileSetup();
+        if (result["status"] == "Success") {
+          ProfileSetupModel model = ProfileSetupModel.fromJson(
+            result["response"],
+          );
+          emit(GetProfileSetupLoadedState(model));
+        } else {
+          emit(GetProfileSetupErrorState(result["response"].toString()));
+        }
+      } catch (e) {
+        emit(GetProfileSetupErrorState(e.toString()));
+      }
+    });
+
     // 🔥 Load initial events safely
-    add(GetNationalityEvent());
-    add(GetGenderEvent());
-    add(GetReligionEvent());
-    add(GetMaritalStatusEvent());
-    add(GetMotherTongueEvent());
-    add(GetBloodGroupEvent());
-    add(GetEducationEvent());
-    add(GetProfessionEvent());
-    add(GetHobbiesEvent());
-    add(GetZodiacEvent());
-    add(GetSalaryEvent());
-    add(GetFamilyTypeEvent());
-    add(GetFamilyStatusEvent());
-    add(GetFamilyValuesEvent());
-    add(GetProfileDetailsEvent());
   }
 }

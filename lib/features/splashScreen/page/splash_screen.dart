@@ -57,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
         } else if (user.familyDetails == 0) {
           router.goNamed(Routes.familyDetails.name);
           return;
-        } else if (user.partnerDetails == 0) {
+        } else if (user.partnerExpectations == 0) {
           router.goNamed(Routes.compatablity1.name);
           return;
         } else if (user.partnerLifeStyle == 0) {

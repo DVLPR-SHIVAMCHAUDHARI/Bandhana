@@ -73,7 +73,7 @@ Future<void> _updateLifestylePreferencesFlag() async {
       profileDetails: currentUser.profileDetails,
       profileSetup: currentUser.profileSetup,
       documentVerification: currentUser.documentVerification,
-      partnerDetails: currentUser.partnerDetails,
+      partnerExpectations: currentUser.partnerExpectations,
       partnerLifeStyle: 1,
       familyDetails: currentUser.familyDetails,
 
@@ -96,7 +96,7 @@ Future<void> _updatePreferencesFlag() async {
       profileDetails: currentUser.profileDetails,
       profileSetup: currentUser.profileSetup,
       documentVerification: currentUser.documentVerification,
-      partnerDetails: 1,
+      isDocumentVerification: 1,
       partnerLifeStyle: currentUser.partnerLifeStyle,
       familyDetails: currentUser.familyDetails,
 

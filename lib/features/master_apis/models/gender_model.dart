@@ -1,4 +1,3 @@
-
 class GenderModel {
   int? id;
   String? name;
@@ -8,16 +7,16 @@ class GenderModel {
   GenderModel({this.id, this.name, this.isDeleted, this.createdAt});
 
   GenderModel.fromJson(Map<String, dynamic> json) {
-    if(json["id"] is int) {
+    if (json["id"] is int) {
       id = json["id"];
     }
-    if(json["name"] is String) {
+    if (json["name"] is String) {
       name = json["name"];
     }
-    if(json["is_deleted"] is int) {
+    if (json["is_deleted"] is int) {
       isDeleted = json["is_deleted"];
     }
-    if(json["created_at"] is String) {
+    if (json["created_at"] is String) {
       createdAt = json["created_at"];
     }
   }
@@ -27,11 +26,11 @@ class GenderModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["name"] = name;
-    _data["is_deleted"] = isDeleted;
-    _data["created_at"] = createdAt;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["id"] = id;
+    data["name"] = name;
+    data["is_deleted"] = isDeleted;
+    data["created_at"] = createdAt;
+    return data;
   }
 }

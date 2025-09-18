@@ -4,14 +4,11 @@ import 'package:bandhana/features/master_apis/models/family_type_model.dart';
 import 'package:bandhana/features/master_apis/models/family_values_model.dart';
 import 'package:bandhana/features/master_apis/models/gender_model.dart';
 import 'package:bandhana/features/master_apis/models/nationality_model.dart';
+import 'package:bandhana/features/master_apis/models/profile_setup_model.dart';
 import 'package:bandhana/features/master_apis/models/salary_model.dart';
 import 'package:bandhana/features/master_apis/models/state_model.dart';
 import 'package:bandhana/features/master_apis/models/user_detail_model.dart';
 import 'package:equatable/equatable.dart';
-import 'package:bandhana/features/master_apis/models/district_model.dart';
-import 'package:bandhana/features/master_apis/models/gender_model.dart';
-import 'package:bandhana/features/master_apis/models/nationality_model.dart';
-import 'package:bandhana/features/master_apis/models/state_model.dart';
 import 'package:bandhana/features/master_apis/models/zodiac_model.dart';
 import 'package:bandhana/features/master_apis/models/religion_model.dart';
 import 'package:bandhana/features/master_apis/models/caste_model.dart';
@@ -21,7 +18,6 @@ import 'package:bandhana/features/master_apis/models/blood_group_model.dart';
 import 'package:bandhana/features/master_apis/models/education_model.dart';
 import 'package:bandhana/features/master_apis/models/profession_model.dart';
 import 'package:bandhana/features/master_apis/models/hobby_model.dart';
-import 'package:equatable/equatable.dart';
 
 abstract class MasterState extends Equatable {}
 
@@ -405,6 +401,27 @@ class GetProfileDetailsLoadedState extends MasterState {
 class GetProfileDetailsErrorState extends MasterState {
   final String message;
   GetProfileDetailsErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+// 🎨 ProfileSetup
+class GetProfileSetupLoadingState extends MasterState {
+  @override
+  List<Object?> get props => [];
+}
+
+class GetProfileSetupLoadedState extends MasterState {
+  final ProfileSetupModel profileSetup;
+  GetProfileSetupLoadedState(this.profileSetup);
+
+  @override
+  List<Object?> get props => [profileSetup];
+}
+
+class GetProfileSetupErrorState extends MasterState {
+  final String message;
+  GetProfileSetupErrorState(this.message);
   @override
   List<Object?> get props => [message];
 }
