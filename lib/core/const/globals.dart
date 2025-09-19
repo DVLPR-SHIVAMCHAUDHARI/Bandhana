@@ -14,6 +14,7 @@ import 'package:bandhana/features/Chat/pages/chat_screen.dart';
 import 'package:bandhana/features/Discover/pages/discover_screen.dart';
 import 'package:bandhana/features/DocumentVerification/pages/document_verification_screen.dart';
 import 'package:bandhana/features/Home/bloc/home_bloc.dart';
+import 'package:bandhana/features/Home/bloc/home_event.dart';
 import 'package:bandhana/features/Home/pages/homescreen.dart';
 import 'package:bandhana/features/HomeAnimation/pages/home_animation_screen.dart';
 import 'package:bandhana/features/Onboarding/pages/first_welcome_screen.dart';

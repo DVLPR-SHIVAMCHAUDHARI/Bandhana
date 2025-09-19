@@ -188,8 +188,10 @@ class RequestCard extends StatelessWidget {
                   onTap: () {
                     router.goNamed(
                       Routes.profileDetail.name,
+
                       pathParameters: {
-                        "mode": ProfileMode.incomingRequest.name,
+                        "mode": ProfileMode.viewOther.name,
+                        "id": 1.toString(),
                       },
                     );
                   },

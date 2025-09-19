@@ -2,6 +2,10 @@ import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:bandhana/features/Home/bloc/home_bloc.dart';
+import 'package:bandhana/features/Home/bloc/home_event.dart';
+import 'package:bandhana/features/Home/bloc/home_state.dart';
+import 'package:bandhana/features/Home/models/home_user_model.dart';
 import 'package:bandhana/features/Profile/bloc/profile_detail_bloc.dart';
 import 'package:bandhana/features/Profile/bloc/profile_detail_event.dart';
 import 'package:bandhana/features/Profile/bloc/profile_detail_state.dart';
@@ -17,280 +21,52 @@ class ProfileDetailedScreen extends StatelessWidget {
     required this.mode,
     required this.id,
   });
+
   final String mode;
   final String id;
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ProfileDetailBloc()..add(SwitchImageEvent(0)),
+    // Fetch users if not already fetched
+    context.read<HomeBloc>().add(FetchUsersEvent());
+
+    return MultiBlocProvider(
+      providers: [BlocProvider(create: (_) => ProfileDetailBloc())],
       child: Scaffold(
-        body: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 🔹 Main Image + overlay UI
-              Stack(
-                children: [
-                  BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
-                    builder: (context, state) {
-                      if (state is SwitchImageState) {
-                        return CachedNetworkImage(
-                          imageUrl: state.avatars[state.selectedIndex]['url'],
-                          imageBuilder: (context, imageProvider) => Container(
-                            height: 500.h,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          placeholder: (context, url) =>
-                              Container(height: 500.h, color: Colors.grey[200]),
-                          errorWidget: (context, url, error) =>
-                              Container(height: 500.h, color: Colors.grey),
-                        );
-                      }
-                      return Container(
-                        height: 500.h,
-                        color: Colors.grey,
-                        alignment: Alignment.center,
-                        child: const Text("something went wrong"),
-                      );
-                    },
-                  ),
-                  Container(
-                    height: 500.h,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.2),
-                          Colors.black.withOpacity(0.6),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 50.h,
-                    left: 16.w,
-                    child: IconButton(
-                      onPressed: () => router.goNamed(Routes.homescreen.name),
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    ),
-                  ),
-                  Positioned(
-                    top: 50.h,
-                    right: 16.w,
-                    child: const CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.favorite_border, color: Colors.black),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 90.h,
-                    left: 24.w,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8.w,
-                                vertical: 4.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              child: const Text(
-                                "☆ Pro User",
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Text(
-                              "70% Match",
-                              style: TextStyle(
-                                fontFamily: Typo.medium,
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          "Ananya Pandey",
-                          style: TextStyle(
-                            fontFamily: Typo.playfairSemiBold,
-                            fontSize: 28.sp,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Nashik, Age: 35",
-                          style: TextStyle(
-                            fontFamily: Typo.medium,
+        body: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            if (state is FetchUsersLoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is FetchUserFailureState) {
+              return Center(child: Text(state.message!));
+            } else if (state is FetchUserLoadedState) {
+              // Find user by ID
+              final HomeUserModel user = state.list.firstWhere(
+                (u) => u.userId.toString() == id,
+                orElse: () => state.list.first,
+              );
 
-                            color: Colors.white,
-                            fontSize: 18.sp,
-                          ),
-                        ),
-                        Text(
-                          "Fashion Designer",
-                          style: TextStyle(
-                            fontFamily: Typo.medium,
-
-                            color: Colors.white,
-                            fontSize: 16.sp,
-                          ),
-                        ),
-                        6.verticalSpace,
-                        Text(
-                          "#Early Bird · Fitness Enthusiast · Non-Smoker",
-                          style: TextStyle(
-                            fontFamily: Typo.medium,
-
-                            color: Colors.white,
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                      ],
+              return SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildMainImage(context, user),
+                    Transform.translate(
+                      offset: Offset(0, -40),
+                      child: _buildAvatarStack(context, user),
                     ),
-                  ),
-                ],
-              ),
-
-              // 🔹 Avatar Stack
-              Transform.translate(
-                offset: Offset(0, -40),
-                child: SizedBox(
-                  height: 120.h,
-                  child: BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
-                    builder: (context, state) {
-                      if (state is SwitchImageState) {
-                        return Stack(
-                          clipBehavior: Clip.none,
-                          alignment: Alignment.center,
-                          children: List.generate(state.avatars.length, (
-                            index,
-                          ) {
-                            final avatar = state.avatars[index];
-                            return Positioned(
-                              top: avatar['top'],
-                              left: avatar['left'],
-                              right: avatar['right'],
-                              child: GestureDetector(
-                                onTap: () {
-                                  context.read<ProfileDetailBloc>().add(
-                                    SwitchImageEvent(index),
-                                  );
-                                },
-                                child: Container(
-                                  height: avatar['size'],
-                                  width: avatar['size'],
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: state.selectedIndex == index
-                                          ? AppColors.primary
-                                          : Colors.transparent,
-                                      width: 2,
-                                    ),
-                                    image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                        avatar['url'],
-                                      ),
-                                      fit: BoxFit.cover,
-                                      alignment: Alignment.topCenter,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                        );
-                      }
-                      return const SizedBox();
-                    },
-                  ),
+                    _buildProfileDetails(user),
+                  ],
                 ),
-              ),
+              );
+            }
 
-              // 🔹 Profile details
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      "70% Match With Your Profile",
-                      style: TextStyle(
-                        fontSize: 24.sp,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: Typo.playfairBold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Card(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "About Ananya",
-                          style: TextStyle(
-                            fontSize: 24.sp,
-                            fontFamily: Typo.playfairBold,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        13.verticalSpace,
-                        Text(
-                          "I believe in meaningful conversations, quiet mornings, and soulful connections. I value health, family traditions, and someone who respects individuality...",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontFamily: Typo.regular,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        35.verticalSpace,
-                        _profileDetail("Profession", "Fashion Designer"),
-                        _profileDetail(
-                          "Education",
-                          "B.A. in Design, SNDT Mumbai",
-                        ),
-                        _profileDetail("Religion", "Hindu"),
-                        _profileDetail("Caste", "Maratha"),
-                        _profileDetail("Location", "Nashik"),
-                        _profileDetail("Job Location", "Nashik"),
-                        _profileDetail("Birth Place", "Nashik"),
-                        _profileDetail("Birth Time", "01:01 PM"),
-                        _profileDetail("Zodiac", "Gemini"),
-                        _profileDetail(
-                          "Language Spoken",
-                          "Marathi, Hindi, English",
-                        ),
-                        _profileDetail("Height", "5'5\""),
-                        _profileDetail("Marital Status", "Never Married"),
-                        _profileDetail("Preferred Match", "Between 33–38"),
-                        SizedBox(height: 80.h),
-                      ],
-                    ).padding(EdgeInsetsGeometry.all(24)),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            return const SizedBox();
+          },
         ),
 
-        // 🔹 Bottom Buttons
+        // Bottom Buttons
         bottomNavigationBar: SafeArea(
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 30.h),
@@ -405,6 +181,358 @@ class ProfileDetailedScreen extends StatelessWidget {
     );
   }
 
+  // 🔹 Main Image
+  // 🔹 Main Image
+  Widget _buildMainImage(BuildContext context, HomeUserModel user) {
+    // 5 profile URLs
+    final List<String?> avatars = [
+      user.profileUrl1,
+      user.profileUrl2,
+      user.profileUrl3,
+      user.profileUrl4,
+      user.profileUrl5,
+    ];
+
+    return BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
+      builder: (context, state) {
+        String imageUrl;
+        int centerIndex = 3; // default center avatar
+
+        if (state is SwitchImageState) {
+          centerIndex = state.selectedIndex;
+          imageUrl = state.avatars[centerIndex]['url'];
+        } else {
+          imageUrl = avatars[centerIndex] ?? '';
+        }
+
+        return Stack(
+          children: [
+            CachedNetworkImage(
+              imageUrl: imageUrl,
+              height: 500.h,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              placeholder: (_, __) =>
+                  Container(height: 500.h, color: Colors.grey[200]),
+              errorWidget: (_, __, ___) =>
+                  Container(height: 500.h, color: Colors.grey),
+            ),
+            Container(
+              height: 500.h,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.2),
+                    Colors.black.withOpacity(0.6),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.7), // dark overlay bottom
+                  ],
+                ),
+              ),
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  50.verticalSpace,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: InkWell(
+                          onTap: () {
+                            mode == ProfileMode.viewOther.name
+                                ? router.goNamed(Routes.homescreen.name)
+                                : router.goNamed(Routes.request.name);
+                          },
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: Icon(Icons.arrow_back, color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: InkWell(
+                          onTap: () {},
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              Icons.favorite_outline,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  200.verticalSpace,
+
+                  // Pro user + Match
+                  Row(
+                    children: [
+                      // Container(
+                      //   padding: EdgeInsets.symmetric(
+                      //     horizontal: 10.w,
+                      //     vertical: 4.h,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.pinkAccent,
+                      //     borderRadius: BorderRadius.circular(20.r),
+                      //   ),
+                      //   child: Text(
+                      //     "☆ Pro User",
+                      //     style: TextStyle(
+                      //       color: Colors.white,
+                      //       fontFamily: Typo.medium,
+                      //       fontWeight: FontWeight.bold,
+                      //       fontSize: 10.sp,
+                      //     ),
+                      //   ),
+                      // ),
+                      10.horizontalSpace,
+                      Text(
+                        "${user.matchPercentage}% Match With Your Profile",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  10.verticalSpace,
+
+                  // Name + Age
+                  Text(
+                    "${user.fullname}, ${user.age}",
+                    style: TextStyle(
+                      fontSize: 28.sp,
+                      fontFamily: Typo.playfairDisplayRegular,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+
+                  5.verticalSpace,
+
+                  // Occupation + Location
+                  Text(
+                    "${user.profession} · ${user.district}",
+                    style: TextStyle(fontSize: 16.sp, color: Colors.white70),
+                  ),
+
+                  12.verticalSpace,
+
+                  // Tags
+                  Wrap(
+                    spacing: 8.w,
+                    children: List.generate(
+                      user.hobbies!.length,
+                      (index) =>
+                          _buildTag("#${user.hobbies![index].hobbyName}"),
+                    ),
+                  ),
+                  40.verticalSpace,
+                ],
+              ),
+            ),
+            // Back button, favorite icon, and text overlays...
+          ],
+        );
+      },
+    );
+  }
+
+  // 🔹 Avatar Stack
+  Widget _buildAvatarStack(BuildContext context, HomeUserModel user) {
+    final List<String?> avatars = [
+      user.profileUrl1,
+      user.profileUrl2,
+      user.profileUrl3,
+      user.profileUrl4,
+      user.profileUrl5,
+    ];
+
+    final int centerIndex = 3;
+
+    return SizedBox(
+      height: 160.h,
+      child: BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
+        builder: (context, state) {
+          // Default positions
+          List<Map<String, dynamic>> avatarPositions = List.generate(
+            avatars.length,
+            (index) => {
+              'index': index,
+              'url': avatars[index] ?? '',
+              'top': index == centerIndex
+                  ? -40.0
+                  : index == 1 || index == 2
+                  ? -20.0
+                  : 20.0,
+              'left': index == 0
+                  ? 0.0
+                  : index == 1
+                  ? 60.w
+                  : index == 2
+                  ? null
+                  : index == 3
+                  ? MediaQuery.sizeOf(context).width * 0.32.w
+                  : null,
+              'right': index == 2
+                  ? 60.w
+                  : index == 4
+                  ? 0.0
+                  : null,
+              'size': index == centerIndex ? 152.h : 100.h,
+            },
+          );
+
+          // Apply positions from state if available
+          if (state is SwitchImageState) {
+            // Keep the same fan layout for top & size
+            avatarPositions = state.avatars.map((avatar) {
+              int idx = avatar['index'];
+              return {
+                ...avatar,
+                'top': idx == centerIndex
+                    ? -40.0
+                    : idx == 1 || idx == 2
+                    ? -15.0
+                    : 20.0,
+                'size': idx == centerIndex ? 152.h : 100.h,
+              };
+            }).toList();
+          }
+
+          return Stack(
+            clipBehavior: Clip.none,
+            children: List.generate(avatarPositions.length, (index) {
+              final avatar = avatarPositions[index];
+              return Positioned(
+                top: avatar['top'],
+                left: avatar['left'],
+                right: avatar['right'],
+                child: GestureDetector(
+                  onTap: () {
+                    if (index != centerIndex) {
+                      context.read<ProfileDetailBloc>().add(
+                        SwitchImageEvent(index, avatarPositions),
+                      );
+                    }
+                  },
+                  child: Container(
+                    height: avatar['size'],
+                    width: avatar['size'],
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color:
+                            state is SwitchImageState &&
+                                state.selectedIndex == index
+                            ? AppColors.primary
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                      image: DecorationImage(
+                        image: CachedNetworkImageProvider(avatar['url']),
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 6.r,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          );
+        },
+      ),
+    );
+  }
+
+  // 🔹 Profile Details
+  Widget _buildProfileDetails(HomeUserModel user) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: Text(
+            "${user.matchPercentage}% Match With Your Profile",
+            style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.bold,
+              fontFamily: Typo.playfairBold,
+            ),
+          ),
+        ),
+        SizedBox(height: 16.h),
+        Card(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "About ${user.fullname!.split(' ').first}",
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontFamily: Typo.playfairBold,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                13.verticalSpace,
+                Text(
+                  user.bio!,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontFamily: Typo.regular,
+                    color: Colors.black87,
+                  ),
+                ),
+                35.verticalSpace,
+                _profileDetail("Profession", user.profession!),
+                _profileDetail("Education", user.education!),
+                _profileDetail("Religion", user.religion!),
+                _profileDetail("Caste", user.caste!),
+                _profileDetail("Location", user.state!),
+                _profileDetail("Job Location", user.workLocation!),
+                _profileDetail("Birth Place", user.birthPlace!),
+                _profileDetail("Birth Time", user.birthTime!),
+                _profileDetail("Zodiac", user.zodiac!),
+                _profileDetail("Language Spoken", user.motherTongue!),
+                _profileDetail("Height", "${user.height} cm"),
+                _profileDetail("Marital Status", user.maritalStatus!),
+                _profileDetail("Preferred Match", "Between 33–38"),
+                SizedBox(height: 80.h),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _profileDetail(String title, String value) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6.h),
@@ -428,4 +556,23 @@ class ProfileDetailedScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildTag(String label) {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.2),
+      borderRadius: BorderRadius.circular(16.r),
+      border: Border.all(color: Colors.white.withOpacity(0.4)),
+    ),
+    child: Text(
+      label,
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 12.sp,
+        fontFamily: Typo.medium,
+      ),
+    ),
+  );
 }

@@ -4,7 +4,10 @@ abstract class ProfileDetailEvent extends Equatable {}
 
 class SwitchImageEvent extends ProfileDetailEvent {
   final int selectedIndex;
-  SwitchImageEvent(this.selectedIndex);
+  final List<Map<String, dynamic>> avatars;
+
+  SwitchImageEvent(this.selectedIndex, this.avatars);
   @override
-  List<Object?> get props => [selectedIndex];
+  // TODO: implement props
+  List<Object?> get props => [avatars, selectedIndex];
 }
