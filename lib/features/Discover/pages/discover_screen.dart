@@ -1,10 +1,33 @@
+import 'package:bandhana/core/sharedWidgets/profile_shimmer.dart';
+import 'package:bandhana/features/Discover/bloc/discover_bloc.dart';
+import 'package:bandhana/features/Discover/bloc/discover_event.dart';
+import 'package:bandhana/features/Discover/bloc/discover_state.dart';
+import 'package:bandhana/features/Home/widgets/profile_card.dart';
+
+import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
+import 'package:bandhana/features/master_apis/bloc/master_event.dart';
 import 'package:flutter/material.dart';
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class DiscoverScreen extends StatelessWidget {
+class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
+
+  @override
+  State<DiscoverScreen> createState() => _DiscoverScreenState();
+}
+
+class _DiscoverScreenState extends State<DiscoverScreen> {
+  @override
+  void initState() {
+    context.read<MasterBloc>().add(GetProfileDetailsEvent());
+    context.read<MasterBloc>().add(GetProfileSetupEvent());
+    context.read<DiscoverBloc>().add(FetchUsersEvent());
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +49,74 @@ class DiscoverScreen extends StatelessWidget {
       ),
       body: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          physics: ClampingScrollPhysics(),
-          child: Column(children: [25.verticalSpace]),
+        child: Expanded(
+          child: RefreshIndicator(
+            onRefresh: () async {
+              // Trigger your API calls again
+              context.read<MasterBloc>().add(GetProfileDetailsEvent());
+              context.read<MasterBloc>().add(GetProfileSetupEvent());
+              context.read<DiscoverBloc>().add(FetchUsersEvent());
+
+              // Optionally wait for a short duration for smooth effect
+              await Future.delayed(const Duration(seconds: 1));
+            },
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(
+                parent: ClampingScrollPhysics(),
+              ), // ✅ needed for pull-to-refresh
+              child: Column(
+                children: [
+                  10.verticalSpace,
+
+                  25.verticalSpace,
+                  BlocBuilder<DiscoverBloc, DiscoverState>(
+                    builder: (context, state) {
+                      if (state is FetchUsersLoadingState) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) => ProfileCardShimmer(),
+                          itemCount: 10,
+                        );
+                      } else if (state is FetchUserLoadedState) {
+                        final users = state.list;
+                        if (users.isEmpty) {
+                          return const Center(child: Text("No matches found"));
+                        }
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: users.length,
+                          itemBuilder: (context, index) {
+                            final user = users[index];
+                            return ProfileCard(
+                              id: user.userId.toString(),
+                              image: user.profileUrl1,
+                              age: user.age?.toString() ?? "-",
+                              district: user.district ?? "-",
+                              match: "${user.matchPercentage ?? 0}% match",
+                              name: user.fullname ?? "Unknown",
+                              profession: user.profession ?? "-",
+                              hobbies: user.hobbies!
+                                  .map((e) => e.hobbyName)
+                                  .toList(),
+                            );
+                          },
+                        );
+                      } else if (state is FetchUserFailureState) {
+                        return const Center(
+                          child: Text("Failed to load users"),
+                        );
+                      }
+
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  ),
+                  100.verticalSpace,
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

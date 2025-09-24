@@ -34,6 +34,7 @@ class RequestScreen extends StatelessWidget {
               RequestCard(),
               RequestCard(),
               RequestCard(),
+              200.verticalSpace,
             ],
           ).paddingHorizontal(24.w),
         ),

@@ -14,7 +14,7 @@
         android:networkSecurityConfig="@xml/network_security_config">
         <meta-data
         android:name="com.razorpay.ApiKey"
-        android:value="rzp_test_RD5iHzm0q2ERFa"/>
+        android:value="fOOJcy9H2x1BXBKCJtVpf3y1"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

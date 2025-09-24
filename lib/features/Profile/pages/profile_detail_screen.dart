@@ -74,7 +74,7 @@ class ProfileDetailedScreen extends StatelessWidget {
               color: Colors.white,
               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
             ),
-            child: mode == ProfileMode.viewOther.name
+            child: mode == ProfileMode.incomingRequest.name
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -209,7 +209,7 @@ class ProfileDetailedScreen extends StatelessWidget {
           children: [
             CachedNetworkImage(
               imageUrl: imageUrl,
-              height: 500.h,
+              height: 550.h,
               width: double.infinity,
               fit: BoxFit.cover,
               placeholder: (_, __) =>
@@ -218,7 +218,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                   Container(height: 500.h, color: Colors.grey),
             ),
             Container(
-              height: 500.h,
+              height: 550.h,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,

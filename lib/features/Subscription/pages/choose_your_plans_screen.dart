@@ -62,7 +62,7 @@ class _ChooseYourPlanScreenState extends State<ChooseYourPlanScreen> {
 
   void openCheckout({required amount}) {
     var options = {
-      'key': 'rzp_test_RD5iHzm0q2ERFa',
+      'key': 'rzp_test_RLOK74js6vkzZk',
       'amount': amount, // Amount in paise
       'name': 'Bandhana',
       'description': 'Test Payment',

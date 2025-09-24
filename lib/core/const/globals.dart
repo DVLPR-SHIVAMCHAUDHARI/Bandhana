@@ -11,6 +11,7 @@ import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_scree
 import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_screen2.dart';
 import 'package:bandhana/features/Chat/pages/chat_list_screen.dart';
 import 'package:bandhana/features/Chat/pages/chat_screen.dart';
+import 'package:bandhana/features/Discover/bloc/discover_bloc.dart';
 import 'package:bandhana/features/Discover/pages/discover_screen.dart';
 import 'package:bandhana/features/DocumentVerification/pages/document_verification_screen.dart';
 import 'package:bandhana/features/Home/bloc/home_bloc.dart';
@@ -141,7 +142,10 @@ GoRouter router = GoRouter(
         ),
         GoRoute(
           path: "/discover",
-          builder: (context, state) => DiscoverScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => DiscoverBloc(),
+            child: DiscoverScreen(),
+          ),
           name: Routes.discover.name,
         ),
         GoRoute(
