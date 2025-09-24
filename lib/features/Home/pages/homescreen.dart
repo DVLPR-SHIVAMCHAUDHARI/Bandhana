@@ -5,7 +5,6 @@ import 'package:bandhana/core/const/typography.dart';
 import 'package:bandhana/features/Home/bloc/home_bloc.dart';
 import 'package:bandhana/features/Home/bloc/home_event.dart';
 import 'package:bandhana/features/Home/bloc/home_state.dart';
-import 'package:bandhana/features/Home/models/home_user_model.dart';
 import 'package:bandhana/features/Home/widgets/profile_card.dart';
 import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
 import 'package:bandhana/features/master_apis/bloc/master_event.dart';
@@ -98,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     return const Center(child: CircularProgressIndicator());
                   },
                 ),
+                100.verticalSpace,
               ],
             ),
           ),
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Text(
-                state.profileDetail.district ?? "No district",
+                state.profileDetail.districtName ?? "No district",
                 style: TextStyle(
                   fontFamily: Typo.regular,
                   color: Colors.white,

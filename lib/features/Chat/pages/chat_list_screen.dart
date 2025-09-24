@@ -22,49 +22,48 @@ class ChatListScreen extends StatelessWidget {
             fontSize: 24.sp,
           ),
         ),
-
         centerTitle: false,
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            ChatTile(
-              ontap: () {
-                router.goNamed(Routes.chat.name);
-              },
-              count: "3",
-              img:
-                  "https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg",
-              message: "Haha oh man 🤣🤣🤣",
-              name: "John Doe",
-              time: "20:00",
-            ),
-            ChatTile(
-              count: "9+",
-              img:
-                  "https://static.wikia.nocookie.net/przestepcy/images/a/a9/Iosef_Tarasov.jpg/revision/latest/thumbnail/width/360/height/450?cb=20230411203930",
-              message: "I killed the dog",
-              name: "Iosef Tarasov",
-              time: "20:00",
-            ),
-            ChatTile(
-              count: "4",
-              img:
-                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLJh47O0sASNk_wdv4a75wiNyewENK7FzD2A&s",
-              message: "Cant find my pencil ✏️",
-              name: "Bowery King",
-              time: "20:00",
-            ),
-            ChatTile(
-              count: "6",
-              img:
-                  "https://deadline.com/wp-content/uploads/2023/03/Keanu-Reeves-john-wick-4.jpg",
-              message: "Have you seen my dog? 🐕",
-              name: "John Wick",
-              time: "20:00",
-            ),
-          ],
-        ),
+      body: ListView(
+        padding: EdgeInsets.symmetric(vertical: 10.h),
+        children: [
+          ChatTile(
+            ontap: () {
+              router.goNamed(Routes.chat.name);
+            },
+            count: "3",
+            img:
+                "https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg",
+            message: "Haha oh man 🤣🤣🤣",
+            name: "John Doe",
+            time: "20:00",
+          ),
+          ChatTile(
+            count: "9+",
+            img:
+                "https://static.wikia.nocookie.net/przestepcy/images/a/a9/Iosef_Tarasov.jpg/revision/latest/thumbnail/width/360/height/450?cb=20230411203930",
+            message: "I killed the dog",
+            name: "Iosef Tarasov",
+            time: "20:00",
+          ),
+          ChatTile(
+            count: "4",
+            img:
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLJh47O0sASNk_wdv4a75wiNyewENK7FzD2A&s",
+            message: "Cant find my pencil ✏️",
+            name: "Bowery King",
+            time: "20:00",
+          ),
+          ChatTile(
+            count: "6",
+            img:
+                "https://deadline.com/wp-content/uploads/2023/03/Keanu-Reeves-john-wick-4.jpg",
+            message: "Have you seen my dog? 🐕",
+            name: "John Wick",
+            time: "20:00",
+          ),
+          SizedBox(height: 1000), // now works correctly
+        ],
       ),
     );
   }

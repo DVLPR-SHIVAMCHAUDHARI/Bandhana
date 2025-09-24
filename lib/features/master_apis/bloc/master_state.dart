@@ -1,8 +1,11 @@
+import 'package:bandhana/features/master_apis/models/basic_compatiblity_model.dart';
 import 'package:bandhana/features/master_apis/models/district_model.dart';
+import 'package:bandhana/features/master_apis/models/family_details_model.dart';
 import 'package:bandhana/features/master_apis/models/family_status_model.dart';
 import 'package:bandhana/features/master_apis/models/family_type_model.dart';
 import 'package:bandhana/features/master_apis/models/family_values_model.dart';
 import 'package:bandhana/features/master_apis/models/gender_model.dart';
+import 'package:bandhana/features/master_apis/models/lifestle_preference_model.dart';
 import 'package:bandhana/features/master_apis/models/nationality_model.dart';
 import 'package:bandhana/features/master_apis/models/profile_setup_model.dart';
 import 'package:bandhana/features/master_apis/models/salary_model.dart';
@@ -391,7 +394,7 @@ class GetProfileDetailsLoadingState extends MasterState {
 }
 
 class GetProfileDetailsLoadedState extends MasterState {
-  final UserDetailModel profileDetail;
+  final RegisterProfileModel profileDetail;
   GetProfileDetailsLoadedState(this.profileDetail);
 
   @override
@@ -422,6 +425,69 @@ class GetProfileSetupLoadedState extends MasterState {
 class GetProfileSetupErrorState extends MasterState {
   final String message;
   GetProfileSetupErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+// 🎨 FamilyDetails
+class GetFamilyDetailsLoadingState extends MasterState {
+  @override
+  List<Object?> get props => [];
+}
+
+class GetFamilyDetailsLoadedState extends MasterState {
+  final FamilyDetailsModel familyDetails;
+  GetFamilyDetailsLoadedState(this.familyDetails);
+
+  @override
+  List<Object?> get props => [familyDetails];
+}
+
+class GetFamilyDetailsErrorState extends MasterState {
+  final String message;
+  GetFamilyDetailsErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+// 🎨 BasicCompatiblity1
+class GetBasicCompatiblity1LoadingState extends MasterState {
+  @override
+  List<Object?> get props => [];
+}
+
+class GetBasicCompatiblity1LoadedState extends MasterState {
+  final BasicCompatiblityModel basicCompatiblity;
+  GetBasicCompatiblity1LoadedState(this.basicCompatiblity);
+
+  @override
+  List<Object?> get props => [basicCompatiblity];
+}
+
+class GetBasicCompatiblity1ErrorState extends MasterState {
+  final String message;
+  GetBasicCompatiblity1ErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+// 🎨 BasicCompatiblity1
+class GetLifestylePreferenceLoadingState extends MasterState {
+  @override
+  List<Object?> get props => [];
+}
+
+class GetLifestylePreferenceLoadedState extends MasterState {
+  final LifestylePreferenceModel lifestylePreference;
+  GetLifestylePreferenceLoadedState(this.lifestylePreference);
+
+  @override
+  List<Object?> get props => [lifestylePreference];
+}
+
+class GetLifestylePreferenceErrorState extends MasterState {
+  final String message;
+  GetLifestylePreferenceErrorState(this.message);
   @override
   List<Object?> get props => [message];
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/repository/repository.dart';
 
@@ -175,6 +177,71 @@ class MasterRepo extends Repository {
   getProfileSetup() async {
     try {
       var response = await dio.get("/profile/get-profile-setup");
+
+      if (response.data["Response"]["Status"]["StatusCode"] == "0") {
+        return {
+          "response": response.data["Response"]["ResponseData"],
+          "status": "Success",
+        };
+      } else {
+        return {
+          "response": response.data["Response"]["status"]["DisplayText"],
+          "status": "failure",
+        };
+      }
+    } catch (e) {
+      logger.e(e);
+      rethrow;
+    }
+  }
+
+  getFamilyDetails() async {
+    try {
+      var response = await dio.get("/profile/get-family-details");
+
+      if (response.data["Response"]["Status"]["StatusCode"] == "0") {
+        return {
+          "response": response.data["Response"]["ResponseData"],
+          "status": "Success",
+        };
+      } else {
+        return {
+          "response": response.data["Response"]["status"]["DisplayText"],
+          "status": "failure",
+        };
+      }
+    } catch (e) {
+      logger.e(e);
+      rethrow;
+    }
+  }
+
+  getBasicCompablity1() async {
+    try {
+      var response = await dio.get("/profile/get-partner-expectations");
+
+      if (response.data["Response"]["Status"]["StatusCode"] == "0") {
+        return {
+          "response": response.data["Response"]["ResponseData"],
+          "status": "Success",
+        };
+      } else {
+        return {
+          "response": response.data["Response"]["status"]["DisplayText"],
+          "status": "failure",
+        };
+      }
+    } catch (e) {
+      logger.e(e);
+      rethrow;
+    }
+  }
+
+  getLifestylePreferences() async {
+    try {
+      var response = await dio.get(
+        "/profile/get-partner-lifestyle-preferences",
+      );
 
       if (response.data["Response"]["Status"]["StatusCode"] == "0") {
         return {

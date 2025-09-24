@@ -14,7 +14,6 @@ import 'package:bandhana/features/Chat/pages/chat_screen.dart';
 import 'package:bandhana/features/Discover/pages/discover_screen.dart';
 import 'package:bandhana/features/DocumentVerification/pages/document_verification_screen.dart';
 import 'package:bandhana/features/Home/bloc/home_bloc.dart';
-import 'package:bandhana/features/Home/bloc/home_event.dart';
 import 'package:bandhana/features/Home/pages/homescreen.dart';
 import 'package:bandhana/features/HomeAnimation/pages/home_animation_screen.dart';
 import 'package:bandhana/features/Onboarding/pages/first_welcome_screen.dart';
@@ -86,7 +85,7 @@ BuildContext get appContext => navigatorKey.currentState!.context;
 
 GoRouter router = GoRouter(
   navigatorKey: navigatorKey,
-  // initialLocation: "/register/profilesetup",
+  // initialLocation: "/register/profilesetup/familyDetails",
   routes: [
     GoRoute(
       path: "/",
@@ -195,26 +194,28 @@ GoRouter router = GoRouter(
               name: Routes.familyDetails.name,
               routes: [
                 GoRoute(
-                  path: "docVerification",
-                  builder: (context, state) => DocumentVerificationScreen(),
-                  name: Routes.docVerification.name,
+                  name: Routes.compatablity1.name,
+
+                  path: "compatablity1",
+                  builder: (context, state) => BlocProvider(
+                    create: (_) => UserPreferencesBloc(),
+                    child: BasicCompablityScreen1(),
+                  ),
                   routes: [
                     GoRoute(
-                      name: Routes.compatablity1.name,
-                      path: 'compatablity1',
+                      name: Routes.compatablity2.name,
+                      path: 'compatablity2',
                       builder: (context, state) => BlocProvider(
                         create: (_) => UserPreferencesBloc(),
-                        child: BasicCompablityScreen1(),
+                        child: BasicCompablityScreen2(),
                       ),
 
                       routes: [
                         GoRoute(
-                          name: Routes.compatablity2.name,
-                          path: 'compatablity2',
-                          builder: (context, state) => BlocProvider(
-                            create: (_) => UserPreferencesBloc(),
-                            child: BasicCompablityScreen2(),
-                          ),
+                          path: 'docVerification',
+                          builder: (context, state) =>
+                              DocumentVerificationScreen(),
+                          name: Routes.docVerification.name,
                         ),
                       ],
                     ),

@@ -47,7 +47,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   EducationModel? selectedEducation;
 
   // local copies of API models (filled when MasterBloc emits)
-  UserDetailModel? _profileDetail;
+  RegisterProfileModel? _profileDetail;
   ProfileSetupModel? _profileSetup;
 
   @override
@@ -90,15 +90,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       // nativeAddressController.text = _profileSetup!.nativeLocation ?? "";
 
       if (_profileSetup!.education != null) {
-        selectedEducation = EducationModel(education: _profileSetup!.education);
+        selectedEducation = EducationModel(
+          education: _profileSetup!.educationName,
+        );
       }
       if (_profileSetup!.profession != null) {
         selectedProfession = ProfessionModel(
-          profession: _profileSetup!.profession,
+          profession: _profileSetup!.professionName,
         );
       }
       if (_profileSetup!.salary != null) {
-        selectedSalaryRange = SalaryModel(salaryRange: _profileSetup!.salary);
+        selectedSalaryRange = SalaryModel(
+          salaryRange: _profileSetup!.salaryName,
+        );
       }
     }
   }
@@ -264,7 +268,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               ),
                             ),
                             Text(
-                              _profileDetail?.district ?? "Loading...",
+                              _profileDetail?.districtName ?? "Loading...",
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: Colors.white,

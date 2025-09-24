@@ -1,12 +1,12 @@
 class MotherTongueModel {
   int? id;
-  String? motherTounge;
+  String? motherTongue;
   String? createdAt;
   int? isDeleted;
 
   MotherTongueModel({
     this.id,
-    this.motherTounge,
+    this.motherTongue,
     this.createdAt,
     this.isDeleted,
   });
@@ -15,8 +15,8 @@ class MotherTongueModel {
     if (json["id"] is int) {
       id = json["id"];
     }
-    if (json["mother_tounge"] is String) {
-      motherTounge = json["mother_tounge"];
+    if (json["mother_tongue"] is String) {
+      motherTongue = json["mother_tongue"];
     }
     if (json["created_at"] is String) {
       createdAt = json["created_at"];
@@ -33,7 +33,7 @@ class MotherTongueModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data["id"] = id;
-    data["mother_tounge"] = motherTounge;
+    data["mother_tongue"] = motherTongue;
     data["created_at"] = createdAt;
     data["is_deleted"] = isDeleted;
     return data;

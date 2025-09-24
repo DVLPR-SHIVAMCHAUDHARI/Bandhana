@@ -119,7 +119,7 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                       ),
                     ),
                     Text(
-                      state.profileDetail.district ?? "No district",
+                      state.profileDetail.districtName ?? "No district",
                       style: TextStyle(fontSize: 12.sp, color: Colors.grey),
                     ),
                   ],

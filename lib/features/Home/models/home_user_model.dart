@@ -1,4 +1,3 @@
-
 class HomeUserModel {
   int? userId;
   int? matchPercentage;
@@ -37,115 +36,154 @@ class HomeUserModel {
   String? petFriendly;
   String? dailyRoutine;
 
-  HomeUserModel({this.userId, this.matchPercentage, this.patnerLifeStyle, this.fullname, this.gender, this.nationality, this.state, this.district, this.birthPlace, this.dateOfBirth, this.birthTime, this.zodiac, this.religion, this.caste, this.maritalStatus, this.motherTongue, this.hobbies, this.education, this.profession, this.bio, this.age, this.height, this.profileUrl1, this.profileUrl2, this.profileUrl3, this.profileUrl4, this.profileUrl5, this.workLocation, this.dite, this.smokingHabit, this.drinkingHabit, this.fitnessActivity, this.sleepPattern, this.travelPreferences, this.petFriendly, this.dailyRoutine});
+  HomeUserModel({
+    this.userId,
+    this.matchPercentage,
+    this.patnerLifeStyle,
+    this.fullname,
+    this.gender,
+    this.nationality,
+    this.state,
+    this.district,
+    this.birthPlace,
+    this.dateOfBirth,
+    this.birthTime,
+    this.zodiac,
+    this.religion,
+    this.caste,
+    this.maritalStatus,
+    this.motherTongue,
+    this.hobbies,
+    this.education,
+    this.profession,
+    this.bio,
+    this.age,
+    this.height,
+    this.profileUrl1,
+    this.profileUrl2,
+    this.profileUrl3,
+    this.profileUrl4,
+    this.profileUrl5,
+    this.workLocation,
+    this.dite,
+    this.smokingHabit,
+    this.drinkingHabit,
+    this.fitnessActivity,
+    this.sleepPattern,
+    this.travelPreferences,
+    this.petFriendly,
+    this.dailyRoutine,
+  });
 
   HomeUserModel.fromJson(Map<String, dynamic> json) {
-    if(json["user_id"] is int) {
+    if (json["user_id"] is int) {
       userId = json["user_id"];
     }
-    if(json["match_percentage"] is int) {
+    if (json["match_percentage"] is int) {
       matchPercentage = json["match_percentage"];
     }
-    if(json["patner_life_style"] is int) {
+    if (json["patner_life_style"] is int) {
       patnerLifeStyle = json["patner_life_style"];
     }
-    if(json["fullname"] is String) {
+    if (json["fullname"] is String) {
       fullname = json["fullname"];
     }
-    if(json["gender"] is String) {
+    if (json["gender"] is String) {
       gender = json["gender"];
     }
-    if(json["nationality"] is String) {
+    if (json["nationality"] is String) {
       nationality = json["nationality"];
     }
-    if(json["state"] is String) {
+    if (json["state"] is String) {
       state = json["state"];
     }
-    if(json["district"] is String) {
+    if (json["district"] is String) {
       district = json["district"];
     }
-    if(json["birth_place"] is String) {
+    if (json["birth_place"] is String) {
       birthPlace = json["birth_place"];
     }
-    if(json["date_of_birth"] is String) {
+    if (json["date_of_birth"] is String) {
       dateOfBirth = json["date_of_birth"];
     }
-    if(json["birth_time"] is String) {
+    if (json["birth_time"] is String) {
       birthTime = json["birth_time"];
     }
-    if(json["zodiac"] is String) {
+    if (json["zodiac"] is String) {
       zodiac = json["zodiac"];
     }
-    if(json["religion"] is String) {
+    if (json["religion"] is String) {
       religion = json["religion"];
     }
-    if(json["caste"] is String) {
+    if (json["caste"] is String) {
       caste = json["caste"];
     }
-    if(json["marital_status"] is String) {
+    if (json["marital_status"] is String) {
       maritalStatus = json["marital_status"];
     }
-    if(json["mother_tongue"] is String) {
+    if (json["mother_tongue"] is String) {
       motherTongue = json["mother_tongue"];
     }
-    if(json["hobbies"] is List) {
-      hobbies = json["hobbies"] == null ? null : (json["hobbies"] as List).map((e) => Hobbies.fromJson(e)).toList();
+    if (json["hobbies"] is List) {
+      hobbies = json["hobbies"] == null
+          ? null
+          : (json["hobbies"] as List).map((e) => Hobbies.fromJson(e)).toList();
     }
-    if(json["education"] is String) {
+    if (json["education"] is String) {
       education = json["education"];
     }
-    if(json["profession"] is String) {
+    if (json["profession"] is String) {
       profession = json["profession"];
     }
-    if(json["bio"] is String) {
+    if (json["bio"] is String) {
       bio = json["bio"];
     }
-    if(json["age"] is int) {
+    if (json["age"] is int) {
       age = json["age"];
     }
-    if(json["height"] is int) {
+    if (json["height"] is int) {
       height = json["height"];
     }
-    if(json["profile_url_1"] is String) {
+    if (json["profile_url_1"] is String) {
       profileUrl1 = json["profile_url_1"];
     }
-    if(json["profile_url_2"] is String) {
+    if (json["profile_url_2"] is String) {
       profileUrl2 = json["profile_url_2"];
     }
-    if(json["profile_url_3"] is String) {
+    if (json["profile_url_3"] is String) {
       profileUrl3 = json["profile_url_3"];
     }
-    if(json["profile_url_4"] is String) {
+    if (json["profile_url_4"] is String) {
       profileUrl4 = json["profile_url_4"];
     }
-    if(json["profile_url_5"] is String) {
+    if (json["profile_url_5"] is String) {
       profileUrl5 = json["profile_url_5"];
     }
-    if(json["work_location"] is String) {
+    if (json["work_location"] is String) {
       workLocation = json["work_location"];
     }
-    if(json["dite"] is String) {
+    if (json["dite"] is String) {
       dite = json["dite"];
     }
-    if(json["smoking_habit"] is String) {
+    if (json["smoking_habit"] is String) {
       smokingHabit = json["smoking_habit"];
     }
-    if(json["drinking_habit"] is String) {
+    if (json["drinking_habit"] is String) {
       drinkingHabit = json["drinking_habit"];
     }
-    if(json["fitness_activity"] is String) {
+    if (json["fitness_activity"] is String) {
       fitnessActivity = json["fitness_activity"];
     }
-    if(json["sleep_pattern"] is String) {
+    if (json["sleep_pattern"] is String) {
       sleepPattern = json["sleep_pattern"];
     }
-    if(json["travel_preferences"] is String) {
+    if (json["travel_preferences"] is String) {
       travelPreferences = json["travel_preferences"];
     }
-    if(json["pet_friendly"] is String) {
+    if (json["pet_friendly"] is String) {
       petFriendly = json["pet_friendly"];
     }
-    if(json["daily_routine"] is String) {
+    if (json["daily_routine"] is String) {
       dailyRoutine = json["daily_routine"];
     }
   }
@@ -155,46 +193,46 @@ class HomeUserModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["user_id"] = userId;
-    _data["match_percentage"] = matchPercentage;
-    _data["patner_life_style"] = patnerLifeStyle;
-    _data["fullname"] = fullname;
-    _data["gender"] = gender;
-    _data["nationality"] = nationality;
-    _data["state"] = state;
-    _data["district"] = district;
-    _data["birth_place"] = birthPlace;
-    _data["date_of_birth"] = dateOfBirth;
-    _data["birth_time"] = birthTime;
-    _data["zodiac"] = zodiac;
-    _data["religion"] = religion;
-    _data["caste"] = caste;
-    _data["marital_status"] = maritalStatus;
-    _data["mother_tongue"] = motherTongue;
-    if(hobbies != null) {
-      _data["hobbies"] = hobbies?.map((e) => e.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["user_id"] = userId;
+    data["match_percentage"] = matchPercentage;
+    data["patner_life_style"] = patnerLifeStyle;
+    data["fullname"] = fullname;
+    data["gender"] = gender;
+    data["nationality"] = nationality;
+    data["state"] = state;
+    data["district"] = district;
+    data["birth_place"] = birthPlace;
+    data["date_of_birth"] = dateOfBirth;
+    data["birth_time"] = birthTime;
+    data["zodiac"] = zodiac;
+    data["religion"] = religion;
+    data["caste"] = caste;
+    data["marital_status"] = maritalStatus;
+    data["mother_tongue"] = motherTongue;
+    if (hobbies != null) {
+      data["hobbies"] = hobbies?.map((e) => e.toJson()).toList();
     }
-    _data["education"] = education;
-    _data["profession"] = profession;
-    _data["bio"] = bio;
-    _data["age"] = age;
-    _data["height"] = height;
-    _data["profile_url_1"] = profileUrl1;
-    _data["profile_url_2"] = profileUrl2;
-    _data["profile_url_3"] = profileUrl3;
-    _data["profile_url_4"] = profileUrl4;
-    _data["profile_url_5"] = profileUrl5;
-    _data["work_location"] = workLocation;
-    _data["dite"] = dite;
-    _data["smoking_habit"] = smokingHabit;
-    _data["drinking_habit"] = drinkingHabit;
-    _data["fitness_activity"] = fitnessActivity;
-    _data["sleep_pattern"] = sleepPattern;
-    _data["travel_preferences"] = travelPreferences;
-    _data["pet_friendly"] = petFriendly;
-    _data["daily_routine"] = dailyRoutine;
-    return _data;
+    data["education"] = education;
+    data["profession"] = profession;
+    data["bio"] = bio;
+    data["age"] = age;
+    data["height"] = height;
+    data["profile_url_1"] = profileUrl1;
+    data["profile_url_2"] = profileUrl2;
+    data["profile_url_3"] = profileUrl3;
+    data["profile_url_4"] = profileUrl4;
+    data["profile_url_5"] = profileUrl5;
+    data["work_location"] = workLocation;
+    data["dite"] = dite;
+    data["smoking_habit"] = smokingHabit;
+    data["drinking_habit"] = drinkingHabit;
+    data["fitness_activity"] = fitnessActivity;
+    data["sleep_pattern"] = sleepPattern;
+    data["travel_preferences"] = travelPreferences;
+    data["pet_friendly"] = petFriendly;
+    data["daily_routine"] = dailyRoutine;
+    return data;
   }
 }
 
@@ -205,10 +243,10 @@ class Hobbies {
   Hobbies({this.id, this.hobbyName});
 
   Hobbies.fromJson(Map<String, dynamic> json) {
-    if(json["id"] is String) {
+    if (json["id"] is String) {
       id = json["id"];
     }
-    if(json["hobby_name"] is String) {
+    if (json["hobby_name"] is String) {
       hobbyName = json["hobby_name"];
     }
   }
@@ -218,9 +256,9 @@ class Hobbies {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["hobby_name"] = hobbyName;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["id"] = id;
+    data["hobby_name"] = hobbyName;
+    return data;
   }
 }

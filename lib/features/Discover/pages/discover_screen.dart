@@ -1,4 +1,3 @@
-import 'package:bandhana/features/Home/widgets/profile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/typography.dart';

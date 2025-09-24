@@ -1,192 +1,163 @@
-class UserDetailModel {
+class RegisterProfileModel {
   int? id;
   String? kul;
-  String? caste;
+  int? caste;
+  String? casteName;
   String? email;
-  String? state;
-  String? gender;
-  String? zodiac;
-  List<Hobbies>? hobbies;
+  int? state;
+  String? stateName;
+  int? gender;
+  String? genderName;
+  int? zodiac;
+  String? zodiacName;
+  List<Hobby>? hobbies;
   int? userId;
-  String? district;
+  int? district;
+  String? districtName;
   String? fullname;
-  String? religion;
+  int? religion;
+  String? religionName;
   String? disablity;
   String? birthTime;
   String? birthPlace;
-  String? bloodGroup;
-  String? nationality;
+  int? bloodGroup;
+  String? bloodGroupName;
+  int? nationality;
+  String? nationalityName;
   String? dateOfBirth;
-  String? motherTongue;
-  String? contactNumber;
+  int? motherTongue;
+  String? motherTongueName;
   String? maritalStatus;
+  String? maritalStatusName;
+  String? contactNumber;
   String? specificDisablity;
   bool? error;
   String? code;
 
-  UserDetailModel({
+  RegisterProfileModel({
     this.id,
     this.kul,
     this.caste,
+    this.casteName,
     this.email,
     this.state,
+    this.stateName,
     this.gender,
+    this.genderName,
     this.zodiac,
+    this.zodiacName,
     this.hobbies,
     this.userId,
     this.district,
+    this.districtName,
     this.fullname,
     this.religion,
+    this.religionName,
     this.disablity,
     this.birthTime,
     this.birthPlace,
     this.bloodGroup,
+    this.bloodGroupName,
     this.nationality,
+    this.nationalityName,
     this.dateOfBirth,
     this.motherTongue,
-    this.contactNumber,
+    this.motherTongueName,
     this.maritalStatus,
+    this.maritalStatusName,
+    this.contactNumber,
     this.specificDisablity,
     this.error,
     this.code,
   });
 
-  UserDetailModel.fromJson(Map<String, dynamic> json) {
-    if (json["id"] is int) {
-      id = json["id"];
-    }
-    if (json["kul"] is String) {
-      kul = json["kul"];
-    }
-    if (json["caste"] is String) {
-      caste = json["caste"];
-    }
-    if (json["email"] is String) {
-      email = json["email"];
-    }
-    if (json["state"] is String) {
-      state = json["state"];
-    }
-    if (json["gender"] is String) {
-      gender = json["gender"];
-    }
-    if (json["zodiac"] is String) {
-      zodiac = json["zodiac"];
-    }
-    if (json["hobbies"] is List) {
-      hobbies = json["hobbies"] == null
-          ? null
-          : (json["hobbies"] as List).map((e) => Hobbies.fromJson(e)).toList();
-    }
-    if (json["user_id"] is int) {
-      userId = json["user_id"];
-    }
-    if (json["district"] is String) {
-      district = json["district"];
-    }
-    if (json["fullname"] is String) {
-      fullname = json["fullname"];
-    }
-    if (json["religion"] is String) {
-      religion = json["religion"];
-    }
-    if (json["disablity"] is String) {
-      disablity = json["disablity"];
-    }
-    if (json["birth_time"] is String) {
-      birthTime = json["birth_time"];
-    }
-    if (json["birth_place"] is String) {
-      birthPlace = json["birth_place"];
-    }
-    if (json["blood_group"] is String) {
-      bloodGroup = json["blood_group"];
-    }
-    if (json["nationality"] is String) {
-      nationality = json["nationality"];
-    }
-    if (json["date_of_birth"] is String) {
-      dateOfBirth = json["date_of_birth"];
-    }
-    if (json["mother_tongue"] is String) {
-      motherTongue = json["mother_tongue"];
-    }
-    if (json["contact_number"] is String) {
-      contactNumber = json["contact_number"];
-    }
-    if (json["marital_status"] is String) {
-      maritalStatus = json["marital_status"];
-    }
-    if (json["specific_disablity"] is String) {
-      specificDisablity = json["specific_disablity"];
-    }
-    if (json["error"] is bool) {
-      error = json["error"];
-    }
-    if (json["code"] is String) {
-      code = json["code"];
-    }
+  factory RegisterProfileModel.fromJson(Map<String, dynamic> json) {
+    return RegisterProfileModel(
+      id: json['id'],
+      kul: json['kul'],
+      caste: json['caste'],
+      casteName: json['caste_name'],
+      email: json['email'],
+      state: json['state'],
+      stateName: json['state_name'],
+      gender: json['gender'],
+      genderName: json['gender_name'],
+      zodiac: json['zodiac'],
+      zodiacName: json['zodiac_name'],
+      hobbies: json['hobbies'] != null
+          ? List<Hobby>.from(json['hobbies'].map((x) => Hobby.fromJson(x)))
+          : null,
+      userId: json['user_id'],
+      district: json['district'],
+      districtName: json['district_name'],
+      fullname: json['fullname'],
+      religion: json['religion'],
+      religionName: json['religion_name'],
+      disablity: json['disablity'],
+      birthTime: json['birth_time'],
+      birthPlace: json['birth_place'],
+      bloodGroup: json['blood_group'],
+      bloodGroupName: json['blood_group_name'],
+      nationality: json['nationality'],
+      nationalityName: json['nationality_name'],
+      dateOfBirth: json['date_of_birth'],
+      motherTongue: json['mother_tongue'],
+      motherTongueName: json['mother_tongue_name'],
+      maritalStatus: json['marital_status']?.toString(),
+      maritalStatusName: json['marital_status_name'],
+      contactNumber: json['contact_number'],
+      specificDisablity: json['specific_disablity'],
+      error: json['error'],
+      code: json['code'],
+    );
   }
 
-  static List<UserDetailModel> fromList(List<Map<String, dynamic>> list) {
-    return list.map(UserDetailModel.fromJson).toList();
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data["id"] = id;
-    data["kul"] = kul;
-    data["caste"] = caste;
-    data["email"] = email;
-    data["state"] = state;
-    data["gender"] = gender;
-    data["zodiac"] = zodiac;
-    if (hobbies != null) {
-      data["hobbies"] = hobbies?.map((e) => e.toJson()).toList();
-    }
-    data["user_id"] = userId;
-    data["district"] = district;
-    data["fullname"] = fullname;
-    data["religion"] = religion;
-    data["disablity"] = disablity;
-    data["birth_time"] = birthTime;
-    data["birth_place"] = birthPlace;
-    data["blood_group"] = bloodGroup;
-    data["nationality"] = nationality;
-    data["date_of_birth"] = dateOfBirth;
-    data["mother_tongue"] = motherTongue;
-    data["contact_number"] = contactNumber;
-    data["marital_status"] = maritalStatus;
-    data["specific_disablity"] = specificDisablity;
-    data["error"] = error;
-    data["code"] = code;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'kul': kul,
+    'caste': caste,
+    'caste_name': casteName,
+    'email': email,
+    'state': state,
+    'state_name': stateName,
+    'gender': gender,
+    'gender_name': genderName,
+    'zodiac': zodiac,
+    'zodiac_name': zodiacName,
+    'hobbies': hobbies?.map((x) => x.toJson()).toList(),
+    'user_id': userId,
+    'district': district,
+    'district_name': districtName,
+    'fullname': fullname,
+    'religion': religion,
+    'religion_name': religionName,
+    'disablity': disablity,
+    'birth_time': birthTime,
+    'birth_place': birthPlace,
+    'blood_group': bloodGroup,
+    'blood_group_name': bloodGroupName,
+    'nationality': nationality,
+    'nationality_name': nationalityName,
+    'date_of_birth': dateOfBirth,
+    'mother_tongue': motherTongue,
+    'mother_tongue_name': motherTongueName,
+    'marital_status': maritalStatus,
+    'marital_status_name': maritalStatusName,
+    'contact_number': contactNumber,
+    'specific_disablity': specificDisablity,
+    'error': error,
+    'code': code,
+  };
 }
 
-class Hobbies {
+class Hobby {
   String? id;
   String? hobbyName;
 
-  Hobbies({this.id, this.hobbyName});
+  Hobby({this.id, this.hobbyName});
 
-  Hobbies.fromJson(Map<String, dynamic> json) {
-    if (json["id"] is String) {
-      id = json["id"];
-    }
-    if (json["hobby_name"] is String) {
-      hobbyName = json["hobby_name"];
-    }
-  }
+  factory Hobby.fromJson(Map<String, dynamic> json) =>
+      Hobby(id: json['id'], hobbyName: json['hobby_name']);
 
-  static List<Hobbies> fromList(List<Map<String, dynamic>> list) {
-    return list.map(Hobbies.fromJson).toList();
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data["id"] = id;
-    data["hobby_name"] = hobbyName;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {'id': id, 'hobby_name': hobbyName};
 }

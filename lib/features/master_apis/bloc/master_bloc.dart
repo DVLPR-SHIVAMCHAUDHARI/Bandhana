@@ -1,9 +1,13 @@
+import 'package:bandhana/core/const/globals.dart';
+import 'package:bandhana/features/master_apis/models/basic_compatiblity_model.dart';
 import 'package:bandhana/features/master_apis/models/district_model.dart';
+import 'package:bandhana/features/master_apis/models/family_details_model.dart';
 import 'package:bandhana/features/master_apis/models/family_status_model.dart';
 import 'package:bandhana/features/master_apis/models/family_type_model.dart';
 import 'package:bandhana/features/master_apis/models/family_values_model.dart';
 import 'package:bandhana/features/master_apis/models/gender_model.dart';
 import 'package:bandhana/features/master_apis/models/hobby_model.dart';
+import 'package:bandhana/features/master_apis/models/lifestle_preference_model.dart';
 import 'package:bandhana/features/master_apis/models/marital_model.dart';
 import 'package:bandhana/features/master_apis/models/nationality_model.dart';
 import 'package:bandhana/features/master_apis/models/profile_setup_model.dart';
@@ -262,7 +266,9 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
       try {
         final result = await repo.getProfileDetail();
         if (result["status"] == "Success") {
-          UserDetailModel model = UserDetailModel.fromJson(result["response"]);
+          RegisterProfileModel model = RegisterProfileModel.fromJson(
+            result["response"],
+          );
           emit(GetProfileDetailsLoadedState(model));
         } else {
           emit(GetProfileDetailsErrorState(result["response"].toString()));
@@ -286,6 +292,64 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
         }
       } catch (e) {
         emit(GetProfileSetupErrorState(e.toString()));
+      }
+    });
+    on<GetFamilyDetails>((event, emit) async {
+      emit(GetFamilyDetailsLoadingState());
+
+      try {
+        final result = await repo.getFamilyDetails();
+        if (result["status"] == "Success") {
+          logger.e('success');
+
+          FamilyDetailsModel model = FamilyDetailsModel.fromJson(
+            result["response"],
+          );
+          emit(GetFamilyDetailsLoadedState(model));
+        } else {
+          emit(GetFamilyDetailsErrorState(result["response"].toString()));
+        }
+      } catch (e) {
+        emit(GetFamilyDetailsErrorState(e.toString()));
+      }
+    });
+    on<GetBasicCompablity1>((event, emit) async {
+      emit(GetBasicCompatiblity1LoadingState());
+
+      try {
+        final result = await repo.getBasicCompablity1();
+        if (result["status"] == "Success") {
+          logger.e('success');
+
+          BasicCompatiblityModel model = BasicCompatiblityModel.fromJson(
+            result["response"],
+          );
+          emit(GetBasicCompatiblity1LoadedState(model));
+        } else {
+          emit(GetBasicCompatiblity1ErrorState(result["response"].toString()));
+        }
+      } catch (e) {
+        emit(GetBasicCompatiblity1ErrorState(e.toString()));
+      }
+    });
+
+    on<GetLifestylePreferences>((event, emit) async {
+      emit(GetLifestylePreferenceLoadingState());
+
+      try {
+        final result = await repo.getLifestylePreferences();
+        if (result["status"] == "Success") {
+          logger.e('success');
+
+          LifestylePreferenceModel model = LifestylePreferenceModel.fromJson(
+            result["response"],
+          );
+          emit(GetLifestylePreferenceLoadedState(model));
+        } else {
+          emit(GetLifestylePreferenceErrorState(result["response"].toString()));
+        }
+      } catch (e) {
+        emit(GetLifestylePreferenceErrorState(e.toString()));
       }
     });
 

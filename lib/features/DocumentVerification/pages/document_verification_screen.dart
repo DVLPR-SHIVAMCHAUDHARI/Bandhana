@@ -27,7 +27,6 @@ class _DocumentVerificationScreenState
   String? idType;
   String? casteType;
 
-  // Controllers for text fields
   final TextEditingController idNumberController = TextEditingController();
   final TextEditingController casteNumberController = TextEditingController();
 
@@ -97,9 +96,7 @@ class _DocumentVerificationScreenState
                           hint: "Choose ID",
                           items: const ["Aadhaar", "PAN"],
                           value: idType,
-                          onChanged: (val) {
-                            setState(() => idType = val);
-                          },
+                          onChanged: (val) => setState(() => idType = val),
                         ),
                         16.verticalSpace,
 
@@ -125,14 +122,13 @@ class _DocumentVerificationScreenState
                         AppDropdown<String>(
                           title: "Select Document Type",
                           hint: "Choose Document",
-                          items: const [
+                          items: [
                             "Caste Certificate",
                             "Birth Certificate",
+                            "Leaving Certificate",
                           ],
                           value: casteType,
-                          onChanged: (val) {
-                            setState(() => casteType = val);
-                          },
+                          onChanged: (val) => setState(() => casteType = val),
                         ),
                         16.verticalSpace,
 
@@ -175,6 +171,7 @@ class _DocumentVerificationScreenState
                           icon: Urls.icAdhar,
                         ),
                         25.verticalSpace,
+
                         BlocListener<UploadBloc, UploadState>(
                           listener: (context, state) {
                             if (state is UploadPermissionDenied) {
@@ -192,16 +189,16 @@ class _DocumentVerificationScreenState
                                 state.permissionFor,
                               );
                             } else if (state is UploadSubmitSuccess) {
-                              // Show success message
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(state.message)),
                               );
 
-                              // Navigate to Home Screen
+                              // Navigate to the next screen
                               router.goNamed(
-                                Routes.homescreen.name,
-                              ); // Replace with your home route
+                                Routes.homeAnimationScreen.name,
+                              ); // or your target route
                             } else if (state is UploadSubmitFailure) {
+                              // Show error message
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(state.error)),
                               );
@@ -213,32 +210,59 @@ class _DocumentVerificationScreenState
                                 final bloc = context.read<UploadBloc>();
                                 final picked = bloc.state.pickedFiles;
 
-                                bloc.add(
-                                  SubmitUploadEvent(
-                                    aadhaarOrPan: idNumberController.text,
-                                    casteCertificate:
-                                        casteNumberController.text,
-                                    aadhaarOrPanFile: picked[idType!],
-                                    liveSelfieFile: picked["Live Selfie"],
-                                    casteCertificateFile: picked[casteType!],
-                                    selfieWithIdFile: picked["Selfie with ID"],
-                                  ),
-                                );
-                              }
-                            },
-                            onSave: () {
-                              if (_formKey.currentState!.validate()) {
-                                final bloc = context.read<UploadBloc>();
-                                final picked = bloc.state.pickedFiles;
+                                if (idType != null && picked[idType] == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Please upload your $idType",
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                if (casteType != null &&
+                                    picked[casteType] == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Please upload your $casteType",
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                if (picked["Live Selfie"] == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Please upload your Live Selfie",
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                if (picked["Selfie with ID"] == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Please upload your Selfie with ID",
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
 
                                 bloc.add(
                                   SubmitUploadEvent(
                                     aadhaarOrPan: idNumberController.text,
                                     casteCertificate:
                                         casteNumberController.text,
-                                    aadhaarOrPanFile: picked[idType!],
+                                    aadhaarOrPanFile: picked[idType],
                                     liveSelfieFile: picked["Live Selfie"],
-                                    casteCertificateFile: picked[casteType!],
+                                    casteCertificateFile: picked[casteType],
                                     selfieWithIdFile: picked["Selfie with ID"],
                                   ),
                                 );

@@ -62,12 +62,20 @@ class ProfileSetupBloc extends Bloc<ProfileSetupEvent, ProfileSetupState> {
           workLocation: event.workLocation ?? '',
           images: _images, // ✅ pass XFile list directly
         );
-
-        emit(
-          ProfileSetupSubmitSuccessState(
-            response['message'] ?? "Profile submitted successfully!",
-          ),
-        );
+        if (response['status'] == "success") {
+          emit(
+            ProfileSetupSubmitSuccessState(
+              response['message'] ?? "Profile submitted successfully!",
+            ),
+          );
+        } else {
+          // ✅ Emit the failure state
+          emit(
+            ProfileSetupSubmitFailureState(
+              response['message'] ?? "Failed to submit profile",
+            ),
+          );
+        }
       } catch (e) {
         logger.e(e);
         emit(ProfileSetupSubmitFailureState("Failed to submit profile: $e"));

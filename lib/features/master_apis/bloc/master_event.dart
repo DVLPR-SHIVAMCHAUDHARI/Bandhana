@@ -81,3 +81,12 @@ class GetProfileDetailsEvent extends MasterEvent {}
 
 //profileSetup
 class GetProfileSetupEvent extends MasterEvent {}
+
+//familyDetails
+class GetFamilyDetails extends MasterEvent {}
+
+//getbasiccompatiblity
+class GetBasicCompablity1 extends MasterEvent {}
+
+//getlifestylepref
+class GetLifestylePreferences extends MasterEvent {}

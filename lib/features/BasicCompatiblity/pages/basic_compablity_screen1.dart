@@ -12,6 +12,7 @@ import 'package:bandhana/features/BasicCompatiblity/widgets/app_multiselect_drop
 import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
 import 'package:bandhana/features/master_apis/bloc/master_event.dart';
 import 'package:bandhana/features/master_apis/bloc/master_state.dart';
+import 'package:bandhana/features/master_apis/models/basic_compatiblity_model.dart';
 import 'package:bandhana/features/master_apis/models/caste_model.dart';
 import 'package:bandhana/features/master_apis/models/district_model.dart';
 import 'package:bandhana/features/master_apis/models/education_model.dart';
@@ -58,6 +59,7 @@ class _BasicCompablityScreen1State extends State<BasicCompablityScreen1> {
     bloc.add(GetEducationEvent());
     bloc.add(GetDistrictEvent(110));
     bloc.add(GetSalaryEvent());
+    bloc.add(GetBasicCompablity1());
   }
 
   @override
@@ -216,7 +218,9 @@ class _BasicCompablityScreen1State extends State<BasicCompablityScreen1> {
                             final selected = state.castes.firstWhere(
                               (e) => e.caste == v,
                             );
-                            setState(() => selectedCast = selected);
+                            setState(() {
+                              selectedCast = selected;
+                            });
                           },
                         );
                       } else if (state is GetCasteErrorState) {
@@ -364,6 +368,15 @@ class _BasicCompablityScreen1State extends State<BasicCompablityScreen1> {
                   25.verticalSpace,
 
                   /// 🔹 Work Location
+                  Text(
+                    "Permanent Address Preferences",
+                    style: TextStyle(
+                      fontFamily: Typo.bold,
+                      fontSize: 16.sp,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  16.verticalSpace,
                   BlocBuilder<MasterBloc, MasterState>(
                     buildWhen: (prev, curr) =>
                         curr is GetDistrictLoadingState ||
@@ -402,55 +415,104 @@ class _BasicCompablityScreen1State extends State<BasicCompablityScreen1> {
                   ),
 
                   25.verticalSpace,
+                  // Prefill BlocListener for Basic Compatibility
+                  BlocListener<MasterBloc, MasterState>(
+                    listener: (context, state) {
+                      if (state is GetBasicCompatiblity1LoadedState) {
+                        final details = state.basicCompatiblity;
 
-                  /// 🔹 Permanent Address
-                  Text(
-                    "Permanent Address Preferences",
-                    style: TextStyle(
-                      fontFamily: Typo.bold,
-                      fontSize: 16.sp,
-                      color: AppColors.black,
-                    ),
-                  ),
-                  19.verticalSpace,
-                  BlocBuilder<MasterBloc, MasterState>(
-                    buildWhen: (prev, curr) =>
-                        curr is GetDistrictLoadingState ||
-                        curr is GetDistrictLoadedState ||
-                        curr is GetDistrictErrorState,
-                    builder: (context, state) {
-                      if (state is GetDistrictLoadingState) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (state is GetDistrictLoadedState) {
-                        return MultiSelectDropdown(
-                          isRequired: true,
-                          items: state.districts
-                              .map((d) => d.districtName ?? "")
-                              .toList(),
-                          selectedItems: selectedPermanentLocation
-                              .map((d) => d.districtName ?? "")
-                              .toList(),
-                          hintText: "Select Permanent Address",
-                          onChanged: (selectedNames) {
-                            setState(() {
-                              selectedPermanentLocation = selectedNames
-                                  .map(
-                                    (name) => state.districts.firstWhere(
-                                      (d) => d.districtName == name,
-                                    ),
-                                  )
-                                  .toList();
-                            });
-                          },
-                        );
-                      } else if (state is GetDistrictErrorState) {
-                        return Text("Error: ${state.message}");
+                        setState(() {
+                          // --- Ranges ---
+                          selectedAgeRange = RangeValues(
+                            (details.ageRange1 ?? 18).toDouble(),
+                            (details.ageRange2 ?? 30).toDouble(),
+                          );
+
+                          selectedHeightRange = RangeValues(
+                            (details.heightRange1 ?? 120).toDouble(),
+                            (details.heightRange2 ?? 180).toDouble(),
+                          );
+
+                          // --- Salary (id + name) ---
+                          if (details.income != null &&
+                              details.incomeName != null) {
+                            selectedSalaryRange = SalaryModel(
+                              id: details.income!,
+                              salaryRange: details.incomeName!,
+                            );
+                          } else {
+                            selectedSalaryRange = null;
+                          }
+
+                          // --- Religion (id + name) ---
+                          if (details.religion != null &&
+                              details.religionName != null) {
+                            selectedReligion = ReligionModel(
+                              id: details.religion!,
+                              religion: details.religionName!,
+                            );
+                          } else {
+                            selectedReligion = null;
+                          }
+                          if (selectedReligion != null) {
+                            context.read<MasterBloc>().add(
+                              GetCasteEvent(selectedReligion!.id!),
+                            );
+                            if (details.caste != null &&
+                                details.casteName != null) {
+                              selectedCast = CasteModel(
+                                caste: details.casteName,
+                                id: details.caste,
+                              );
+                            } else {
+                              selectedSalaryRange = null;
+                            }
+                          }
+
+                          selectedEducationLevels = details.educaion!
+                              .map(
+                                (e) => EducationModel(
+                                  education: e.education,
+                                  id: int.tryParse(e.id.toString()),
+                                ),
+                              )
+                              .toList();
+
+                          selectedProfessions = details.profession!
+                              .map(
+                                (e) => ProfessionModel(
+                                  profession: e.profession,
+                                  id: int.tryParse(e.id.toString()),
+                                ),
+                              )
+                              .toList();
+
+                          selectedWorkLocation = details.workLocation1!
+                              .map(
+                                (e) => DistrictModel(
+                                  districtName: e.districtName,
+                                  districtId: int.tryParse(e.id.toString()),
+                                ),
+                              )
+                              .toList();
+
+                          selectedNativeLocation = details.nativeLocation1!
+                              .map(
+                                (e) => DistrictModel(
+                                  districtName: e.districtName,
+                                  districtId: int.tryParse(e.id.toString()),
+                                ),
+                              )
+                              .toList();
+
+                          // --- Other Expectations (text field) ---
+                          otherFieldController.text =
+                              details.otherExpectations ?? "";
+                        });
                       }
-                      return const SizedBox.shrink();
                     },
+                    child: const SizedBox.shrink(),
                   ),
-
-                  25.verticalSpace,
 
                   /// 🔹 Native Location
                   Text(
@@ -533,80 +595,53 @@ class _BasicCompablityScreen1State extends State<BasicCompablityScreen1> {
                         onNext: () {
                           if (_formKey.currentState!.validate()) {
                             final preferences = {
+                              // ✅ Age & Height
                               "age_range_1": selectedAgeRange.start,
                               "age_range_2": selectedAgeRange.end,
                               "height_range_1": selectedHeightRange.start,
                               "height_range_2": selectedHeightRange.end,
-                              "religion": selectedReligion!.id,
-                              "caste": selectedCast!.caste,
+
+                              // ✅ Religion & Caste
+                              "religion": selectedReligion?.id,
+                              "caste": selectedCast?.id,
+
+                              // ✅ Education & Profession
                               "educaion": selectedEducationLevels
                                   .map((e) => e.id)
                                   .toList(),
                               "profession": selectedProfessions
                                   .map((e) => e.id)
                                   .toList(),
-                              "income": selectedSalaryRange!.id,
+
+                              // ✅ Salary
+                              "income": selectedSalaryRange?.id,
+
+                              // ✅ Native Locations (up to 3)
                               "native_location_1":
-                                  selectedNativeLocation[0].districtId,
-
+                                  selectedNativeLocation.isNotEmpty
+                                  ? selectedNativeLocation[0].districtId
+                                  : null,
                               "native_location_2":
-                                  selectedNativeLocation[1].districtId,
-
+                                  selectedNativeLocation.length > 1
+                                  ? selectedNativeLocation[1].districtId
+                                  : null,
                               "native_location_3":
-                                  selectedNativeLocation[2].districtId,
-                              "work_location_1":
-                                  selectedWorkLocation[0].districtId,
+                                  selectedNativeLocation.length > 2
+                                  ? selectedNativeLocation[2].districtId
+                                  : null,
 
-                              "work_location_2":
-                                  selectedWorkLocation[1].districtId,
-                              "work_location_3":
-                                  selectedWorkLocation[2].districtId,
+                              // ✅ Work Locations (up to 3)
+                              "work_location_1": selectedWorkLocation.isNotEmpty
+                                  ? selectedWorkLocation[0].districtId
+                                  : null,
+                              "work_location_2": selectedWorkLocation.length > 1
+                                  ? selectedWorkLocation[1].districtId
+                                  : null,
+                              "work_location_3": selectedWorkLocation.length > 2
+                                  ? selectedWorkLocation[2].districtId
+                                  : null,
 
-                              "other_expectations": otherFieldController.text,
-                            };
-
-                            context.read<UserPreferencesBloc>().add(
-                              SubmitPreferencesEvent(preferences),
-                            );
-                          } else {
-                            snackbar(
-                              context,
-                              message: "Please fill all required fields.",
-                            );
-                          }
-                        },
-                        onSave: () {
-                          if (_formKey.currentState!.validate()) {
-                            final preferences = {
-                              "age_range_1": selectedAgeRange.start,
-                              "age_range_2": selectedAgeRange.end,
-                              "height_range_1": selectedHeightRange.start,
-                              "height_range_2": selectedHeightRange.end,
-                              "religion": selectedReligion!.id,
-                              "caste": selectedCast!.caste,
-                              "educaion": selectedEducationLevels
-                                  .map((e) => e.id)
-                                  .toList(),
-                              "profession": selectedProfessions
-                                  .map((e) => e.id)
-                                  .toList(),
-                              "income": selectedSalaryRange!.id,
-                              "native_location_1":
-                                  selectedNativeLocation[0].districtId,
-
-                              "native_location_2":
-                                  selectedNativeLocation[1].districtId,
-
-                              "native_location_3":
-                                  selectedNativeLocation[2].districtId,
-                              "work_location_1":
-                                  selectedWorkLocation[0].districtId,
-
-                              "work_location_2":
-                                  selectedWorkLocation[1].districtId,
-                              "work_location_3":
-                                  selectedWorkLocation[2].districtId,
-
+                              // ✅ Other Expectations
                               "other_expectations": otherFieldController.text,
                             };
 

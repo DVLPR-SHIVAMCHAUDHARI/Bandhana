@@ -20,6 +20,7 @@ import 'package:bandhana/features/master_apis/models/mother_tongue_model.dart';
 import 'package:bandhana/features/master_apis/models/nationality_model.dart';
 import 'package:bandhana/features/master_apis/models/religion_model.dart';
 import 'package:bandhana/features/master_apis/models/state_model.dart';
+import 'package:bandhana/features/master_apis/models/user_detail_model.dart';
 import 'package:bandhana/features/master_apis/models/zodiac_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -97,10 +98,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     bloc.add(GetBloodGroupEvent());
 
     bloc.add(GetHobbiesEvent());
+    bloc.add(GetProfileDetailsEvent());
     bloc.add(GetZodiacEvent());
   }
 
   Widget _buildDatePicker(String title, String hint) {
+    final today = DateTime.now();
+    final earliestDate = DateTime(
+      today.year - 100,
+      today.month,
+      today.day,
+    ); // optional: max age 100
+    final latestDate = DateTime(
+      today.year - 18,
+      today.month,
+      today.day,
+    ); // minimum age 21
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -117,9 +131,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           onTap: () async {
             final picked = await showDatePicker(
               context: context,
-              initialDate: DateTime.now(),
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now(),
+              initialDate: latestDate,
+              firstDate: earliestDate,
+              lastDate: latestDate,
             );
             if (picked != null) {
               setState(() {
@@ -129,7 +143,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             }
           },
           child: AbsorbPointer(
-            // prevents manual typing but keeps validation
             child: TextFormField(
               controller: dobController,
               validator: (value) {
@@ -320,11 +333,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 16.verticalSpace,
-                AppTextField(
-                  isRequired: true,
-                  title: "Full Name",
-                  hint: "Full Name",
-                  controller: fullNameController,
+                BlocListener<MasterBloc, MasterState>(
+                  listener: (context, state) {
+                    // TODO: implement listener
+                    if (state is GetProfileDetailsLoadedState) {
+                      fullNameController.text = state.profileDetail.fullname!;
+                    }
+                  },
+                  child: AppTextField(
+                    isRequired: true,
+                    title: "Full Name",
+                    hint: "Full Name",
+                    controller: fullNameController,
+                  ),
                 ),
                 16.verticalSpace,
 
@@ -356,6 +377,118 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     }
                     return const SizedBox.shrink();
                   },
+                ),
+                BlocListener<MasterBloc, MasterState>(
+                  listener: (context, state) {
+                    if (state is GetProfileDetailsLoadedState) {
+                      RegisterProfileModel profile = state.profileDetail;
+
+                      // Text Fields
+                      fullNameController.text = profile.fullname ?? "";
+                      String formatNumber(String? fullNumber) {
+                        if (fullNumber == null || fullNumber.isEmpty) return "";
+
+                        // Check if it starts with '+' and remove the country code
+                        if (fullNumber.startsWith("+")) {
+                          // Find the first digit after the country code (after the first 1-3 digits)
+                          // We'll remove everything until the last 10 digits
+                          if (fullNumber.length > 10) {
+                            return fullNumber.substring(fullNumber.length - 10);
+                          }
+                        }
+                        return fullNumber;
+                      }
+
+                      // Usage
+                      contactController.text = formatNumber(
+                        profile.contactNumber,
+                      );
+                      dobController.text = profile.dateOfBirth ?? "";
+                      birthTimeController.text =
+                          profile.birthTime
+                              ?.split(":")
+                              .sublist(0, 2)
+                              .join(":") ??
+                          "";
+                      birthPlace.text = profile.birthPlace ?? "";
+                      kulController.text = profile.kul ?? "";
+                      emailController.text = profile.email ?? "";
+                      specificDisability.text = profile.specificDisablity ?? "";
+                      disability = profile.disablity;
+
+                      // Dropdowns
+
+                      selectedZodiac = ZodiacModel(
+                        id: int.tryParse(profile.zodiac.toString() ?? '0'),
+                        zodiac: profile.zodiacName,
+                      );
+
+                      gender = GenderModel(
+                        id: int.tryParse(profile.gender.toString() ?? '0'),
+                        name: profile.genderName,
+                      );
+
+                      selectedNationality = NationalityModel(
+                        id: int.tryParse(profile.nationality.toString() ?? '0'),
+                        nationality: profile.nationalityName,
+                      );
+
+                      selectedState = StateModel(
+                        stateId: int.tryParse(profile.state.toString() ?? '0'),
+                        stateName: profile.stateName,
+                      );
+
+                      selectedDistrict = DistrictModel(
+                        districtId: int.tryParse(
+                          profile.district.toString() ?? '0',
+                        ),
+                        districtName: profile.districtName,
+                      );
+
+                      religion = ReligionModel(
+                        id: int.tryParse(profile.religion.toString() ?? '0'),
+                        religion: profile.religionName,
+                      );
+
+                      caste = CasteModel(
+                        id: int.tryParse(profile.caste.toString() ?? '0'),
+                        caste: profile.casteName,
+                      );
+
+                      motherTongue = MotherTongueModel(
+                        id: int.tryParse(
+                          profile.motherTongue.toString() ?? '0',
+                        ),
+                        motherTongue: profile.motherTongueName,
+                      );
+
+                      maritalStatus = MaritalModel(
+                        id: int.tryParse(
+                          profile.maritalStatus.toString() ?? '0',
+                        ),
+                        maritalStatus: profile.maritalStatusName,
+                      );
+
+                      bloodGroup = BloodGroupModel(
+                        id: int.tryParse(profile.bloodGroup.toString() ?? '0'),
+                        bloodGroup: profile.bloodGroupName,
+                      );
+
+                      // Hobbies
+                      selectedHobbyIds.clear();
+                      selectedHobbies.clear();
+                      if (profile.hobbies != null) {
+                        for (var hobby in profile.hobbies!) {
+                          selectedHobbyIds.add(int.parse(hobby.id!));
+                          selectedHobbies.add(hobby.hobbyName!);
+                        }
+                      }
+
+                      // Force rebuild to update UI
+                      setState(() {});
+                    }
+                  },
+                  child: const SizedBox.shrink(),
                 ),
 
                 16.verticalSpace,
@@ -603,12 +736,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
                         hint: "Select Mother Tongue",
                         items: state.tongues
-                            .map((e) => e.motherTounge!)
+                            .map((e) => e.motherTongue.toString())
                             .toList(),
-                        value: motherTongue?.motherTounge,
+                        value: motherTongue?.motherTongue,
                         onChanged: (v) {
                           final selected = state.tongues.firstWhere(
-                            (e) => e.motherTounge == v,
+                            (e) => e.motherTongue == v,
                           );
                           setState(() => motherTongue = selected);
                         },
