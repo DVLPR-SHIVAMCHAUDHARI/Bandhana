@@ -191,7 +191,7 @@ class RequestCard extends StatelessWidget {
                       Routes.profileDetail.name,
 
                       pathParameters: {
-                        "mode": ProfileMode.viewOther.name,
+                        "mode": ProfileMode.incomingRequest.name,
                         "id": 1.toString(),
                       },
                     );

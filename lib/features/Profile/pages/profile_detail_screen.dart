@@ -74,7 +74,7 @@ class ProfileDetailedScreen extends StatelessWidget {
               color: Colors.white,
               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
             ),
-            child: mode == ProfileMode.incomingRequest.name
+            child: mode == ProfileMode.viewOther.name
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -110,8 +110,13 @@ class ProfileDetailedScreen extends StatelessWidget {
                       Expanded(
                         child: InkWell(
                           onTap: () {
-                            router.pushNamed(Routes.messageRequested.name);
+                            ProfileType.normal.name == "normal"
+                                ? router.pushNamed(Routes.choosePlan.name)
+                                : router.pushNamed(
+                                    Routes.messageRequested.name,
+                                  );
                           },
+
                           child: Container(
                             decoration: BoxDecoration(
                               boxShadow: [
