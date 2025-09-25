@@ -1,27 +1,72 @@
+// In 'profile_detail_bloc.dart'
+
 import 'package:bandhana/features/Profile/bloc/profile_detail_event.dart';
 import 'package:bandhana/features/Profile/bloc/profile_detail_state.dart';
+import 'package:bandhana/features/Profile/model/user_detail_model.dart';
+import 'package:bandhana/features/Profile/repository/profile_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
+  UserDetailModel? _currentUser;
+
   final int centerIndex = 3;
+  final ProfileRepository repo = ProfileRepository();
+
+  bool _isFavorite = false;
 
   ProfileDetailBloc() : super(InitialState()) {
+    on<GetUserDetailById>(_onGetUserDetailById);
     on<SwitchImageEvent>(_switchImage);
+    on<ToggleFavoriteEvent>(_toggleFavorite);
   }
 
-  void _switchImage(SwitchImageEvent event, Emitter emit) {
-    // Make a copy of the avatars list
+  Future<void> _onGetUserDetailById(
+    GetUserDetailById event,
+    Emitter<ProfileDetailState> emit,
+  ) async {
+    emit(ProfileDetailLoading());
+    try {
+      final result = await repo.getUserById(id: event.id);
+
+      if (result["status"] == "Success") {
+        final UserDetailModel user = result["response"] as UserDetailModel;
+        _currentUser = user;
+
+        emit(ProfileDetailLoaded(user, isFavorite: _isFavorite));
+      } else {
+        emit(
+          ProfileDetailError(result["response"]?.toString() ?? "Unknown error"),
+        );
+      }
+    } catch (e) {
+      emit(ProfileDetailError(e.toString()));
+    }
+  }
+
+  void _switchImage(SwitchImageEvent event, Emitter<ProfileDetailState> emit) {
+    if (_currentUser == null) return;
+
     final newAvatars = event.avatars
         .map((avatar) => Map<String, dynamic>.from(avatar))
         .toList();
 
-    // Swap the selected avatar with the center avatar
     if (event.selectedIndex != centerIndex) {
       final temp = newAvatars[centerIndex]['url'];
       newAvatars[centerIndex]['url'] = newAvatars[event.selectedIndex]['url'];
       newAvatars[event.selectedIndex]['url'] = temp;
     }
 
-    emit(SwitchImageState(newAvatars, centerIndex));
+    emit(SwitchImageState(newAvatars, centerIndex, _currentUser!, _isFavorite));
+  }
+
+  void _toggleFavorite(
+    ToggleFavoriteEvent event,
+    Emitter<ProfileDetailState> emit,
+  ) {
+    if (_currentUser == null) return;
+
+    _isFavorite = !_isFavorite;
+
+    emit(FavoriteToggledState(_isFavorite, _currentUser!));
   }
 }

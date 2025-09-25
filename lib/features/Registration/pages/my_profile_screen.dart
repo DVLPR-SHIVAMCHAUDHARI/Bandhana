@@ -1,29 +1,18 @@
-import 'dart:io';
-
 import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
-import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
-import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_bloc.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_event.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_state.dart';
+import 'package:bandhana/features/Profile/bloc/profile_detail_bloc.dart';
+import 'package:bandhana/features/Profile/bloc/profile_detail_event.dart';
+import 'package:bandhana/features/Profile/bloc/profile_detail_state.dart';
 import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
 import 'package:bandhana/features/master_apis/bloc/master_event.dart';
 import 'package:bandhana/features/master_apis/bloc/master_state.dart';
-import 'package:bandhana/features/master_apis/models/education_model.dart';
-import 'package:bandhana/features/master_apis/models/profession_model.dart';
-import 'package:bandhana/features/master_apis/models/profile_setup_model.dart';
-import 'package:bandhana/features/master_apis/models/salary_model.dart';
-import 'package:bandhana/features/master_apis/models/user_detail_model.dart';
+import 'package:bandhana/features/master_apis/models/your_detail_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -33,572 +22,441 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
-  SalaryModel? selectedSalaryRange;
-  var fullNameController = TextEditingController();
-  var phoneController = TextEditingController();
-  var bioController = TextEditingController();
-  var ageController = TextEditingController();
-  var heightController = TextEditingController();
-  var permanentAddressController = TextEditingController();
-  var workAddressController = TextEditingController();
-  var nativeAddressController = TextEditingController();
-
-  ProfessionModel? selectedProfession;
-  EducationModel? selectedEducation;
-
-  // local copies of API models (filled when MasterBloc emits)
-  RegisterProfileModel? _profileDetail;
-  ProfileSetupModel? _profileSetup;
+  final int centerIndex = 3;
 
   @override
   void initState() {
     super.initState();
-    final masterBloc = context.read<MasterBloc>();
-    // call APIs once
-    masterBloc.add(GetProfileDetailsEvent());
-    masterBloc.add(GetProfileSetupEvent());
-    masterBloc.add(GetProfessionEvent());
-    masterBloc.add(GetSalaryEvent());
-    masterBloc.add(GetEducationEvent());
-  }
-
-  @override
-  void dispose() {
-    fullNameController.dispose();
-    phoneController.dispose();
-    bioController.dispose();
-    ageController.dispose();
-    heightController.dispose();
-    permanentAddressController.dispose();
-    workAddressController.dispose();
-    nativeAddressController.dispose();
-    super.dispose();
-  }
-
-  /// Update form controllers from API models (safe: called from BlocListener)
-  void _applyApiDataToControllers() {
-    if (_profileDetail != null) {
-      fullNameController.text = _profileDetail!.fullname ?? "";
-      phoneController.text = _profileDetail!.contactNumber ?? "";
-    }
-    if (_profileSetup != null) {
-      bioController.text = _profileSetup!.bio ?? "";
-      ageController.text = _profileSetup!.age?.toString() ?? "";
-      heightController.text = _profileSetup!.height?.toString() ?? "";
-      permanentAddressController.text = _profileSetup!.permanentLocation ?? "";
-      workAddressController.text = _profileSetup!.workLocation ?? "";
-      // nativeAddressController.text = _profileSetup!.nativeLocation ?? "";
-
-      if (_profileSetup!.education != null) {
-        selectedEducation = EducationModel(
-          education: _profileSetup!.educationName,
-        );
-      }
-      if (_profileSetup!.profession != null) {
-        selectedProfession = ProfessionModel(
-          profession: _profileSetup!.professionName,
-        );
-      }
-      if (_profileSetup!.salary != null) {
-        selectedSalaryRange = SalaryModel(
-          salaryRange: _profileSetup!.salaryName,
-        );
-      }
-    }
+    context.read<MasterBloc>().add(GetYourDetails());
   }
 
   @override
   Widget build(BuildContext context) {
-    final profileSetupBloc = context.read<ProfileSetupBloc>();
-
-    return MultiBlocListener(
-      listeners: [
-        // Listen to MasterBloc to capture profile detail & setup responses
-        BlocListener<MasterBloc, MasterState>(
-          listener: (context, state) {
-            if (state is GetProfileDetailsLoadedState) {
-              _profileDetail = state.profileDetail;
-              _applyApiDataToControllers();
-              setState(() {}); // rebuild to show name/district if needed
-            } else if (state is GetProfileSetupLoadedState) {
-              _profileSetup = state.profileSetup;
-              _applyApiDataToControllers();
-              setState(() {}); // rebuild to show images / prefilled values
-            }
-          },
-        ),
-
-        // Optionally listen to ProfileSetupBloc events (e.g., picks) for side-effects
-        BlocListener<ProfileSetupBloc, ProfileSetupState>(
-          listener: (context, state) {
-            // we rebuild UI via BlocBuilder below; nothing extra required here
-          },
-        ),
-      ],
+    return BlocProvider(
+      create: (_) => ProfileDetailBloc(),
       child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: AppColors.primary,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-            onPressed: () => router.goNamed(Routes.homescreen.name),
-          ),
-          centerTitle: false,
-          title: const Text(
-            "My Profile",
-            style: TextStyle(
+        body: BlocBuilder<MasterBloc, MasterState>(
+          buildWhen: (prev, curr) =>
+              curr is GetYourDetailsLoadingState ||
+              curr is GetYourDetailsLoadedState ||
+              curr is GetYourDetailsErrorState,
+          builder: (context, state) {
+            if (state is GetYourDetailsLoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is GetYourDetailsErrorState) {
+              return Center(
+                child: Text("Failed to load profile: ${state.message}"),
+              );
+            } else if (state is GetYourDetailsLoadedState) {
+              final YourDetailModel user = state.yourDetail;
+
+              // Initialize ProfileDetailBloc with this user
+              final profileBloc = context.read<ProfileDetailBloc>();
+              profileBloc.add(
+                GetUserDetailById(user.profileDetails!.id.toString()),
+              );
+
+              return Stack(
+                children: [
+                  SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildMainImage(context, user),
+                        Transform.translate(
+                          offset: Offset(0, -40),
+                          child: _buildAvatarStack(context, user),
+                        ),
+                        _buildProfileDetails(user),
+                        SizedBox(height: 120.h),
+                      ],
+                    ),
+                  ),
+                  // Top AppBar
+                  Positioned(
+                    top: 50.h,
+                    left: 16.w,
+                    right: 16.w,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () => router.goNamed(Routes.homescreen.name),
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: Icon(Icons.arrow_back, color: Colors.black),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
+        ),
+
+        // Bottom Button
+        bottomNavigationBar: SafeArea(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+            decoration: BoxDecoration(
               color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      router.pushNamed(Routes.editProfile.name);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 24.r,
+                            offset: const Offset(4, 8),
+                            color: AppColors.primaryOpacity,
+                          ),
+                        ],
+                        gradient: AppColors.buttonGradient,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 32.w,
+                        vertical: 14.h,
+                      ),
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        "Edit Profile",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: Typo.bold,
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-        body: BlocBuilder<ProfileSetupBloc, ProfileSetupState>(
-          builder: (context, setupState) {
-            // picked images from ProfileSetupBloc (local / selected)
-            List pickedImages = [];
-            if (setupState is PickImageLoadedState) {
-              pickedImages = setupState.images;
-            }
+      ),
+    );
+  }
 
-            // server gallery images from _profileSetup (profileUrl2..profileUrl5)
-            final List<String> serverGallery = [
-              _profileSetup?.profileUrl2,
-              _profileSetup?.profileUrl3,
-              _profileSetup?.profileUrl4,
-              _profileSetup?.profileUrl5,
-            ].whereType<String>().toList();
+  Widget _buildMainImage(BuildContext context, YourDetailModel user) {
+    final List<String?> avatars = [
+      user.profileSetup!.profileUrl1,
+      user.profileSetup!.profileUrl2,
+      user.profileSetup!.profileUrl3,
+      user.profileSetup!.profileUrl4,
+      user.profileSetup!.profileUrl5,
+    ];
 
-            // main image candidate: priority -> pickedImages[0] -> server profileUrl1 -> null
-            ImageProvider? mainImageProvider;
-            if (pickedImages.isNotEmpty) {
-              try {
-                mainImageProvider = FileImage(File(pickedImages[0].path));
-              } catch (_) {
-                mainImageProvider = null;
-              }
-            } else if (_profileSetup?.profileUrl1 != null) {
-              mainImageProvider = CachedNetworkImageProvider(
-                _profileSetup!.profileUrl1!,
-              );
-            } else {
-              mainImageProvider = null;
-            }
+    return BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
+      builder: (context, state) {
+        String imageUrl = avatars[centerIndex] ?? '';
+        int highlightedIndex = centerIndex;
 
-            return SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
+        if (state is SwitchImageState) {
+          highlightedIndex = state.selectedIndex;
+          imageUrl = state.avatars[highlightedIndex]['url'];
+        }
+
+        return Stack(
+          children: [
+            CachedNetworkImage(
+              imageUrl: imageUrl,
+              height: 550.h,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              placeholder: (_, __) =>
+                  Container(height: 500.h, color: Colors.grey[200]),
+              errorWidget: (_, __, ___) =>
+                  Container(height: 500.h, color: Colors.grey),
+            ),
+            Container(
+              height: 570,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+                ),
+              ),
+              padding: EdgeInsets.all(20.w),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // HEADER area: gradient + avatar + name + district
-                  Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        height: 100.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(40.r),
-                            bottomRight: Radius.circular(40.r),
-                          ),
-                          color: AppColors.primary,
-                        ),
-                      ),
-
-                      // Avatar
-                      Positioned(
-                        left: 38.w,
-                        top: 37.h,
-                        child: CircleAvatar(
-                          radius: 48.r,
-                          backgroundColor: Colors.white,
-                          child: Stack(
-                            children: [
-                              CircleAvatar(
-                                radius: 46.r,
-                                backgroundImage: mainImageProvider,
-                                child: mainImageProvider == null
-                                    ? const Icon(Icons.person, size: 40)
-                                    : null,
-                              ),
-                              Positioned(
-                                top: 0,
-                                right: 0,
-                                child: InkWell(
-                                  onTap: () {
-                                    // open picker to replace/add images
-                                    profileSetupBloc.add(
-                                      PickImageEvent(
-                                        limit: 5 - pickedImages.length,
-                                      ),
-                                    );
-                                  },
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.white,
-                                    radius: 15,
-                                    child: SvgPicture.asset(
-                                      Urls.icEdit,
-                                      height: 14.h,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      // Name + district (from _profileDetail if available, fallback to localDb)
-                      Positioned(
-                        top: 47.h,
-                        left: 150.w,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _profileDetail?.fullname ??
-                                  localDb.getUserData()?.fullname ??
-                                  "",
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              _profileDetail?.districtName ?? "Loading...",
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
                   50.verticalSpace,
-
-                  // Form fields and gallery (kept same components)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Partner expectations",
-                        style: TextStyle(
-                          color: AppColors.black,
-                          fontSize: 22.sp,
-                          fontFamily: Typo.semiBold,
-                        ),
+                  Text(
+                    "${user.profileDetails!.fullname}, ${user.profileSetup!.age}",
+                    style: TextStyle(
+                      fontSize: 28.sp,
+                      fontFamily: Typo.playfairDisplayRegular,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  5.verticalSpace,
+                  Text(
+                    "${user.profileSetup!.professionName} · ${user.profileDetails!.districtName}",
+                    style: TextStyle(fontSize: 16.sp, color: Colors.white70),
+                  ),
+                  12.verticalSpace,
+                  Wrap(
+                    spacing: 8.w,
+                    children: List.generate(
+                      user.profileDetails!.hobbies!.length,
+                      (index) => _buildTag(
+                        "#${user.profileDetails!.hobbies![index].hobbyName}",
                       ),
-                      16.verticalSpace,
-                      AppTextField(
-                        title: "Name",
-                        hint: "John Doe",
-                        controller: fullNameController,
-                      ),
-                      16.verticalSpace,
-                      PhoneNumberField(
-                        title: "Mobile No.",
-                        controller: phoneController,
-                      ),
-                      16.verticalSpace,
-                      Text(
-                        "Upload Photos",
-                        style: TextStyle(
-                          color: AppColors.black,
-                          fontSize: 16.sp,
-                          fontFamily: Typo.bold,
-                        ),
-                      ),
-                      10.verticalSpace,
-
-                      // Gallery: fill with pickedImages first, then serverGallery, then add slots
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.w),
-                        child: Wrap(
-                          spacing: 10,
-                          children: List.generate(5, (index) {
-                            // If we have a picked image for this slot:
-                            if (index < pickedImages.length) {
-                              final p = pickedImages[index];
-                              return Stack(
-                                children: [
-                                  Container(
-                                    width: 64.w,
-                                    height: 58.h,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      image: DecorationImage(
-                                        image: FileImage(File(p.path)),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: 0,
-                                    top: 0,
-                                    child: GestureDetector(
-                                      onTap: () => profileSetupBloc.add(
-                                        RemoveImageEvent(index),
-                                      ),
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.black54,
-                                        ),
-                                        child: const Icon(
-                                          Icons.close,
-                                          size: 18,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-
-                            // If picked images exhausted, show server gallery (offset = index - pickedImages.length)
-                            final serverIndex = index - pickedImages.length;
-                            if (serverIndex >= 0 &&
-                                serverIndex < serverGallery.length) {
-                              final url = serverGallery[serverIndex];
-                              return Container(
-                                width: 64.w,
-                                height: 58.h,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  image: DecorationImage(
-                                    image: CachedNetworkImageProvider(url),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              );
-                            }
-
-                            // Otherwise show add button
-                            return GestureDetector(
-                              onTap: () => profileSetupBloc.add(
-                                PickImageEvent(limit: 5 - pickedImages.length),
-                              ),
-                              child: Container(
-                                width: 64.w,
-                                height: 58.h,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppColors.primary),
-                                ),
-                                child: Icon(
-                                  Icons.add_a_photo,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
-                      ),
-
-                      16.verticalSpace,
-
-                      // Bio etc (prefilled values are already applied to controllers via listener)
-                      AppTextField(
-                        title: "About You(Bio)",
-                        hint: "Write a short bio about yourself",
-                        controller: bioController,
-                        lines: 4,
-                      ),
-                      16.verticalSpace,
-                      AppTextField(
-                        title: "Age",
-                        hint: "Enter your age",
-                        controller: ageController,
-                      ),
-                      16.verticalSpace,
-                      AppTextField(
-                        title: "Height",
-                        hint: "Enter your height",
-                        controller: heightController,
-                      ),
-                      16.verticalSpace,
-
-                      // Education Dropdown
-                      BlocBuilder<MasterBloc, MasterState>(
-                        buildWhen: (prev, curr) =>
-                            curr is GetEducationLoadingState ||
-                            curr is GetEducationLoadedState ||
-                            curr is GetEducationErrorState,
-                        builder: (context, state) {
-                          if (state is GetEducationLoadingState) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (state is GetEducationLoadedState) {
-                            return AppDropdown<String>(
-                              title: "Highest Education",
-                              isRequired: true,
-                              hint: "Select Education",
-                              items: state.educations
-                                  .map((e) => e.education!)
-                                  .toList(),
-                              value: selectedEducation?.education,
-                              onChanged: (v) {
-                                final selected = state.educations.firstWhere(
-                                  (e) => e.education == v,
-                                );
-                                setState(() => selectedEducation = selected);
-                              },
-                            );
-                          } else if (state is GetEducationErrorState) {
-                            return Text("Error: ${state.message}");
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                      16.verticalSpace,
-
-                      // Profession Dropdown
-                      BlocBuilder<MasterBloc, MasterState>(
-                        buildWhen: (prev, curr) =>
-                            curr is GetProfessionLoadingState ||
-                            curr is GetProfessionLoadedState ||
-                            curr is GetProfessionErrorState,
-                        builder: (context, state) {
-                          if (state is GetProfessionLoadingState) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (state is GetProfessionLoadedState) {
-                            return AppDropdown<String>(
-                              title: "Profession",
-                              isRequired: true,
-                              hint: "Select profession",
-                              items: state.professions
-                                  .map((e) => e.profession!)
-                                  .toList(),
-                              value: selectedProfession?.profession,
-                              onChanged: (v) {
-                                final selected = state.professions.firstWhere(
-                                  (e) => e.profession == v,
-                                );
-                                setState(() => selectedProfession = selected);
-                              },
-                            );
-                          } else if (state is GetProfessionErrorState) {
-                            return Text("Error: ${state.message}");
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                      16.verticalSpace,
-
-                      // Salary Dropdown
-                      BlocBuilder<MasterBloc, MasterState>(
-                        buildWhen: (prev, curr) =>
-                            curr is GetSalaryLoadingState ||
-                            curr is GetSalaryLoadedState ||
-                            curr is GetSalaryErrorState,
-                        builder: (context, state) {
-                          if (state is GetSalaryLoadingState) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (state is GetSalaryLoadedState) {
-                            return AppDropdown<String>(
-                              title: "Salary Range",
-                              isRequired: true,
-                              hint: "Select Salary",
-                              items: state.salarys
-                                  .map((e) => e.salaryRange!)
-                                  .toList(),
-                              value: selectedSalaryRange?.salaryRange,
-                              onChanged: (v) {
-                                final selected = state.salarys.firstWhere(
-                                  (e) => e.salaryRange == v,
-                                );
-                                setState(() => selectedSalaryRange = selected);
-                              },
-                            );
-                          } else if (state is GetSalaryErrorState) {
-                            return Text("Error: ${state.message}");
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                      16.verticalSpace,
-
-                      // Locations
-                      AppTextField(
-                        lines: 4,
-                        title: "Permanent Location",
-                        hint: "Enter your permanent address",
-                        controller: permanentAddressController,
-                        onChanged: (val) => profileSetupBloc.add(
-                          UpdateFieldEvent(
-                            field: "permanentLocation",
-                            value: val,
-                          ),
-                        ),
-                      ),
-                      16.verticalSpace,
-                      AppTextField(
-                        lines: 4,
-                        title: "Work Location",
-                        hint: "Enter your work address",
-                        controller: workAddressController,
-                        onChanged: (val) => profileSetupBloc.add(
-                          UpdateFieldEvent(field: "workLocation", value: val),
-                        ),
-                      ),
-                      16.verticalSpace,
-                      AppTextField(
-                        lines: 4,
-                        title: "Native Location",
-                        hint: "Enter your Native address",
-                        controller: nativeAddressController,
-                        onChanged: (val) => profileSetupBloc.add(
-                          UpdateFieldEvent(field: "nativeLocation", value: val),
-                        ),
-                      ),
-                      100.verticalSpace,
-                    ],
-                  ).paddingHorizontal(24.w),
+                    ),
+                  ),
+                  40.verticalSpace,
                 ],
               ),
-            );
-          },
-        ),
-        bottomNavigationBar: SafeArea(
-          child: Container(
-            padding: EdgeInsets.all(24),
-            child: SizedBox(
-              height: 58.h,
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Handle proceed / save profile setup (call repo via bloc)
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.r),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildAvatarStack(BuildContext context, YourDetailModel user) {
+    final List<String?> avatars = [
+      user.profileSetup!.profileUrl1,
+      user.profileSetup!.profileUrl2,
+      user.profileSetup!.profileUrl3,
+      user.profileSetup!.profileUrl4,
+      user.profileSetup!.profileUrl5,
+    ];
+
+    return SizedBox(
+      height: 160.h,
+      child: BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
+        builder: (context, state) {
+          List<Map<String, dynamic>> avatarPositions = List.generate(
+            avatars.length,
+            (index) => {
+              'index': index,
+              'url': avatars[index] ?? '',
+              'top': index == centerIndex
+                  ? -40.0
+                  : index == 1 || index == 2
+                  ? -20.0
+                  : 20.0,
+              'left': index == 0
+                  ? 0.0
+                  : index == 1
+                  ? 60.w
+                  : index == 2
+                  ? null
+                  : index == 3
+                  ? MediaQuery.sizeOf(context).width * 0.32.w
+                  : null,
+              'right': index == 2
+                  ? 60.w
+                  : index == 4
+                  ? 0.0
+                  : null,
+              'size': index == centerIndex ? 152.h : 100.h,
+            },
+          );
+
+          int highlightedIndex = centerIndex;
+          if (state is SwitchImageState) {
+            highlightedIndex = state.selectedIndex;
+            avatarPositions = state.avatars.map((avatar) {
+              int idx = avatar['index'];
+              return {
+                ...avatar,
+                'top': idx == centerIndex
+                    ? -40.0
+                    : idx == 1 || idx == 2
+                    ? -15.0
+                    : 20.0,
+                'size': idx == centerIndex ? 152.h : 100.h,
+              };
+            }).toList();
+          }
+
+          return Stack(
+            clipBehavior: Clip.none,
+            children: List.generate(avatarPositions.length, (index) {
+              final avatar = avatarPositions[index];
+              return Positioned(
+                top: avatar['top'],
+                left: avatar['left'],
+                right: avatar['right'],
+                child: GestureDetector(
+                  onTap: () {
+                    if (index != highlightedIndex) {
+                      context.read<ProfileDetailBloc>().add(
+                        SwitchImageEvent(index, avatarPositions),
+                      );
+                    }
+                  },
+                  child: Container(
+                    height: avatar['size'],
+                    width: avatar['size'],
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: index == highlightedIndex
+                            ? AppColors.primary
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                      image: DecorationImage(
+                        image: CachedNetworkImageProvider(avatar['url']),
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 6.r,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                child: const Text(
-                  "Save & Update",
+              );
+            }),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileDetails(YourDetailModel user) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 16.h),
+        Card(
+          margin: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "About ${user.profileDetails?.fullname?.split(' ').first ?? ''}",
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 24.sp,
+                    fontFamily: Typo.playfairBold,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+                13.verticalSpace,
+                Text(
+                  user.profileSetup?.bio ?? '-',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontFamily: Typo.regular,
+                    color: Colors.black87,
+                  ),
+                ),
+                35.verticalSpace,
+                _profileDetail(
+                  "Profession",
+                  user.profileSetup?.professionName ?? '-',
+                ),
+                _profileDetail(
+                  "Education",
+                  user.profileSetup?.educationName ?? '-',
+                ),
+                _profileDetail("Salary", user.profileSetup?.salaryName ?? '-'),
+                _profileDetail(
+                  "Height",
+                  "${user.profileSetup?.height ?? '-'} cm",
+                ),
+                _profileDetail(
+                  "Marital Status",
+                  user.profileDetails?.maritalStatusName ?? '-',
+                ),
+                _profileDetail(
+                  "Work Location",
+                  user.profileSetup?.workLocation ?? '-',
+                ),
+                _profileDetail(
+                  "Permanent Location",
+                  user.profileSetup?.permanentLocation ?? '-',
+                ),
+                _profileDetail(
+                  "Religion",
+                  user.profileDetails?.religionName ?? '-',
+                ),
+                _profileDetail("Caste", user.profileDetails?.casteName ?? '-'),
+                _profileDetail(
+                  "Hobbies",
+                  user.profileDetails!.hobbies!
+                      .map((e) => e.hobbyName)
+                      .toList()
+                      .toString(),
+                ),
+                _profileDetail(
+                  "Mother Tongue",
+                  user.profileDetails?.motherTongueName ?? '-',
+                ),
+              ],
             ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _profileDetail(String title, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 6.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 170.w,
+            child: Text(
+              title,
+              style: TextStyle(fontFamily: Typo.bold, fontSize: 18.sp),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              ": $value",
+              style: TextStyle(fontFamily: Typo.medium, fontSize: 18.sp),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTag(String label) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.white.withOpacity(0.4)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12.sp,
+          fontFamily: Typo.medium,
         ),
       ),
     );

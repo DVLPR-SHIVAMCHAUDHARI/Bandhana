@@ -99,29 +99,29 @@ class FamilyDetailsModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["user_id"] = userId;
-    _data["family_type"] = familyType;
-    _data["fathers_name"] = fathersName;
-    _data["mothers_name"] = mothersName;
-    _data["family_status"] = familyStatus;
-    _data["family_values"] = familyValues;
-    _data["no_of_sisters"] = noOfSisters;
-    _data["mamas_kul_clan"] = mamasKulClan;
-    _data["no_of_brothers"] = noOfBrothers;
-    _data["fathers_contact"] = fathersContact;
-    _data["mothers_contact"] = mothersContact;
-    _data["family_type_name"] = familyTypeName;
-    _data["family_status_name"] = familyStatusName;
-    _data["family_values_name"] = familyValuesName;
-    _data["fathers_occupation"] = fathersOccupation;
-    _data["mothers_occupation"] = mothersOccupation;
-    _data["maternal_uncle_mamas_name"] = maternalUncleMamasName;
-    _data["relatives_family_surnames"] = relativesFamilySurnames;
-    _data["maternal_uncle_mamas_village"] = maternalUncleMamasVillage;
-    _data["error"] = error;
-    _data["code"] = code;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["id"] = id;
+    data["user_id"] = userId;
+    data["family_type"] = familyType;
+    data["fathers_name"] = fathersName;
+    data["mothers_name"] = mothersName;
+    data["family_status"] = familyStatus;
+    data["family_values"] = familyValues;
+    data["no_of_sisters"] = noOfSisters;
+    data["mamas_kul_clan"] = mamasKulClan;
+    data["no_of_brothers"] = noOfBrothers;
+    data["fathers_contact"] = fathersContact;
+    data["mothers_contact"] = mothersContact;
+    data["family_type_name"] = familyTypeName;
+    data["family_status_name"] = familyStatusName;
+    data["family_values_name"] = familyValuesName;
+    data["fathers_occupation"] = fathersOccupation;
+    data["mothers_occupation"] = mothersOccupation;
+    data["maternal_uncle_mamas_name"] = maternalUncleMamasName;
+    data["relatives_family_surnames"] = relativesFamilySurnames;
+    data["maternal_uncle_mamas_village"] = maternalUncleMamasVillage;
+    data["error"] = error;
+    data["code"] = code;
+    return data;
   }
 }

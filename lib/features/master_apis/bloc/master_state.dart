@@ -10,7 +10,8 @@ import 'package:bandhana/features/master_apis/models/nationality_model.dart';
 import 'package:bandhana/features/master_apis/models/profile_setup_model.dart';
 import 'package:bandhana/features/master_apis/models/salary_model.dart';
 import 'package:bandhana/features/master_apis/models/state_model.dart';
-import 'package:bandhana/features/master_apis/models/user_detail_model.dart';
+import 'package:bandhana/features/master_apis/models/register_profile_model.dart.dart';
+import 'package:bandhana/features/master_apis/models/your_detail_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bandhana/features/master_apis/models/zodiac_model.dart';
 import 'package:bandhana/features/master_apis/models/religion_model.dart';
@@ -471,7 +472,7 @@ class GetBasicCompatiblity1ErrorState extends MasterState {
   List<Object?> get props => [message];
 }
 
-// 🎨 BasicCompatiblity1
+// 🎨 BasicCompatiblity2
 class GetLifestylePreferenceLoadingState extends MasterState {
   @override
   List<Object?> get props => [];
@@ -488,6 +489,27 @@ class GetLifestylePreferenceLoadedState extends MasterState {
 class GetLifestylePreferenceErrorState extends MasterState {
   final String message;
   GetLifestylePreferenceErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+// 🎨
+class GetYourDetailsLoadingState extends MasterState {
+  @override
+  List<Object?> get props => [];
+}
+
+class GetYourDetailsLoadedState extends MasterState {
+  final YourDetailModel yourDetail;
+  GetYourDetailsLoadedState(this.yourDetail);
+
+  @override
+  List<Object?> get props => [yourDetail];
+}
+
+class GetYourDetailsErrorState extends MasterState {
+  final String message;
+  GetYourDetailsErrorState(this.message);
   @override
   List<Object?> get props => [message];
 }

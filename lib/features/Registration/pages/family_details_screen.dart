@@ -11,7 +11,6 @@ import 'package:bandhana/features/Registration/Bloc/family_details_bloc/family_d
 import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
 import 'package:bandhana/features/master_apis/bloc/master_event.dart';
 import 'package:bandhana/features/master_apis/bloc/master_state.dart';
-import 'package:bandhana/features/master_apis/models/family_details_model.dart';
 import 'package:bandhana/features/master_apis/models/family_type_model.dart';
 import 'package:bandhana/features/master_apis/models/family_status_model.dart';
 import 'package:bandhana/features/master_apis/models/family_values_model.dart';
@@ -295,8 +294,9 @@ class _FamilyDetailsScreenState extends State<FamilyDetailsScreen> {
 
                         // Remove country code from phone number for input field
                         String formatNumber(String? fullNumber) {
-                          if (fullNumber == null || fullNumber.isEmpty)
+                          if (fullNumber == null || fullNumber.isEmpty) {
                             return "";
+                          }
                           return fullNumber.length > 3
                               ? fullNumber.substring(fullNumber.length - 10)
                               : fullNumber;

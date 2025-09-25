@@ -25,6 +25,7 @@ class ProfileCard extends StatelessWidget {
   final String? age;
   final String? profession;
   final String? district;
+
   final List? hobbies;
 
   @override
@@ -173,6 +174,7 @@ class ProfileCard extends StatelessWidget {
                         pathParameters: {
                           "mode": ProfileMode.viewOther.name,
                           "id": id.toString(),
+                          "match": match.toString(),
                         },
                       );
                     },

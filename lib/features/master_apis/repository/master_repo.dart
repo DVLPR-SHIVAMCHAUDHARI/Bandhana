@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/repository/repository.dart';
 
@@ -242,6 +240,27 @@ class MasterRepo extends Repository {
       var response = await dio.get(
         "/profile/get-partner-lifestyle-preferences",
       );
+
+      if (response.data["Response"]["Status"]["StatusCode"] == "0") {
+        return {
+          "response": response.data["Response"]["ResponseData"],
+          "status": "Success",
+        };
+      } else {
+        return {
+          "response": response.data["Response"]["status"]["DisplayText"],
+          "status": "failure",
+        };
+      }
+    } catch (e) {
+      logger.e(e);
+      rethrow;
+    }
+  }
+
+  getYourDetail() async {
+    try {
+      var response = await dio.get("/matched/self-user-details");
 
       if (response.data["Response"]["Status"]["StatusCode"] == "0") {
         return {

@@ -13,7 +13,8 @@ import 'package:bandhana/features/master_apis/models/nationality_model.dart';
 import 'package:bandhana/features/master_apis/models/profile_setup_model.dart';
 import 'package:bandhana/features/master_apis/models/salary_model.dart';
 import 'package:bandhana/features/master_apis/models/state_model.dart';
-import 'package:bandhana/features/master_apis/models/user_detail_model.dart';
+import 'package:bandhana/features/master_apis/models/register_profile_model.dart.dart';
+import 'package:bandhana/features/master_apis/models/your_detail_model.dart';
 import 'package:bandhana/features/master_apis/models/zodiac_model.dart';
 import 'package:bandhana/features/master_apis/models/religion_model.dart';
 import 'package:bandhana/features/master_apis/models/caste_model.dart';
@@ -350,6 +351,23 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
         }
       } catch (e) {
         emit(GetLifestylePreferenceErrorState(e.toString()));
+      }
+    });
+    on<GetYourDetails>((event, emit) async {
+      emit(GetYourDetailsLoadingState());
+
+      try {
+        final result = await repo.getYourDetail();
+        if (result["status"] == "Success") {
+          logger.e('success');
+
+          YourDetailModel model = YourDetailModel.fromJson(result["response"]);
+          emit(GetYourDetailsLoadedState(model));
+        } else {
+          emit(GetYourDetailsErrorState(result["response"].toString()));
+        }
+      } catch (e) {
+        emit(GetYourDetailsErrorState(e.toString()));
       }
     });
 

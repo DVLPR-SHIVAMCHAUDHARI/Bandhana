@@ -20,7 +20,7 @@ import 'package:bandhana/features/master_apis/models/mother_tongue_model.dart';
 import 'package:bandhana/features/master_apis/models/nationality_model.dart';
 import 'package:bandhana/features/master_apis/models/religion_model.dart';
 import 'package:bandhana/features/master_apis/models/state_model.dart';
-import 'package:bandhana/features/master_apis/models/user_detail_model.dart';
+import 'package:bandhana/features/master_apis/models/register_profile_model.dart.dart';
 import 'package:bandhana/features/master_apis/models/zodiac_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

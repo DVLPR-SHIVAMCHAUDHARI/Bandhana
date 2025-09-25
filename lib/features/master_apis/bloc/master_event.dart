@@ -90,3 +90,6 @@ class GetBasicCompablity1 extends MasterEvent {}
 
 //getlifestylepref
 class GetLifestylePreferences extends MasterEvent {}
+
+//GetYourData
+class GetYourDetails extends MasterEvent {}

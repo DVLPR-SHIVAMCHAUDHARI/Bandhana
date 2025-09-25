@@ -28,8 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // fire APIs once on home load
-    context.read<MasterBloc>().add(GetProfileDetailsEvent());
-    context.read<MasterBloc>().add(GetProfileSetupEvent());
+    context.read<MasterBloc>().add(GetYourDetails());
+
     context.read<HomeBloc>().add(FetchUsersEvent()); // ✅ moved from build
   }
 
@@ -42,8 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: RefreshIndicator(
             onRefresh: () async {
               // Trigger your API calls again
-              context.read<MasterBloc>().add(GetProfileDetailsEvent());
-              context.read<MasterBloc>().add(GetProfileSetupEvent());
+              context.read<MasterBloc>().add(GetYourDetails());
+
               context.read<HomeBloc>().add(FetchUsersEvent());
 
               // Optionally wait for a short duration for smooth effect
@@ -126,15 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              _buildUserAvatar(),
-              9.horizontalSpace,
-              GestureDetector(
-                onTap: () => router.goNamed(Routes.myProfile.name),
-                child: _buildUserDetails(),
-              ),
-            ],
+          GestureDetector(
+            onTap: () => router.goNamed(Routes.myProfile.name),
+            child: _buildUserHeaderInfo(), // ✅ one BlocBuilder instead of two
           ),
           Row(
             children: [
@@ -160,102 +154,94 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// 🔹 User Avatar (from Setup API)
-  Widget _buildUserAvatar() {
+  /// 🔹 User Avatar + Details combined
+  Widget _buildUserHeaderInfo() {
     return BlocBuilder<MasterBloc, MasterState>(
       buildWhen: (prev, curr) =>
-          curr is GetProfileSetupLoadingState ||
-          curr is GetProfileSetupLoadedState ||
-          curr is GetProfileSetupErrorState,
+          curr is GetYourDetailsLoadingState ||
+          curr is GetYourDetailsLoadedState ||
+          curr is GetYourDetailsErrorState,
       builder: (context, state) {
-        if (state is GetProfileSetupLoadingState) {
-          return _loadingAvatar();
-        } else if (state is GetProfileSetupLoadedState) {
-          final url = state.profileSetup.profileUrl1;
-          if (url != null && url.isNotEmpty) {
-            return CircleAvatar(
-              radius: 21,
-              backgroundImage: CachedNetworkImageProvider(url),
-            );
-          } else {
-            return const CircleAvatar(radius: 21, child: Icon(Icons.person));
-          }
-        }
-        return const CircleAvatar(radius: 21, child: Icon(Icons.person));
-      },
-    );
-  }
-
-  Widget _loadingAvatar() => const SizedBox(
-    height: 42,
-    width: 42,
-    child: CircleAvatar(child: CircularProgressIndicator(strokeWidth: 2)),
-  );
-
-  /// 🔹 User Details (from Details API)
-  Widget _buildUserDetails() {
-    return BlocBuilder<MasterBloc, MasterState>(
-      buildWhen: (prev, curr) =>
-          curr is GetProfileDetailsLoadingState ||
-          curr is GetProfileDetailsLoadedState ||
-          curr is GetProfileDetailsErrorState,
-      builder: (context, state) {
-        if (state is GetProfileDetailsLoadingState) {
-          return const SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(
-              color: Colors.white,
-              strokeWidth: 2,
-            ),
-          );
-        } else if (state is GetProfileDetailsLoadedState) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        if (state is GetYourDetailsLoadingState) {
+          return Row(
             children: [
-              Text(
-                state.profileDetail.fullname ?? "No name",
-                style: TextStyle(
-                  fontFamily: Typo.semiBold,
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                ),
+              const CircleAvatar(
+                radius: 21,
+                child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              Text(
-                state.profileDetail.districtName ?? "No district",
-                style: TextStyle(
-                  fontFamily: Typo.regular,
-                  color: Colors.white,
-                  fontSize: 12.sp,
-                ),
+              9.horizontalSpace,
+              const Text("Loading...", style: TextStyle(color: Colors.white)),
+            ],
+          );
+        } else if (state is GetYourDetailsLoadedState) {
+          final user = state.yourDetail;
+          return Row(
+            children: [
+              CircleAvatar(
+                radius: 21,
+                backgroundImage:
+                    (user.profileDetails!.fullname != null &&
+                        user.profileSetup!.profileUrl1!.isNotEmpty)
+                    ? CachedNetworkImageProvider(
+                        user.profileSetup!.profileUrl1!,
+                      )
+                    : null,
+                child:
+                    (user.profileSetup!.profileUrl1 == null ||
+                        user.profileSetup!.profileUrl1!.isEmpty)
+                    ? const Icon(Icons.person)
+                    : null,
+              ),
+              9.horizontalSpace,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user.profileDetails!.fullname ?? "No name",
+                    style: TextStyle(
+                      fontFamily: Typo.semiBold,
+                      color: Colors.white,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                  Text(
+                    user.profileDetails!.districtName ?? "No district",
+                    style: TextStyle(
+                      fontFamily: Typo.regular,
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                    ),
+                  ),
+                ],
               ),
             ],
           );
-        } else if (state is GetProfileDetailsErrorState) {
+        } else if (state is GetYourDetailsErrorState) {
           return const Text(
             "Failed to load profile",
             style: TextStyle(color: Colors.red),
           );
         }
-        // fallback from local db
+
+        // fallback from local DB
         final localUser = localDb.getUserData();
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        return Row(
           children: [
-            Text(
-              localUser?.fullname ?? "Guest User",
-              style: TextStyle(
-                fontFamily: Typo.semiBold,
-                color: Colors.white,
-                fontSize: 14.sp,
-              ),
-            ),
-            Text(
-              "Loading...",
-              style: TextStyle(
-                fontFamily: Typo.regular,
-                color: Colors.white,
-                fontSize: 12.sp,
-              ),
+            const CircleAvatar(radius: 21, child: Icon(Icons.person)),
+            9.horizontalSpace,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  localUser?.fullname ?? "Guest User",
+                  style: TextStyle(
+                    fontFamily: Typo.semiBold,
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                  ),
+                ),
+                const Text("Loading...", style: TextStyle(color: Colors.white)),
+              ],
             ),
           ],
         );

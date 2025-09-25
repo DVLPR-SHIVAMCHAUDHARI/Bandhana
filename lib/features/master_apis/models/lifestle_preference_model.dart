@@ -73,19 +73,19 @@ class LifestylePreferenceModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["diet"] = diet;
-    _data["user_id"] = userId;
-    _data["pet_friendly"] = petFriendly;
-    _data["daily_routine"] = dailyRoutine;
-    _data["sleep_pattern"] = sleepPattern;
-    _data["smoking_habit"] = smokingHabit;
-    _data["drinking_habit"] = drinkingHabit;
-    _data["fitness_activity"] = fitnessActivity;
-    _data["travel_preferences"] = travelPreferences;
-    _data["error"] = error;
-    _data["code"] = code;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["id"] = id;
+    data["diet"] = diet;
+    data["user_id"] = userId;
+    data["pet_friendly"] = petFriendly;
+    data["daily_routine"] = dailyRoutine;
+    data["sleep_pattern"] = sleepPattern;
+    data["smoking_habit"] = smokingHabit;
+    data["drinking_habit"] = drinkingHabit;
+    data["fitness_activity"] = fitnessActivity;
+    data["travel_preferences"] = travelPreferences;
+    data["error"] = error;
+    data["code"] = code;
+    return data;
   }
 }

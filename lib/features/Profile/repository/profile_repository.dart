@@ -1,0 +1,29 @@
+import 'package:bandhana/core/repository/repository.dart';
+
+import 'package:bandhana/features/Profile/model/user_detail_model.dart';
+
+class ProfileRepository extends Repository {
+  Future<Map<String, dynamic>> getUserById({id}) async {
+    try {
+      var response = await dio.get(
+        "/matched/user-details",
+        queryParameters: {"user_id": id},
+      );
+
+      if (response.data["Response"]["Status"]["StatusCode"] == "0") {
+        final Map<String, dynamic> userJson =
+            response.data["Response"]["ResponseData"];
+        final UserDetailModel userDetails = UserDetailModel.fromJson(userJson);
+
+        return {"status": "Success", "response": userDetails};
+      } else {
+        return {
+          "status": "Failure",
+          "response": response.data["Response"]["Status"]["DisplayText"],
+        };
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+}

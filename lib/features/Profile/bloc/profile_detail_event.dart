@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-abstract class ProfileDetailEvent extends Equatable {}
+abstract class ProfileDetailEvent extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 class SwitchImageEvent extends ProfileDetailEvent {
   final int selectedIndex;
@@ -8,6 +11,14 @@ class SwitchImageEvent extends ProfileDetailEvent {
 
   SwitchImageEvent(this.selectedIndex, this.avatars);
   @override
-  // TODO: implement props
   List<Object?> get props => [avatars, selectedIndex];
+}
+
+class ToggleFavoriteEvent extends ProfileDetailEvent {}
+
+class GetUserDetailById extends ProfileDetailEvent {
+  final String id;
+  GetUserDetailById(this.id);
+  @override
+  List<Object?> get props => [id];
 }

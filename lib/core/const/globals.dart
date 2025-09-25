@@ -22,6 +22,7 @@ import 'package:bandhana/features/Onboarding/pages/onboarding_screen.dart';
 import 'package:bandhana/features/Profile/bloc/profile_detail_bloc.dart';
 import 'package:bandhana/features/Profile/pages/message_requested_screen.dart';
 import 'package:bandhana/features/Profile/pages/profile_detail_screen.dart';
+import 'package:bandhana/features/Registration/pages/edit_profile_screen.dart';
 import 'package:bandhana/features/Registration/pages/family_details_screen.dart';
 import 'package:bandhana/features/Registration/pages/registration_screen.dart';
 import 'package:bandhana/features/Requests/pages/request_screen.dart';
@@ -59,6 +60,7 @@ enum Routes {
   messageRequested,
   choosePlan,
   myProfile,
+  editProfile,
   privacyPolicy,
   about,
   chat,
@@ -161,7 +163,7 @@ GoRouter router = GoRouter(
       ],
     ),
     GoRoute(
-      path: "/profileDetail/:mode/:id",
+      path: "/profileDetail/:mode/:id/:match",
       name: Routes.profileDetail.name,
       builder: (context, state) {
         return MultiBlocProvider(
@@ -170,6 +172,7 @@ GoRouter router = GoRouter(
             BlocProvider(create: (context) => HomeBloc()),
           ],
           child: ProfileDetailedScreen(
+            match: state.pathParameters['match'] ?? "50",
             id: state.pathParameters['id'] ?? "1",
             mode: state.pathParameters['mode'] ?? "viewOther",
           ),
@@ -251,6 +254,14 @@ GoRouter router = GoRouter(
         child: MyProfileScreen(),
       ),
       name: Routes.myProfile.name,
+    ),
+    GoRoute(
+      path: "/editProfile",
+      builder: (context, state) => BlocProvider(
+        create: (context) => ProfileSetupBloc(),
+        child: EditProfileScreen(),
+      ),
+      name: Routes.editProfile.name,
     ),
     GoRoute(
       path: "/privacyPolicy", // fixed typo (was privayPolicy)

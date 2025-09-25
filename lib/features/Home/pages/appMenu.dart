@@ -20,8 +20,8 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
   @override
   void initState() {
     super.initState();
-    context.read<MasterBloc>().add(GetProfileDetailsEvent());
-    context.read<MasterBloc>().add(GetProfileSetupEvent());
+    // ✅ Fire only once
+    context.read<MasterBloc>().add(GetYourDetails());
   }
 
   @override
@@ -54,101 +54,93 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
     return Row(
       children: [
         10.widthBox,
-
-        /// Avatar
-        BlocBuilder<MasterBloc, MasterState>(
-          buildWhen: (prev, curr) =>
-              curr is GetProfileSetupLoadingState ||
-              curr is GetProfileSetupLoadedState ||
-              curr is GetProfileSetupErrorState,
-          builder: (context, state) {
-            if (state is GetProfileSetupLoadingState) {
-              return const SizedBox(
-                height: 48,
-                width: 48,
-                child: CircleAvatar(
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              );
-            } else if (state is GetProfileSetupLoadedState &&
-                state.profileSetup.profileUrl1 != null) {
-              return ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: state.profileSetup.profileUrl1!,
-                  height: 48,
-                  width: 48,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const CircleAvatar(
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  errorWidget: (context, url, error) =>
-                      const CircleAvatar(child: Icon(Icons.person)),
-                ),
-              );
-            }
-            return const CircleAvatar(radius: 24, child: Icon(Icons.person));
-          },
-        ),
-
-        12.horizontalSpace,
-
-        /// Name + District
         Expanded(
           child: BlocBuilder<MasterBloc, MasterState>(
             buildWhen: (prev, curr) =>
-                curr is GetProfileDetailsLoadingState ||
-                curr is GetProfileDetailsLoadedState ||
-                curr is GetProfileDetailsErrorState,
+                curr is GetYourDetailsLoadingState ||
+                curr is GetYourDetailsLoadedState ||
+                curr is GetYourDetailsErrorState,
             builder: (context, state) {
-              if (state is GetProfileDetailsLoadingState) {
-                return const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                );
-              } else if (state is GetProfileDetailsLoadedState) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              if (state is GetYourDetailsLoadingState) {
+                return Row(
                   children: [
-                    Text(
-                      state.profileDetail.fullname ?? "No name",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                    const CircleAvatar(
+                      radius: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     ),
-                    Text(
-                      state.profileDetail.districtName ?? "No district",
-                      style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                    12.horizontalSpace,
+                    const Text("Loading..."),
+                  ],
+                );
+              } else if (state is GetYourDetailsLoadedState) {
+                final user = state.yourDetail;
+
+                return Row(
+                  children: [
+                    ClipOval(
+                      child:
+                          (user.profileSetup?.profileUrl1 != null &&
+                              user.profileSetup!.profileUrl1!.isNotEmpty)
+                          ? CachedNetworkImage(
+                              imageUrl: user.profileSetup!.profileUrl1!,
+                              height: 48,
+                              width: 48,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const CircleAvatar(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const CircleAvatar(child: Icon(Icons.person)),
+                            )
+                          : const CircleAvatar(
+                              radius: 24,
+                              child: Icon(Icons.person),
+                            ),
+                    ),
+                    12.horizontalSpace,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.profileDetails?.fullname ?? "No name",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          user.profileDetails?.districtName ?? "No district",
+                          style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                        ),
+                      ],
                     ),
                   ],
                 );
+              } else if (state is GetYourDetailsErrorState) {
+                return const Text("Failed to load user");
               }
 
               // fallback from localDb
               final localUser = localDb.getUserData();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return Row(
                 children: [
-                  Text(
-                    localUser?.fullname ?? "Guest User",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const Text(
-                    "Loading...",
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  const CircleAvatar(radius: 24, child: Icon(Icons.person)),
+                  12.horizontalSpace,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(localUser?.fullname ?? "Guest User"),
+                      const Text("Loading..."),
+                    ],
                   ),
                 ],
               );
             },
           ),
         ),
-
         IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_forward_ios, size: 16),

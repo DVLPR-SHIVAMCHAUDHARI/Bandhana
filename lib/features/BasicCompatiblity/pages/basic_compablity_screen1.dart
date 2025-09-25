@@ -12,7 +12,6 @@ import 'package:bandhana/features/BasicCompatiblity/widgets/app_multiselect_drop
 import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
 import 'package:bandhana/features/master_apis/bloc/master_event.dart';
 import 'package:bandhana/features/master_apis/bloc/master_state.dart';
-import 'package:bandhana/features/master_apis/models/basic_compatiblity_model.dart';
 import 'package:bandhana/features/master_apis/models/caste_model.dart';
 import 'package:bandhana/features/master_apis/models/district_model.dart';
 import 'package:bandhana/features/master_apis/models/education_model.dart';
