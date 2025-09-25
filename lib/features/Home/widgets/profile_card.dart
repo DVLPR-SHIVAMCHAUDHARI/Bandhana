@@ -93,13 +93,14 @@ class ProfileCard extends StatelessWidget {
                 //     ),
                 //   ),
                 // ),
-                10.horizontalSpace,
+                // 10.horizontalSpace,
                 Text(
-                  match ?? "",
+                  "$match % Match" ?? "",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
+                    fontFamily: Typo.bold,
                   ),
                 ),
               ],

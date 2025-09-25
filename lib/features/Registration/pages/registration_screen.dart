@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/saveNextButton.dart';
+import 'package:bandhana/core/const/snack_bar.dart';
 import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
 import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
 import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
@@ -25,13 +26,15 @@ import 'package:bandhana/features/master_apis/models/zodiac_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/typography.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
+  RegistrationScreen({super.key, required this.type});
+  String type;
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
@@ -319,10 +322,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
-        leading: BackButton(
-          color: Colors.black,
-          onPressed: () => router.goNamed(Routes.signin.name),
-        ),
+        leading: widget.type == "edit"
+            ? null
+            : BackButton(
+                color: Colors.black,
+                onPressed: () => router.goNamed(Routes.signin.name),
+              ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -950,7 +955,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 );
 
                                 // Navigate to next screen after submission
-                                router.goNamed(Routes.profilesetup.name);
+                                widget.type == "edit"
+                                    ? snackbar(
+                                        context,
+                                        color: Colors.green,
+                                        message: "Success",
+                                        title: "Great",
+                                      )
+                                    : router.goNamed(Routes.profilesetup.name);
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

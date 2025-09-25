@@ -186,13 +186,16 @@ GoRouter router = GoRouter(
       name: Routes.messageRequested.name,
     ),
     GoRoute(
-      path: "/register",
-      builder: (context, state) => RegistrationScreen(),
+      path: "/register/:type",
+      builder: (context, state) =>
+          RegistrationScreen(type: state.pathParameters["type"] ?? "normal"),
       name: Routes.register.name,
       routes: [
         GoRoute(
-          path: "profilesetup",
-          builder: (context, state) => ProfileSetupScreen(),
+          path: "profilesetup/:type1",
+          builder: (context, state) => ProfileSetupScreen(
+            type: state.pathParameters["type1"] ?? "normal",
+          ),
           name: Routes.profilesetup.name,
           routes: [
             GoRoute(

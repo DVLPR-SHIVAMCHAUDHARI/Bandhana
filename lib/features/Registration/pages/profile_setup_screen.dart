@@ -22,7 +22,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
-  const ProfileSetupScreen({super.key});
+  ProfileSetupScreen({super.key, required this.type});
+  String type;
 
   @override
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -106,7 +107,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       value: bloc,
       child: Scaffold(
         appBar: AppBar(
-          leading: const BackButton(color: Colors.black),
+          automaticallyImplyLeading: widget.type == "edit" ? false : true,
           title: Text(
             "Profile Setup",
             style: TextStyle(fontSize: 24.sp, fontFamily: Typo.bold),
@@ -414,7 +415,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                             context,
                             message: state.message,
                           );
-                          router.goNamed(Routes.familyDetails.name);
+                          widget.type == "edit"
+                              ? null
+                              : router.goNamed(Routes.familyDetails.name);
                         } else if (state is ProfileSetupSubmitFailureState) {
                           snackbar(
                             context,

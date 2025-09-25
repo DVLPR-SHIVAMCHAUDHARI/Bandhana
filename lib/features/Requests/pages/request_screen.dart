@@ -191,6 +191,7 @@ class RequestCard extends StatelessWidget {
                       Routes.profileDetail.name,
 
                       pathParameters: {
+                        "match": "90",
                         "mode": ProfileMode.incomingRequest.name,
                         "id": 1.toString(),
                       },

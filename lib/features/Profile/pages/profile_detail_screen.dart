@@ -482,7 +482,7 @@ class ProfileDetailedScreen extends StatelessWidget {
         children: [
           Center(
             child: Text(
-              "$match With Your Profile",
+              "$match % Match With Your Profile",
               style: TextStyle(
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
