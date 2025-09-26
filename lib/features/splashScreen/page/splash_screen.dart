@@ -47,12 +47,19 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (token.accessToken != null && token.accessToken!.isNotEmpty) {
       final user = localDb.getUserData();
+      logger.e(user);
       if (user != null) {
         if (user.profileDetails == 0) {
-          router.goNamed(Routes.register.name);
+          router.goNamed(
+            Routes.register.name,
+            pathParameters: {"type": "normal"},
+          );
           return;
         } else if (user.profileSetup == 0) {
-          router.goNamed(Routes.profilesetup.name);
+          router.goNamed(
+            Routes.profilesetup.name,
+            pathParameters: {"type1": "normal"},
+          );
           return;
         } else if (user.familyDetails == 0) {
           router.goNamed(Routes.familyDetails.name);

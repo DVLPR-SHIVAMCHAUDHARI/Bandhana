@@ -66,3 +66,24 @@ class ProfileDetailError extends GetProfileDetailState {
   @override
   List<Object?> get props => [message];
 }
+
+class SendRequestLoadingState extends ProfileDetailState {}
+
+class SendRequestLoadedState extends ProfileDetailState {
+  final String message;
+
+  SendRequestLoadedState(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+// 🔹 Error state
+class SendRequestErrorState extends GetProfileDetailState {
+  final String message;
+
+  SendRequestErrorState(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

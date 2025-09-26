@@ -42,7 +42,6 @@ class DocRepository extends Repository {
       );
 
       if (response.data['Response']['Status']['StatusCode'] == "0") {
-        updateprofileSetupFlag();
         return {
           "message": response.data['Response']['Status']['DisplayText'],
           "status": "success",
@@ -57,24 +56,5 @@ class DocRepository extends Repository {
       logger.e(e);
       return {"message": "An error occurred: $e", "status": "error"};
     }
-  }
-}
-
-Future<void> updateprofileSetupFlag() async {
-  final db = LocalDbService.instance;
-  final currentUser = db.getUserData();
-  if (currentUser != null) {
-    final updatedUser = UserModel(
-      mobileNumber: currentUser.mobileNumber,
-      fullname: currentUser.fullname,
-      profileDetails: currentUser.profileDetails,
-      profileSetup: currentUser.profileSetup,
-      documentVerification: 1,
-      partnerExpectations: currentUser.partnerExpectations,
-
-      partnerLifeStyle: currentUser.partnerLifeStyle,
-      familyDetails: currentUser.familyDetails,
-    );
-    await db.saveUserData(updatedUser);
   }
 }

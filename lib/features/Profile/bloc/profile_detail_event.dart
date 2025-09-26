@@ -22,3 +22,10 @@ class GetUserDetailById extends ProfileDetailEvent {
   @override
   List<Object?> get props => [id];
 }
+
+class SendRequestEvent extends ProfileDetailEvent {
+  final String id;
+  SendRequestEvent(this.id);
+  @override
+  List<Object?> get props => [id];
+}

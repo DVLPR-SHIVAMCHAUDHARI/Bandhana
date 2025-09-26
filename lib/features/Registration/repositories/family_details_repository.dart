@@ -47,7 +47,6 @@ class FamilyDetailRepository extends Repository {
       );
 
       if (response.data['Response']['Status']['StatusCode'] == "0") {
-        updateFamilyDetailsFlag();
         return {
           "message": response.data['Response']['Status']['DisplayText'],
           "status": "success",
@@ -63,27 +62,4 @@ class FamilyDetailRepository extends Repository {
       return {"message": "Error occurred: $e", "status": "error"};
     }
   }
-}
-
-Future<void> updateFamilyDetailsFlag() async {
-  final db = LocalDbService.instance;
-
-  // get current user
-  final currentUser = db.getUserData();
-
-  // create updated user with familyDetails = 1
-  final updatedUser = UserModel(
-    mobileNumber: currentUser!.mobileNumber,
-    fullname: currentUser.fullname,
-    profileDetails: currentUser.profileDetails,
-    profileSetup: currentUser.profileSetup,
-    documentVerification: currentUser.documentVerification,
-    partnerExpectations: currentUser.partnerExpectations,
-
-    partnerLifeStyle: currentUser.partnerLifeStyle,
-    familyDetails: 1, // ✅ update this
-  );
-
-  // save back to Hive
-  await db.saveUserData(updatedUser);
 }

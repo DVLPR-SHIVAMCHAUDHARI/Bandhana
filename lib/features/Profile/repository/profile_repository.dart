@@ -26,4 +26,27 @@ class ProfileRepository extends Repository {
       rethrow;
     }
   }
+
+  Future<Map<String, dynamic>> sendRequest({id}) async {
+    try {
+      var response = await dio.post(
+        "/matched/send-request",
+        queryParameters: {"user_id": id},
+      );
+
+      if (response.data["Response"]["Status"]["StatusCode"] == "0") {
+        return {
+          "status": "Success",
+          "response": response.data["Response"]["Status"]["DisplayText"],
+        };
+      } else {
+        return {
+          "status": "Failure",
+          "response": response.data["Response"]["Status"]["DisplayText"],
+        };
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

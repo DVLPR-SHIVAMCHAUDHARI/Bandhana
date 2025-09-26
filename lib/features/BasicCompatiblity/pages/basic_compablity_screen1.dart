@@ -582,6 +582,7 @@ class _BasicCompablityScreen1State extends State<BasicCompablityScreen1> {
                           message: state.message,
                         );
                         router.pushNamed(Routes.compatablity2.name);
+                        context.read<MasterBloc>().add(GetprofileStatus());
                       } else if (state is PreferencesFailure) {
                         snackbar(context, message: state.message);
                       }

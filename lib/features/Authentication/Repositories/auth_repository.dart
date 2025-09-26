@@ -69,11 +69,29 @@ class AuthRepository extends Repository {
       if (statusCode == "0") {
         final responseData = response.data['Response']['ResponseData'];
 
-        // 1️⃣ Store access token
+        // Store access token
         await token.storeTokens(accessToken: responseData['x_auth_token']);
 
-        // 2️⃣ Save user to Hive
-        await saveUserAfterOtp(responseData);
+        // Save user in Hive
+        await saveUserAfterOtp(
+          UserModel(
+            code: null,
+            district: null,
+            documentVerification: responseData["document_verification"],
+            error: null,
+            familyDetails: responseData["family_details"],
+            fullname: responseData['fullname'],
+            isDocumentVerification: responseData["is_document_verification"],
+            mobileNumber: responseData['mobile_number'],
+            partnerExpectations: responseData['partner_expectations'],
+            partnerLifeStyle: responseData['partner_life_style'],
+            paymentDone: null,
+            profileDetails: responseData['profile_details'],
+            profileSetup: responseData['profile_setup'],
+            profileUrl1: null,
+            userId: null,
+          ),
+        );
 
         return {"status": "success", "message": message};
       } else {
@@ -81,18 +99,16 @@ class AuthRepository extends Repository {
       }
     } catch (e, st) {
       logger.e("Error verifying OTP: $e\n$st");
-      rethrow;
+      return {"status": "failure", "message": "Something went wrong"};
     }
   }
 
   /// Save user after OTP verification
-  Future<void> saveUserAfterOtp(Map<String, dynamic> response) async {
-    // Convert API response to UserModel
-    final userModel = UserModel.fromJson(response);
-    print("📦 UserModel created: $userModel");
+  Future<void> saveUserAfterOtp(response) async {
+    print("📦 UserModel created: $response");
 
     // Save user to Hive
-    await localDb.saveUserData(userModel);
+    await localDb.saveUserData(response);
 
     // Optional: print saved data for debugging
     final savedUser = localDb.getUserData();

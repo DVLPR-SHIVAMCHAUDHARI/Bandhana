@@ -185,10 +185,16 @@ class OtpVerificationScreen extends StatelessWidget {
                           return;
                         } else if (user != null) {
                           if (user.profileDetails == 0) {
-                            router.goNamed(Routes.register.name);
+                            router.goNamed(
+                              Routes.register.name,
+                              pathParameters: {"type": "normal"},
+                            );
                             return;
                           } else if (user.profileSetup == 0) {
-                            router.goNamed(Routes.profilesetup.name);
+                            router.goNamed(
+                              Routes.profilesetup.name,
+                              pathParameters: {"type1": "normal"},
+                            );
                             return;
                           } else if (user.documentVerification == 0) {
                             router.goNamed(Routes.docVerification.name);

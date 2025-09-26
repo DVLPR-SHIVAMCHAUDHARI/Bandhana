@@ -963,6 +963,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                         title: "Great",
                                       )
                                     : router.goNamed(Routes.profilesetup.name);
+                                context.read<MasterBloc>().add(
+                                  GetprofileStatus(),
+                                );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

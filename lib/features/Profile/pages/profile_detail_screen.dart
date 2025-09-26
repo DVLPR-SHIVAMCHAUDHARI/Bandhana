@@ -121,40 +121,63 @@ class ProfileDetailedScreen extends StatelessWidget {
                   ),
                   10.widthBox,
                   Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        ProfileType.normal.name == "normal"
-                            ? router.pushNamed(Routes.choosePlan.name)
-                            : router.pushNamed(Routes.messageRequested.name);
+                    child: BlocConsumer<ProfileDetailBloc, ProfileDetailState>(
+                      listener: (context, state) {
+                        if (state is SendRequestLoadedState) {
+                          router.pushNamed(Routes.messageRequested.name);
+                        } else if (state is SendRequestErrorState) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(state.message)),
+                          );
+                        }
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 24.r,
-                              offset: Offset(4, 8),
-                              color: AppColors
-                                  .primaryOpacity, // Assuming this is defined
+                      builder: (context, state) {
+                        if (state is SendRequestLoadingState) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
                             ),
-                          ],
-                          gradient: AppColors
-                              .buttonGradient, // Assuming this is defined
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 32.w,
-                          vertical: 14.h,
-                        ),
-                        child: Text(
-                          textAlign: TextAlign.center,
-                          "Show Interest",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: Typo.bold,
-                            fontSize: 16.sp,
+                          );
+                        }
+
+                        return InkWell(
+                          onTap: () {
+                            if (localDb.getUserData()!.paymentDone == 0) {
+                              router.pushNamed(Routes.choosePlan.name);
+                            } else {
+                              context.read<ProfileDetailBloc>().add(
+                                SendRequestEvent(id),
+                              );
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 24.r,
+                                  offset: Offset(4, 8),
+                                  color: AppColors.primaryOpacity,
+                                ),
+                              ],
+                              gradient: AppColors.buttonGradient,
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 32.w,
+                              vertical: 14.h,
+                            ),
+                            child: Text(
+                              textAlign: TextAlign.center,
+                              "Show Interest",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: Typo.bold,
+                                fontSize: 16.sp,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -476,7 +499,7 @@ class ProfileDetailedScreen extends StatelessWidget {
   // --- _buildProfileDetails ---
   Widget _buildProfileDetails(UserDetailModel user) {
     return Padding(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.symmetric(vertical: 20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -498,6 +521,7 @@ class ProfileDetailedScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 🔹 Title
                   Text(
                     "About ${user.profileDetails!.fullname!.split(' ').first}",
                     style: TextStyle(
@@ -507,6 +531,8 @@ class ProfileDetailedScreen extends StatelessWidget {
                     ),
                   ),
                   13.verticalSpace,
+
+                  // 🔹 Bio
                   Text(
                     user.profileSetup!.bio!,
                     style: TextStyle(
@@ -515,50 +541,152 @@ class ProfileDetailedScreen extends StatelessWidget {
                       color: Colors.black87,
                     ),
                   ),
-                  35.verticalSpace,
-                  _profileDetail(
-                    "Profession",
-                    user.profileSetup!.professionName!,
-                  ),
-                  _profileDetail(
-                    "Education",
-                    user.profileSetup!.educationName!,
-                  ),
-                  _profileDetail(
-                    "Religion",
-                    user.profileDetails!.religionName!,
-                  ),
-                  _profileDetail("Caste", user.profileDetails!.casteName!),
-                  _profileDetail(
-                    "Location",
-                    user.profileDetails!.districtName!,
-                  ),
-                  _profileDetail(
-                    "Job Location",
-                    user.profileDetails!.districtName!,
-                  ),
-                  _profileDetail(
-                    "Birth Place",
-                    user.profileDetails!.birthPlace!,
-                  ),
-                  _profileDetail("Birth Time", user.profileDetails!.birthTime!),
-                  _profileDetail("Zodiac", user.profileDetails!.zodiacName!),
-                  _profileDetail(
-                    "Language Spoken",
-                    user.profileDetails!.motherTongueName!,
-                  ),
-                  _profileDetail("Height", "${user.profileSetup!.height} cm"),
-                  _profileDetail(
-                    "Marital Status",
-                    user.profileDetails!.maritalStatusName!,
-                  ),
-                  _profileDetail("Match Percentage", match),
+
+                  30.verticalSpace,
+
+                  _sectionCard("Personal Details", [
+                    _profileDetail("Full Name", user.profileDetails!.fullname!),
+                    _profileDetail("Age", user.profileSetup!.age.toString()),
+                    _profileDetail("Gender", user.profileDetails!.genderName!),
+                    _profileDetail(
+                      "Date of Birth",
+                      user.profileDetails!.dateOfBirth!,
+                    ),
+                    _profileDetail(
+                      "Religion",
+                      user.profileDetails!.religionName!,
+                    ),
+                    _profileDetail("Caste", user.profileDetails!.casteName!),
+                    _profileDetail(
+                      "Mother Tongue",
+                      user.profileDetails!.motherTongueName!,
+                    ),
+                    _profileDetail(
+                      "Nationality",
+                      user.profileDetails!.nationalityName!,
+                    ),
+                    _profileDetail(
+                      "Blood Group",
+                      user.profileDetails!.bloodGroupName!,
+                    ),
+                  ], icon: Icons.person),
+
+                  _sectionCard("Family Details", [
+                    _profileDetail(
+                      "Father's Name",
+                      user.familyDetails!.fathersName!,
+                    ),
+                    _profileDetail(
+                      "Mother's Name",
+                      user.familyDetails!.mothersName!,
+                    ),
+                    _profileDetail(
+                      "Family Type",
+                      user.familyDetails!.familyTypeName!,
+                    ),
+                    _profileDetail(
+                      "Family Status",
+                      user.familyDetails!.familyStatusName!,
+                    ),
+                    _profileDetail(
+                      "Family Values",
+                      user.familyDetails!.familyValuesName!,
+                    ),
+                  ], icon: Icons.family_restroom),
+
+                  _sectionCard("Academics & Profession", [
+                    _profileDetail(
+                      "Education",
+                      user.profileSetup!.educationName!,
+                    ),
+                    _profileDetail(
+                      "Profession",
+                      user.profileSetup!.professionName!,
+                    ),
+                    _profileDetail("Salary", user.profileSetup!.salaryName!),
+                    _profileDetail(
+                      "Work Location",
+                      user.profileSetup!.workLocation!,
+                    ),
+                    _profileDetail(
+                      "Permanent Location",
+                      user.profileSetup!.permanentLocation!,
+                    ),
+                  ], icon: Icons.school),
+
+                  _sectionCard("Lifestyle & Preferences", [
+                    _profileDetail(
+                      "Diet",
+                      user.patnerLifeStylePreferences!.diet!,
+                    ),
+                    _profileDetail(
+                      "Smoking Habit",
+                      user.patnerLifeStylePreferences!.smokingHabit!,
+                    ),
+                    _profileDetail(
+                      "Drinking Habit",
+                      user.patnerLifeStylePreferences!.drinkingHabit!,
+                    ),
+                    _profileDetail(
+                      "Fitness Activity",
+                      user.patnerLifeStylePreferences!.fitnessActivity!,
+                    ),
+                    _profileDetail(
+                      "Travel Preferences",
+                      user.patnerLifeStylePreferences!.travelPreferences!,
+                    ),
+                  ], icon: Icons.favorite),
+
+                  _sectionCard("Hobbies", [
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: user.profileDetails!.hobbies!
+                          .map((h) => Chip(label: Text(h.hobbyName!)))
+                          .toList(),
+                    ),
+                  ], icon: Icons.sports_esports),
+
                   SizedBox(height: 80.h),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  //section method
+  // Update sectionCard to accept an IconData
+  Widget _sectionCard(String title, List<Widget> children, {IconData? icon}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (icon != null)
+                  Icon(icon, size: 22, color: AppColors.primary),
+                if (icon != null) const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ...children,
+          ],
+        ),
       ),
     );
   }
@@ -571,15 +699,15 @@ class ProfileDetailedScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 170.w,
+            width: 180.w,
             child: Text(
-              title,
+              '$title :',
               style: TextStyle(fontFamily: Typo.bold, fontSize: 18.sp),
             ),
           ),
           Expanded(
             child: Text(
-              ": $value",
+              value,
               style: TextStyle(fontFamily: Typo.medium, fontSize: 18.sp),
             ),
           ),

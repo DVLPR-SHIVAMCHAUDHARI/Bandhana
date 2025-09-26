@@ -3,6 +3,8 @@ import 'package:bandhana/features/DocumentVerification/bloc/upload_bloc.dart';
 import 'package:bandhana/features/DocumentVerification/bloc/upload_event.dart';
 import 'package:bandhana/features/DocumentVerification/bloc/upload_state.dart';
 import 'package:bandhana/features/DocumentVerification/shared_widget/upload_image_doc.dart';
+import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
+import 'package:bandhana/features/master_apis/bloc/master_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -57,7 +59,8 @@ class _DocumentVerificationScreenState
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(state.message)));
-            router.goNamed(Routes.compatablity1.name);
+            router.goNamed(Routes.homeAnimationScreen.name);
+            context.read<MasterBloc>().add(GetprofileStatus());
           } else if (state is UploadSubmitFailure) {
             ScaffoldMessenger.of(
               context,
@@ -197,6 +200,9 @@ class _DocumentVerificationScreenState
                               router.goNamed(
                                 Routes.homeAnimationScreen.name,
                               ); // or your target route
+                              context.read<MasterBloc>().add(
+                                GetprofileStatus(),
+                              );
                             } else if (state is UploadSubmitFailure) {
                               // Show error message
                               ScaffoldMessenger.of(context).showSnackBar(

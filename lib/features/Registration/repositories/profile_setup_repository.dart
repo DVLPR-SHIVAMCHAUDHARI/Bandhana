@@ -47,7 +47,6 @@ class ProfileSetupRepository extends Repository {
       final response = await dio.post("/profile/profile-setup", data: formData);
 
       if (response.data['Response']['Status']['StatusCode'] == "0") {
-        updateprofileSetupFlag();
         return {
           "message": response.data['Response']['Status']['DisplayText'],
           "status": "success",
@@ -62,30 +61,5 @@ class ProfileSetupRepository extends Repository {
       logger.e(e);
       return {"message": "An error occurred: $e", "status": "error"};
     }
-  }
-}
-
-Future<void> updateprofileSetupFlag() async {
-  final db = LocalDbService.instance;
-
-  // get current user
-  final currentUser = db.getUserData();
-
-  if (currentUser != null) {
-    // create updated user with familyDetails = 1
-    final updatedUser = UserModel(
-      mobileNumber: currentUser.mobileNumber,
-      fullname: currentUser.fullname,
-      profileDetails: currentUser.profileDetails,
-      profileSetup: 1, //uppdate this
-      documentVerification: currentUser.documentVerification,
-      partnerExpectations: currentUser.partnerExpectations,
-
-      partnerLifeStyle: currentUser.partnerLifeStyle,
-      familyDetails: currentUser.familyDetails,
-    );
-
-    // save back to Hive
-    await db.saveUserData(updatedUser);
   }
 }

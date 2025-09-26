@@ -513,3 +513,20 @@ class GetYourDetailsErrorState extends MasterState {
   @override
   List<Object?> get props => [message];
 }
+
+class GetProfileStatusLoadingState extends MasterState {
+  @override
+  List<Object?> get props => [];
+}
+
+class GetProfileStatusLoadedState extends MasterState {
+  @override
+  List<Object?> get props => [];
+}
+
+class GetProfileStatusErrorState extends MasterState {
+  final String message;
+  GetProfileStatusErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}

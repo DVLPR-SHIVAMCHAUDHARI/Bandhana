@@ -18,6 +18,7 @@ class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
     on<GetUserDetailById>(_onGetUserDetailById);
     on<SwitchImageEvent>(_switchImage);
     on<ToggleFavoriteEvent>(_toggleFavorite);
+    on<SendRequestEvent>(sendRequest);
   }
 
   Future<void> _onGetUserDetailById(
@@ -68,5 +69,24 @@ class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
     _isFavorite = !_isFavorite;
 
     emit(FavoriteToggledState(_isFavorite, _currentUser!));
+  }
+
+  sendRequest(SendRequestEvent event, Emitter emit) async {
+    emit(SendRequestLoadingState());
+    try {
+      final result = await repo.sendRequest(id: event.id);
+
+      if (result["status"] == "Success") {
+        emit(SendRequestLoadedState(result["response"]));
+      } else {
+        emit(
+          SendRequestErrorState(
+            result["response"]?.toString() ?? "Unknown error",
+          ),
+        );
+      }
+    } catch (e) {
+      emit(SendRequestErrorState(e.toString()));
+    }
   }
 }

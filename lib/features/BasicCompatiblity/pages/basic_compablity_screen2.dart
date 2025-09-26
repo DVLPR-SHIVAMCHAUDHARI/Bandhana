@@ -132,6 +132,7 @@ class _BasicCompablityScreen2State extends State<BasicCompablityScreen2> {
                   message: state.message,
                 );
                 router.goNamed(Routes.docVerification.name);
+                context.read<MasterBloc>().add(GetprofileStatus());
               } else if (state is LifestylePreferencesFailure) {
                 snackbar(context, message: state.message);
               }

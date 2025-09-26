@@ -1,4 +1,5 @@
 import 'package:bandhana/core/const/globals.dart';
+import 'package:bandhana/core/const/user_model.dart';
 import 'package:bandhana/core/repository/repository.dart';
 
 class MasterRepo extends Repository {
@@ -278,4 +279,40 @@ class MasterRepo extends Repository {
       rethrow;
     }
   }
+
+  getProfileStatus() async {
+    try {
+      var response = await dio.post("/user/profile-status");
+
+      if (response.data["Response"]["Status"]["StatusCode"] == "0") {
+        saveUserAfterOtp(response.data["Response"]["ResponseData"]);
+        return {
+          "response": response.data["Response"]["ResponseData"],
+          "status": "Success",
+        };
+      } else {
+        return {
+          "response": response.data["Response"]["status"]["DisplayText"],
+          "status": "failure",
+        };
+      }
+    } catch (e) {
+      logger.e(e);
+      rethrow;
+    }
+  }
+}
+
+/// Save user after OTP verification
+Future<void> saveUserAfterOtp(Map<String, dynamic> response) async {
+  // Convert API response to UserModel
+  final userModel = UserModel.fromJson(response);
+  print("📦 UserModel created: $userModel");
+
+  // Save user to Hive
+  await localDb.saveUserData(userModel);
+
+  // Optional: print saved data for debugging
+  final savedUser = localDb.getUserData();
+  print("✅ Saved user in Hive: ${savedUser?.toJson()}");
 }

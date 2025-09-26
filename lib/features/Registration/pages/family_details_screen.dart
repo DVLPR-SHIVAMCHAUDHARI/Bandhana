@@ -433,6 +433,7 @@ class _FamilyDetailsScreenState extends State<FamilyDetailsScreen> {
                           color: Colors.green,
                         );
                         router.goNamed(Routes.compatablity1.name);
+                        context.read<MasterBloc>().add(GetprofileStatus());
                       } else if (state is FamilyDetailFailure) {
                         snackbar(context, message: state.message);
                       }

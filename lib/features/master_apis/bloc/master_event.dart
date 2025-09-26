@@ -93,3 +93,5 @@ class GetLifestylePreferences extends MasterEvent {}
 
 //GetYourData
 class GetYourDetails extends MasterEvent {}
+
+class GetprofileStatus extends MasterEvent {}

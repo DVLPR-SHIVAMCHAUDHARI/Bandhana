@@ -25,13 +25,17 @@ import 'package:bandhana/features/Profile/pages/profile_detail_screen.dart';
 import 'package:bandhana/features/Registration/pages/edit_profile_screen.dart';
 import 'package:bandhana/features/Registration/pages/family_details_screen.dart';
 import 'package:bandhana/features/Registration/pages/registration_screen.dart';
+import 'package:bandhana/features/Requests/bloc/request_bloc.dart';
 import 'package:bandhana/features/Requests/pages/request_screen.dart';
 import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
 import 'package:bandhana/features/Subscription/pages/choose_your_plans_screen.dart';
+import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
+import 'package:bandhana/features/master_apis/bloc/master_event.dart';
 import 'package:bandhana/features/navbar/pages/navbar.dart';
 import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_bloc.dart';
 import 'package:bandhana/features/Registration/pages/my_profile_screen.dart';
 import 'package:bandhana/features/Registration/pages/profile_setup_screen.dart';
+import 'package:bandhana/features/notification/pages/notifications_screen.dart';
 import 'package:bandhana/features/splashScreen/page/splash_screen.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -65,6 +69,7 @@ enum Routes {
   about,
   chat,
   familyDetails,
+  notification,
 }
 
 enum ProfileMode {
@@ -92,7 +97,10 @@ GoRouter router = GoRouter(
   routes: [
     GoRoute(
       path: "/",
-      builder: (context, state) => SplashScreen(),
+      builder: (context, state) => BlocProvider(
+        create: (context) => MasterBloc()..add(GetprofileStatus()),
+        child: SplashScreen(),
+      ),
       name: Routes.splash.name,
     ),
     GoRoute(
@@ -141,6 +149,13 @@ GoRouter router = GoRouter(
             child: HomeScreen(),
           ),
           name: Routes.homescreen.name,
+          routes: [
+            GoRoute(
+              path: "/notification",
+              builder: (context, state) => NotificationsScreen(),
+              name: Routes.notification.name,
+            ),
+          ],
         ),
         GoRoute(
           path: "/discover",
@@ -157,7 +172,10 @@ GoRouter router = GoRouter(
         ),
         GoRoute(
           path: "/request",
-          builder: (context, state) => RequestScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => RequestBloc(),
+            child: RequestScreen(),
+          ),
           name: Routes.request.name,
         ),
       ],

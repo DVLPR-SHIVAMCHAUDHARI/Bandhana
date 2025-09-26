@@ -105,7 +105,6 @@ class RegistrationRepository extends Repository {
         },
       );
       if (response.data['Response']['Status']['StatusCode'] == "0") {
-        updateprofileDetailFlag();
         return {
           "message": response.data['Response']['Status']['DisplayText'],
           "status": "success",
@@ -119,30 +118,5 @@ class RegistrationRepository extends Repository {
     } catch (e) {
       throw Exception('Error in submitting family details: $e');
     }
-  }
-}
-
-Future<void> updateprofileDetailFlag() async {
-  final db = LocalDbService.instance;
-
-  // get current user
-  final currentUser = db.getUserData();
-
-  if (currentUser != null) {
-    // create updated user with familyDetails = 1
-    final updatedUser = UserModel(
-      mobileNumber: currentUser.mobileNumber,
-      fullname: currentUser.fullname,
-      profileDetails: 1, //update this
-      profileSetup: currentUser.profileSetup,
-      documentVerification: currentUser.documentVerification,
-      partnerExpectations: currentUser.partnerExpectations,
-
-      partnerLifeStyle: currentUser.partnerLifeStyle,
-      familyDetails: currentUser.familyDetails,
-    );
-
-    // save back to Hive
-    await db.saveUserData(updatedUser);
   }
 }

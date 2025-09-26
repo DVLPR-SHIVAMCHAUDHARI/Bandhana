@@ -25,7 +25,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     context.read<MasterBloc>().add(GetProfileDetailsEvent());
     context.read<MasterBloc>().add(GetProfileSetupEvent());
     context.read<DiscoverBloc>().add(FetchUsersEvent());
-    // TODO: implement initState
     super.initState();
   }
 
@@ -43,78 +42,68 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             fontFamily: Typo.bold,
           ),
         ),
-
         backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: SafeArea(
         bottom: false,
-        child: Expanded(
-          child: RefreshIndicator(
-            onRefresh: () async {
-              // Trigger your API calls again
-              context.read<MasterBloc>().add(GetProfileDetailsEvent());
-              context.read<MasterBloc>().add(GetProfileSetupEvent());
-              context.read<DiscoverBloc>().add(FetchUsersEvent());
-
-              // Optionally wait for a short duration for smooth effect
-              await Future.delayed(const Duration(seconds: 1));
-            },
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(
-                parent: ClampingScrollPhysics(),
-              ), // ✅ needed for pull-to-refresh
-              child: Column(
-                children: [
-                  10.verticalSpace,
-
-                  25.verticalSpace,
-                  BlocBuilder<DiscoverBloc, DiscoverState>(
-                    builder: (context, state) {
-                      if (state is FetchUsersLoadingState) {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) => ProfileCardShimmer(),
-                          itemCount: 10,
-                        );
-                      } else if (state is FetchUserLoadedState) {
-                        final users = state.list;
-                        if (users.isEmpty) {
-                          return const Center(child: Text("No matches found"));
-                        }
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: users.length,
-                          itemBuilder: (context, index) {
-                            final user = users[index];
-                            return ProfileCard(
-                              id: user.userId.toString(),
-                              image: user.profileUrl1,
-                              age: user.age?.toString() ?? "-",
-                              district: user.district ?? "-",
-                              match: "${user.matchPercentage ?? 0}% match",
-                              name: user.fullname ?? "Unknown",
-                              profession: user.profession ?? "-",
-                              hobbies: user.hobbies!
-                                  .map((e) => e.hobbyName)
-                                  .toList(),
-                            );
-                          },
-                        );
-                      } else if (state is FetchUserFailureState) {
-                        return const Center(
-                          child: Text("Failed to load users"),
-                        );
+        child: RefreshIndicator(
+          onRefresh: () async {
+            context.read<MasterBloc>().add(GetProfileDetailsEvent());
+            context.read<MasterBloc>().add(GetProfileSetupEvent());
+            context.read<DiscoverBloc>().add(FetchUsersEvent());
+            await Future.delayed(const Duration(seconds: 1));
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: ClampingScrollPhysics(),
+            ),
+            child: Column(
+              children: [
+                10.verticalSpace,
+                25.verticalSpace,
+                BlocBuilder<DiscoverBloc, DiscoverState>(
+                  builder: (context, state) {
+                    if (state is FetchUsersLoadingState) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) => ProfileCardShimmer(),
+                        itemCount: 10,
+                      );
+                    } else if (state is FetchUserLoadedState) {
+                      final users = state.list;
+                      if (users.isEmpty) {
+                        return const Center(child: Text("No matches found"));
                       }
-
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                  ),
-                  100.verticalSpace,
-                ],
-              ),
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          final user = users[index];
+                          return ProfileCard(
+                            id: user.userId.toString(),
+                            image: user.profileUrl1,
+                            age: user.age?.toString() ?? "-",
+                            district: user.district ?? "-",
+                            match: "${user.matchPercentage ?? 0}% match",
+                            name: user.fullname ?? "Unknown",
+                            profession: user.profession ?? "-",
+                            hobbies: user.hobbies!
+                                .map((e) => e.hobbyName)
+                                .toList(),
+                          );
+                        },
+                      );
+                    } else if (state is FetchUserFailureState) {
+                      return const Center(child: Text("Failed to load users"));
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
+                100.verticalSpace,
+              ],
             ),
           ),
         ),

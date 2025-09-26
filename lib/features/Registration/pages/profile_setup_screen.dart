@@ -418,6 +418,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           widget.type == "edit"
                               ? null
                               : router.goNamed(Routes.familyDetails.name);
+                          context.read<MasterBloc>().add(GetprofileStatus());
                         } else if (state is ProfileSetupSubmitFailureState) {
                           snackbar(
                             context,

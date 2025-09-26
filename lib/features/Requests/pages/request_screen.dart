@@ -1,14 +1,52 @@
 import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/asset_urls.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:bandhana/features/Home/models/home_user_model.dart';
+import 'package:bandhana/features/Requests/bloc/request_bloc.dart';
+import 'package:bandhana/features/Requests/bloc/request_event.dart';
+import 'package:bandhana/features/Requests/bloc/request_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class RequestScreen extends StatelessWidget {
+class RequestScreen extends StatefulWidget {
   const RequestScreen({super.key});
+
+  @override
+  State<RequestScreen> createState() => _RequestScreenState();
+}
+
+class _RequestScreenState extends State<RequestScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    context.read<RequestBloc>().add(GetRecievedRequests());
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildRequestList(List<HomeUserModel> users) {
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(vertical: 16.h),
+      itemCount: users.length + 1,
+      itemBuilder: (context, index) {
+        if (index == users.length) {
+          return SizedBox(height: 100.h);
+        }
+        return RequestCard(user: users[index]);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,86 +61,79 @@ class RequestScreen extends StatelessWidget {
             fontSize: 24.sp,
           ),
         ),
-
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.pinkAccent,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Colors.pinkAccent,
+          tabs: const [
+            Tab(text: "Received"),
+            Tab(text: "Sent"),
+          ],
+        ),
         centerTitle: false,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              RequestCard(),
-              RequestCard(),
-              RequestCard(),
-              RequestCard(),
-              200.verticalSpace,
-            ],
-          ).paddingHorizontal(24.w),
-        ),
+      body: Column(
+        children: [
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                BlocBuilder<RequestBloc, RequestState>(
+                  builder: (context, state) {
+                    if (state is RecievedRequestsLoadingState) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is RecievedRequestsLoadedState) {
+                      return _buildRequestList(
+                        state.users,
+                      ).paddingHorizontal(24.w);
+                    } else if (state is RecievedRequestsErrorState) {
+                      return Center(child: Text(state.error));
+                    }
+                    return const SizedBox();
+                  },
+                ),
+                Center(child: Text("TODO: Sent requests list")),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class RequestCard extends StatelessWidget {
-  const RequestCard({super.key});
+  final HomeUserModel user;
+  const RequestCard({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10.h),
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-      clipBehavior: Clip.none,
       width: double.infinity,
       height: 220.h,
-
       decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(Urls.igSplashBackground),
-          fit: BoxFit.fitWidth,
-          opacity: 0.05,
-        ),
         borderRadius: BorderRadius.circular(30.r),
         gradient: AppColors.splashGradient,
       ),
       child: Column(
         children: [
+          // top row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 4.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.pinkAccent,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Text(
-                      "☆ Pro User",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: Typo.medium,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10.sp,
-                      ),
-                    ),
-                  ),
-                  10.horizontalSpace,
-                  Text(
-                    "70% Match",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+              Text(
+                "${user.matchPercentage}% Match",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               Text(
-                "30 min ago",
+                "30 min ago", // TODO: replace with real time if available
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: Typo.medium,
@@ -114,12 +145,13 @@ class RequestCard extends StatelessWidget {
           ),
           20.verticalSpace,
 
+          // profile row
           Row(
             children: [
               CircleAvatar(
                 radius: 30.r,
                 backgroundImage: CachedNetworkImageProvider(
-                  "https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg",
+                  user.profileUrl1 ?? "",
                 ),
               ),
               20.horizontalSpace,
@@ -127,16 +159,15 @@ class RequestCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "John Doe, 36",
+                    "${user.fullname}, ${user.age}",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: Typo.bold,
                       fontSize: 18.sp,
                     ),
                   ),
-
                   Text(
-                    "Fashion Designer",
+                    user.profession ?? "",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: Typo.medium,
@@ -144,7 +175,11 @@ class RequestCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "#Creative • #CoffeeLover • #TravelsOften",
+                    user.hobbies
+                            ?.map((h) => "#${h.hobbyName}")
+                            .take(3)
+                            .join(" • ") ??
+                        "",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: Typo.medium,
@@ -156,6 +191,8 @@ class RequestCard extends StatelessWidget {
             ],
           ),
           20.verticalSpace,
+
+          // buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -163,7 +200,7 @@ class RequestCard extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: () {},
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.white),
+                    side: const BorderSide(color: Colors.white),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.r),
                     ),
@@ -173,7 +210,6 @@ class RequestCard extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    textAlign: TextAlign.center,
                     "Reject",
                     style: TextStyle(
                       color: Colors.white,
@@ -183,17 +219,16 @@ class RequestCard extends StatelessWidget {
                   ),
                 ),
               ),
-              10.widthBox,
+              10.horizontalSpace,
               Expanded(
                 child: InkWell(
                   onTap: () {
                     router.goNamed(
                       Routes.profileDetail.name,
-
                       pathParameters: {
-                        "match": "90",
+                        "match": user.matchPercentage.toString(),
                         "mode": ProfileMode.incomingRequest.name,
-                        "id": 1.toString(),
+                        "id": user.userId.toString(),
                       },
                     );
                   },
@@ -207,8 +242,8 @@ class RequestCard extends StatelessWidget {
                       vertical: 12.h,
                     ),
                     child: Text(
-                      textAlign: TextAlign.center,
                       "View & Accept",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: Typo.semiBold,

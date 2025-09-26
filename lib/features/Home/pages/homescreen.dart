@@ -132,7 +132,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Row(
             children: [
-              const Icon(Icons.notifications_outlined, color: Colors.white),
+              IconButton(
+                onPressed: () {
+                  router.pushNamed(Routes.notification.name);
+                },
+                icon: const Icon(
+                  Icons.notifications_outlined,
+                  color: Colors.white,
+                ),
+              ),
               10.horizontalSpace,
               Builder(
                 builder: (ctx) => IconButton.filled(

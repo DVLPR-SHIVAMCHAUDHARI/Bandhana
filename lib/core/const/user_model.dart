@@ -1,58 +1,64 @@
-class UserModel {
-  String? mobileNumber;
-  String? fullname;
-  int? profileDetails;
-  int? profileSetup;
-  int? documentVerification;
-  int? partnerExpectations;
-  int? partnerLifeStyle;
-  int? familyDetails;
-  int? isDocumentVerification;
-  String? xAuthToken;
 
-  UserModel({
-    this.mobileNumber,
-    this.fullname,
-    this.profileDetails,
-    this.profileSetup,
-    this.documentVerification,
-    this.partnerExpectations,
-    this.partnerLifeStyle,
-    this.familyDetails,
-    this.isDocumentVerification,
-    this.xAuthToken,
-  });
+class UserModel {
+  int? userId;
+  dynamic district;
+  String? fullname;
+  int? paymentDone;
+  String? mobileNumber;
+  int? profileSetup;
+  dynamic profileUrl1;
+  int? familyDetails;
+  int? profileDetails;
+  int? partnerLifeStyle;
+  int? partnerExpectations;
+  int? documentVerification;
+  int? isDocumentVerification;
+  bool? error;
+  String? code;
+
+  UserModel({this.userId, this.district, this.fullname, this.paymentDone, this.mobileNumber, this.profileSetup, this.profileUrl1, this.familyDetails, this.profileDetails, this.partnerLifeStyle, this.partnerExpectations, this.documentVerification, this.isDocumentVerification, this.error, this.code});
 
   UserModel.fromJson(Map<String, dynamic> json) {
-    if (json["mobile_number"] is String) {
-      mobileNumber = json["mobile_number"];
+    if(json["user_id"] is int) {
+      userId = json["user_id"];
     }
-    if (json["fullname"] is String) {
+    district = json["district"];
+    if(json["fullname"] is String) {
       fullname = json["fullname"];
     }
-    if (json["profile_details"] is int) {
-      profileDetails = json["profile_details"];
+    if(json["payment_done"] is int) {
+      paymentDone = json["payment_done"];
     }
-    if (json["profile_setup"] is int) {
+    if(json["mobile_number"] is String) {
+      mobileNumber = json["mobile_number"];
+    }
+    if(json["profile_setup"] is int) {
       profileSetup = json["profile_setup"];
     }
-    if (json["document_verification"] is int) {
-      documentVerification = json["document_verification"];
-    }
-    if (json["partner_expectations"] is int) {
-      partnerExpectations = json["partner_expectations"];
-    }
-    if (json["partner_life_style"] is int) {
-      partnerLifeStyle = json["partner_life_style"];
-    }
-    if (json["family_details"] is int) {
+    profileUrl1 = json["profile_url_1"];
+    if(json["family_details"] is int) {
       familyDetails = json["family_details"];
     }
-    if (json["is_document_verification"] is int) {
+    if(json["profile_details"] is int) {
+      profileDetails = json["profile_details"];
+    }
+    if(json["partner_life_style"] is int) {
+      partnerLifeStyle = json["partner_life_style"];
+    }
+    if(json["partner_expectations"] is int) {
+      partnerExpectations = json["partner_expectations"];
+    }
+    if(json["document_verification"] is int) {
+      documentVerification = json["document_verification"];
+    }
+    if(json["is_document_verification"] is int) {
       isDocumentVerification = json["is_document_verification"];
     }
-    if (json["x_auth_token"] is String) {
-      xAuthToken = json["x_auth_token"];
+    if(json["error"] is bool) {
+      error = json["error"];
+    }
+    if(json["code"] is String) {
+      code = json["code"];
     }
   }
 
@@ -61,17 +67,22 @@ class UserModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data["mobile_number"] = mobileNumber;
-    data["fullname"] = fullname;
-    data["profile_details"] = profileDetails;
-    data["profile_setup"] = profileSetup;
-    data["document_verification"] = documentVerification;
-    data["partner_expectations"] = partnerExpectations;
-    data["partner_life_style"] = partnerLifeStyle;
-    data["family_details"] = familyDetails;
-    data["is_document_verification"] = isDocumentVerification;
-    data["x_auth_token"] = xAuthToken;
-    return data;
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["user_id"] = userId;
+    _data["district"] = district;
+    _data["fullname"] = fullname;
+    _data["payment_done"] = paymentDone;
+    _data["mobile_number"] = mobileNumber;
+    _data["profile_setup"] = profileSetup;
+    _data["profile_url_1"] = profileUrl1;
+    _data["family_details"] = familyDetails;
+    _data["profile_details"] = profileDetails;
+    _data["partner_life_style"] = partnerLifeStyle;
+    _data["partner_expectations"] = partnerExpectations;
+    _data["document_verification"] = documentVerification;
+    _data["is_document_verification"] = isDocumentVerification;
+    _data["error"] = error;
+    _data["code"] = code;
+    return _data;
   }
 }

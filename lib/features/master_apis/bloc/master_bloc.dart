@@ -1,4 +1,5 @@
 import 'package:bandhana/core/const/globals.dart';
+import 'package:bandhana/core/const/user_model.dart';
 import 'package:bandhana/features/master_apis/models/basic_compatiblity_model.dart';
 import 'package:bandhana/features/master_apis/models/district_model.dart';
 import 'package:bandhana/features/master_apis/models/family_details_model.dart';
@@ -301,8 +302,6 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
       try {
         final result = await repo.getFamilyDetails();
         if (result["status"] == "Success") {
-          logger.e('success');
-
           FamilyDetailsModel model = FamilyDetailsModel.fromJson(
             result["response"],
           );
@@ -320,8 +319,6 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
       try {
         final result = await repo.getBasicCompablity1();
         if (result["status"] == "Success") {
-          logger.e('success');
-
           BasicCompatiblityModel model = BasicCompatiblityModel.fromJson(
             result["response"],
           );
@@ -340,8 +337,6 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
       try {
         final result = await repo.getLifestylePreferences();
         if (result["status"] == "Success") {
-          logger.e('success');
-
           LifestylePreferenceModel model = LifestylePreferenceModel.fromJson(
             result["response"],
           );
@@ -359,8 +354,6 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
       try {
         final result = await repo.getYourDetail();
         if (result["status"] == "Success") {
-          logger.e('success');
-
           YourDetailModel model = YourDetailModel.fromJson(result["response"]);
           emit(GetYourDetailsLoadedState(model));
         } else {
@@ -368,6 +361,22 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
         }
       } catch (e) {
         emit(GetYourDetailsErrorState(e.toString()));
+      }
+    });
+    on<GetprofileStatus>((event, emit) async {
+      emit(GetProfileStatusLoadingState());
+
+      try {
+        final result = await repo.getProfileStatus();
+        if (result["status"] == "Success") {
+          UserModel model = UserModel.fromJson(result["response"]);
+
+          emit(GetProfileStatusLoadedState());
+        } else {
+          emit(GetProfileSetupErrorState(result["response"].toString()));
+        }
+      } catch (e) {
+        emit(GetProfileSetupErrorState(e.toString()));
       }
     });
 
