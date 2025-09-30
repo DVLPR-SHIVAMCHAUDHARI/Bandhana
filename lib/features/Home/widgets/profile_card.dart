@@ -167,33 +167,38 @@ class ProfileCard extends StatelessWidget {
                 ),
                 10.widthBox,
                 Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      router.goNamed(
-                        Routes.profileDetail.name,
-
-                        pathParameters: {
-                          "mode": ProfileMode.viewOther.name,
-                          "id": id.toString(),
-                          "match": match.toString(),
-                        },
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: AppColors.buttonGradient,
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 32.w,
-                        vertical: 14.h,
-                      ),
-                      child: Text(
-                        "View Profile",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: Typo.bold,
-                          fontSize: 16.sp,
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(20.r),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20.r),
+                      onTap: () {
+                        router.pushNamed(
+                          Routes.profileDetail.name,
+                          pathParameters: {
+                            "mode": ProfileMode.viewOther.name,
+                            "id": id.toString(),
+                            "match": match.toString(),
+                          },
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: AppColors.buttonGradient,
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 32.w,
+                          vertical: 14.h,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "View Profile",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: Typo.bold,
+                            fontSize: 16.sp,
+                          ),
                         ),
                       ),
                     ),

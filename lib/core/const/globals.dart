@@ -42,6 +42,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 
+/// --------------------------- ENUMS ---------------------------
 enum Routes {
   splash,
   onboard,
@@ -79,171 +80,235 @@ enum ProfileMode {
 
 enum ProfileType { pro, normal }
 
+/// --------------------------- SERVICES ---------------------------
+final LocalDbService localDb = LocalDbService();
+final RequestPermission permission = RequestPermission();
+final TokenServices token = TokenServices();
+
+/// --------------------------- LOGGER ---------------------------
 final logger = Logger(
   printer: PrettyPrinter(methodCount: 0, errorMethodCount: 5, printTime: false),
 );
-LocalDbService localDb = LocalDbService();
 
-RequestPermission permission = RequestPermission();
-TokenServices token = TokenServices();
-
+/// --------------------------- NAVIGATION KEYS ---------------------------
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
 BuildContext get appContext => navigatorKey.currentState!.context;
 
-GoRouter router = GoRouter(
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
+/// --------------------------- GO ROUTER ---------------------------
+final GoRouter router = GoRouter(
   navigatorKey: navigatorKey,
-  // initialLocation: "/register/profilesetup/familyDetails",
+  // initialLocation: "/register/normal/profilesetup/normal",
   routes: [
+    // Splash
     GoRoute(
       path: "/",
+      name: Routes.splash.name,
       builder: (context, state) => BlocProvider(
         create: (context) => MasterBloc()..add(GetprofileStatus()),
         child: SplashScreen(),
       ),
-      name: Routes.splash.name,
     ),
+
+    // Onboarding & Welcome
     GoRoute(
       path: "/onboard",
-      builder: (context, state) => OnboardingScreen(),
       name: Routes.onboard.name,
+      builder: (context, state) => OnboardingScreen(),
     ),
     GoRoute(
       path: "/firstwelcome",
-      builder: (context, state) => FirstWelcomeScreen(),
       name: Routes.welcome.name,
+      builder: (context, state) => FirstWelcomeScreen(),
     ),
+
+    // Auth
     GoRoute(
       path: "/signin",
-      builder: (context, state) => SigninScreen(),
       name: Routes.signin.name,
+      builder: (context, state) => SigninScreen(),
       routes: [
         GoRoute(
           path: "otp/:number/:prev",
+          name: Routes.otp.name,
           builder: (context, state) => OtpVerificationScreen(
             number: state.pathParameters['number'] ?? "",
             prev: state.pathParameters['prev'] ?? "",
           ),
-          name: Routes.otp.name,
         ),
         GoRoute(
           path: "signup",
-          builder: (context, state) => SignupScreen(),
           name: Routes.signup.name,
+          builder: (context, state) => SignupScreen(),
         ),
       ],
     ),
+
+    // HomeAnimation
     GoRoute(
       path: "/homeanimation",
-      builder: (context, state) => HomeAnimationScreen(),
       name: Routes.homeAnimationScreen.name,
+      builder: (context, state) => HomeAnimationScreen(),
     ),
+
+    // Shell Route with Navbar
     ShellRoute(
-      builder: (context, state, child) => Navbar(child: child),
+      navigatorKey: _shellNavigatorKey,
+      builder: (context, state, child) {
+        // hide navbar on specific paths
+        final hideNavbarForPaths = [
+          "/homescreen/profileDetail",
+          "/homescreen/profileDetail/messageRequested",
+          "/homescreen/notification",
+          "/homescreen/choosePlan",
+          "/homescreen/myProfile",
+          "/homescreen/myProfile/editProfile",
+          "/chatList/chat",
+        ];
+
+        final currentPath = state.uri.toString();
+        final showNavbar = !hideNavbarForPaths.any(
+          (path) => currentPath.startsWith(path),
+        );
+
+        return showNavbar ? Navbar(child: child) : child;
+      },
       routes: [
         GoRoute(
           path: "/homescreen",
+          name: Routes.homescreen.name,
           builder: (context, state) => BlocProvider(
             create: (context) => HomeBloc(),
-
             child: HomeScreen(),
           ),
-          name: Routes.homescreen.name,
           routes: [
             GoRoute(
-              path: "/notification",
-              builder: (context, state) => NotificationsScreen(),
+              path: "myProfile",
+              name: Routes.myProfile.name,
+              builder: (context, state) => BlocProvider(
+                create: (context) => ProfileSetupBloc(),
+                child: MyProfileScreen(),
+              ),
+              routes: [
+                GoRoute(
+                  path: "editProfile",
+                  name: Routes.editProfile.name,
+                  builder: (context, state) => BlocProvider(
+                    create: (context) => ProfileSetupBloc(),
+                    child: EditProfileScreen(),
+                  ),
+                ),
+              ],
+            ),
+            GoRoute(
+              path: "notification",
               name: Routes.notification.name,
+              builder: (context, state) => NotificationsScreen(),
+            ),
+            GoRoute(
+              path: "profileDetail/:mode/:id/:match",
+              name: Routes.profileDetail.name,
+              builder: (context, state) => MultiBlocProvider(
+                providers: [
+                  BlocProvider(create: (context) => ProfileDetailBloc()),
+                  BlocProvider(create: (context) => HomeBloc()),
+                ],
+                child: ProfileDetailedScreen(
+                  match: state.pathParameters['match'] ?? "50",
+                  id: state.pathParameters['id'] ?? "1",
+                  mode: state.pathParameters['mode'] ?? "viewOther",
+                ),
+              ),
+              routes: [
+                GoRoute(
+                  path: "messageRequested",
+                  name: Routes.messageRequested.name,
+                  builder: (context, state) => MessageRequestedScreen(),
+                ),
+              ],
+            ),
+            GoRoute(
+              path: "choosePlan",
+              name: Routes.choosePlan.name,
+              builder: (context, state) => BlocProvider(
+                create: (context) => SubscriptionBloc(),
+                child: ChooseYourPlanScreen(),
+              ),
             ),
           ],
         ),
         GoRoute(
           path: "/discover",
+          name: Routes.discover.name,
           builder: (context, state) => BlocProvider(
             create: (context) => DiscoverBloc(),
             child: DiscoverScreen(),
           ),
-          name: Routes.discover.name,
         ),
         GoRoute(
           path: "/chatList",
-          builder: (context, state) => ChatListScreen(),
           name: Routes.chatList.name,
+          builder: (context, state) => ChatListScreen(),
+          routes: [
+            GoRoute(
+              path: "chat",
+              name: Routes.chat.name,
+              builder: (context, state) => ChatScreen(),
+            ),
+          ],
         ),
         GoRoute(
           path: "/request",
+          name: Routes.request.name,
           builder: (context, state) => BlocProvider(
             create: (context) => RequestBloc(),
             child: RequestScreen(),
           ),
-          name: Routes.request.name,
         ),
       ],
     ),
-    GoRoute(
-      path: "/profileDetail/:mode/:id/:match",
-      name: Routes.profileDetail.name,
-      builder: (context, state) {
-        return MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (context) => ProfileDetailBloc()),
-            BlocProvider(create: (context) => HomeBloc()),
-          ],
-          child: ProfileDetailedScreen(
-            match: state.pathParameters['match'] ?? "50",
-            id: state.pathParameters['id'] ?? "1",
-            mode: state.pathParameters['mode'] ?? "viewOther",
-          ),
-        );
-      },
-    ),
 
-    GoRoute(
-      path: "/messageRequested",
-      builder: (context, state) => MessageRequestedScreen(),
-      name: Routes.messageRequested.name,
-    ),
+    // Other screens outside ShellRoute
     GoRoute(
       path: "/register/:type",
+      name: Routes.register.name,
       builder: (context, state) =>
           RegistrationScreen(type: state.pathParameters["type"] ?? "normal"),
-      name: Routes.register.name,
       routes: [
         GoRoute(
           path: "profilesetup/:type1",
+          name: Routes.profilesetup.name,
           builder: (context, state) => ProfileSetupScreen(
             type: state.pathParameters["type1"] ?? "normal",
           ),
-          name: Routes.profilesetup.name,
           routes: [
             GoRoute(
               path: "familyDetails",
-              builder: (context, state) => FamilyDetailsScreen(),
               name: Routes.familyDetails.name,
+              builder: (context, state) => FamilyDetailsScreen(),
               routes: [
                 GoRoute(
-                  name: Routes.compatablity1.name,
-
                   path: "compatablity1",
+                  name: Routes.compatablity1.name,
                   builder: (context, state) => BlocProvider(
                     create: (_) => UserPreferencesBloc(),
                     child: BasicCompablityScreen1(),
                   ),
                   routes: [
                     GoRoute(
+                      path: "compatablity2",
                       name: Routes.compatablity2.name,
-                      path: 'compatablity2',
                       builder: (context, state) => BlocProvider(
                         create: (_) => UserPreferencesBloc(),
                         child: BasicCompablityScreen2(),
                       ),
-
                       routes: [
                         GoRoute(
-                          path: 'docVerification',
+                          path: "docVerification",
+                          name: Routes.docVerification.name,
                           builder: (context, state) =>
                               DocumentVerificationScreen(),
-                          name: Routes.docVerification.name,
                         ),
                       ],
                     ),
@@ -255,44 +320,16 @@ GoRouter router = GoRouter(
         ),
       ],
     ),
+
     GoRoute(
-      path: "/chat",
-      builder: (context, state) => ChatScreen(),
-      name: Routes.chat.name,
-    ),
-    GoRoute(
-      path: "/choosePlan",
-      builder: (context, state) => BlocProvider(
-        create: (context) => SubscriptionBloc(),
-        child: ChooseYourPlanScreen(),
-      ),
-      name: Routes.choosePlan.name,
-    ),
-    GoRoute(
-      path: "/myProfile",
-      builder: (context, state) => BlocProvider(
-        create: (context) => ProfileSetupBloc(),
-        child: MyProfileScreen(),
-      ),
-      name: Routes.myProfile.name,
-    ),
-    GoRoute(
-      path: "/editProfile",
-      builder: (context, state) => BlocProvider(
-        create: (context) => ProfileSetupBloc(),
-        child: EditProfileScreen(),
-      ),
-      name: Routes.editProfile.name,
-    ),
-    GoRoute(
-      path: "/privacyPolicy", // fixed typo (was privayPolicy)
-      builder: (context, state) => PrivacyPolicyScreen(),
+      path: "/privacyPolicy",
       name: Routes.privacyPolicy.name,
+      builder: (context, state) => PrivacyPolicyScreen(),
     ),
     GoRoute(
       path: "/about",
-      builder: (context, state) => AboutScreen(),
       name: Routes.about.name,
+      builder: (context, state) => AboutScreen(),
     ),
   ],
 );

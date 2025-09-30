@@ -29,7 +29,7 @@ class ChatListScreen extends StatelessWidget {
         children: [
           ChatTile(
             ontap: () {
-              router.goNamed(Routes.chat.name);
+              router.pushNamed(Routes.chat.name);
             },
             count: "3",
             img:

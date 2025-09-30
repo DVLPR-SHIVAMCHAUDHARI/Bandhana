@@ -182,38 +182,68 @@ class ProfileDetailedScreen extends StatelessWidget {
                   ),
                 ],
               )
-            : InkWell(
-                onTap: () {
-                  ProfileType.normal.name == "normal"
-                      ? router.pushNamed(Routes.choosePlan.name)
-                      : router.pushNamed(Routes.chatList.name);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 24.r,
-                        offset: Offset(4, 8),
-                        color: AppColors.primaryOpacity,
+            : Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24.w,
+                          vertical: 14.h,
+                        ),
                       ),
-                    ],
-                    gradient: AppColors.buttonGradient,
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 32.w,
-                    vertical: 14.h,
-                  ),
-                  child: Text(
-                    textAlign: TextAlign.center,
-                    "Accept Request",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: Typo.bold,
-                      fontSize: 16.sp,
+                      child: Text(
+                        "Skip",
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontFamily: Typo.bold,
+                          fontSize: 16.sp,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  10.horizontalSpace,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        ProfileType.normal.name == "normal"
+                            ? router.pushNamed(Routes.choosePlan.name)
+                            : router.pushNamed(Routes.chatList.name);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 24.r,
+                              offset: Offset(4, 8),
+                              color: AppColors.primaryOpacity,
+                            ),
+                          ],
+                          gradient: AppColors.buttonGradient,
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 32.w,
+                          vertical: 14.h,
+                        ),
+                        child: Text(
+                          textAlign: TextAlign.center,
+                          "Accept Request",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: Typo.bold,
+                            fontSize: 16.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
       ),
     );

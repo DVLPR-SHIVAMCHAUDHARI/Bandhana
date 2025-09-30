@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   ProfileSetupScreen({super.key, required this.type});
@@ -101,6 +102,44 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     setState(() {});
   }
 
+  /// Pick multiple images and crop (Square only)
+  Future<void> _pickAndCropImages() async {
+    final ImagePicker picker = ImagePicker();
+
+    // Calculate remaining slots
+    int remaining = 5;
+    final state = bloc.state;
+    if (state is PickImageLoadedState) remaining -= state.images.length;
+    if (remaining <= 0) return;
+
+    final List<XFile>? pickedFiles = await picker.pickMultiImage();
+    if (pickedFiles == null || pickedFiles.isEmpty) return;
+
+    List<XFile> croppedImages = [];
+    for (var file in pickedFiles.take(remaining)) {
+      final CroppedFile? cropped = await ImageCropper().cropImage(
+        sourcePath: file.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1), // Square
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Image',
+            toolbarColor: AppColors.primary,
+            toolbarWidgetColor: Colors.white,
+            lockAspectRatio: true, // Lock square on Android
+          ),
+          IOSUiSettings(
+            title: 'Crop Image',
+            aspectRatioLockEnabled: true, // Lock square on iOS
+          ),
+        ],
+      );
+
+      if (cropped != null) croppedImages.add(XFile(cropped.path));
+    }
+
+    bloc.add(PickCroppedImagesEvent(images: croppedImages));
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -147,82 +186,154 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
                         final remaining = 5 - pickedImages.length;
 
-                        return Row(
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (remaining > 0)
-                              GestureDetector(
-                                onTap: () {
-                                  bloc.add(PickImageEvent(limit: remaining));
-                                },
-                                child: Container(
-                                  width: 80,
-                                  height: 80,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: AppColors.primary,
+                            Text(
+                              "Images Selected: ${pickedImages.length} / 5",
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: pickedImages.length < 5
+                                    ? Colors.red
+                                    : Colors.green,
+                                fontFamily: Typo.medium,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                if (remaining > 0)
+                                  GestureDetector(
+                                    onTap: _pickAndCropImages,
+                                    child: Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: AppColors.primary,
+                                        ),
+                                        color: AppColors.primary.withOpacity(
+                                          0.1,
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        Icons.add,
+                                        color: AppColors.primary,
+                                        size: 30,
+                                      ),
                                     ),
-                                    color: AppColors.primary.withOpacity(0.1),
                                   ),
-                                  child: Icon(
-                                    Icons.add,
-                                    color: AppColors.primary,
-                                    size: 30,
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 90,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: pickedImages.length,
+                                      itemBuilder: (context, index) {
+                                        final img = pickedImages[index];
+                                        return Stack(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () async {
+                                                final CroppedFile?
+                                                cropped = await ImageCropper()
+                                                    .cropImage(
+                                                      sourcePath: img.path,
+                                                      uiSettings: [
+                                                        AndroidUiSettings(
+                                                          toolbarTitle:
+                                                              'Crop Image',
+                                                          toolbarColor:
+                                                              AppColors.primary,
+                                                          toolbarWidgetColor:
+                                                              Colors.white,
+                                                          lockAspectRatio: true,
+                                                          initAspectRatio:
+                                                              CropAspectRatioPreset
+                                                                  .square,
+                                                        ),
+                                                        IOSUiSettings(
+                                                          title: 'Crop Image',
+                                                          aspectRatioLockEnabled:
+                                                              true,
+                                                          aspectRatioPickerButtonHidden:
+                                                              true,
+                                                        ),
+                                                      ],
+                                                    );
+                                                if (cropped != null) {
+                                                  final newImages =
+                                                      List<XFile>.from(
+                                                        pickedImages,
+                                                      );
+                                                  newImages[index] = XFile(
+                                                    cropped.path,
+                                                  );
+                                                  bloc.add(
+                                                    PickCroppedImagesEvent(
+                                                      images: newImages,
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              child: Container(
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 5,
+                                                    ),
+                                                width: 80,
+                                                height: 80,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  image: DecorationImage(
+                                                    image: FileImage(
+                                                      File(img.path),
+                                                    ),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              right: 0,
+                                              top: 0,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  final newImages =
+                                                      List<XFile>.from(
+                                                        pickedImages,
+                                                      );
+                                                  newImages.removeAt(index);
+                                                  bloc.add(
+                                                    PickCroppedImagesEvent(
+                                                      images: newImages,
+                                                    ),
+                                                  );
+                                                },
+                                                child: Container(
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.black54,
+                                                      ),
+                                                  child: const Icon(
+                                                    Icons.close,
+                                                    size: 18,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: SizedBox(
-                                height: 90,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: pickedImages.length,
-                                  itemBuilder: (context, index) {
-                                    final img = pickedImages[index];
-                                    return Stack(
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.symmetric(
-                                            horizontal: 5,
-                                          ),
-                                          width: 80,
-                                          height: 80,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            image: DecorationImage(
-                                              image: FileImage(File(img.path)),
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          right: 0,
-                                          top: 0,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              bloc.add(RemoveImageEvent(index));
-                                            },
-                                            child: Container(
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black54,
-                                              ),
-                                              child: const Icon(
-                                                Icons.close,
-                                                size: 18,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
+                              ],
                             ),
                           ],
                         );
@@ -231,7 +342,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
                     20.verticalSpace,
 
-                    // Form Fields Section
+                    // --- Form Fields ---
                     AppTextField(
                       isRequired: true,
                       title: "About You (Bio)",
@@ -262,7 +373,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     ),
                     16.verticalSpace,
 
-                    // Profession Dropdown
+                    // --- Dropdowns ---
                     BlocBuilder<MasterBloc, MasterState>(
                       buildWhen: (prev, curr) =>
                           curr is GetProfessionLoadingState ||
@@ -297,7 +408,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     ),
                     16.verticalSpace,
 
-                    // Education Dropdown
                     BlocBuilder<MasterBloc, MasterState>(
                       buildWhen: (prev, curr) =>
                           curr is GetEducationLoadingState ||
@@ -332,7 +442,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     ),
                     16.verticalSpace,
 
-                    // Salary Dropdown
                     BlocBuilder<MasterBloc, MasterState>(
                       buildWhen: (prev, curr) =>
                           curr is GetSalaryLoadingState ||
@@ -367,7 +476,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     ),
                     16.verticalSpace,
 
-                    // Locations
                     AppTextField(
                       lines: 4,
                       isRequired: true,
@@ -393,19 +501,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                       ),
                     ),
                     16.verticalSpace,
-                    // AppTextField(
-                    //   lines: 4,
-                    //   isRequired: true,
-                    //   title: "Native Location",
-                    //   hint: "Enter your native address",
-                    //   controller: nativeLocationController,
-                    //   onChanged: (val) => bloc.add(
-                    //     UpdateFieldEvent(field: "nativeLocation", value: val),
-                    //   ),
-                    // ),
-                    16.verticalSpace,
 
-                    // Buttons
                     BlocConsumer<ProfileSetupBloc, ProfileSetupState>(
                       listener: (context, state) {
                         if (state is ProfileSetupSubmitSuccessState) {

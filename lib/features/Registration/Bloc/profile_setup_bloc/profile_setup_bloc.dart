@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/features/Registration/repositories/profile_setup_repository.dart';
 import 'package:bloc/bloc.dart';
@@ -11,13 +12,13 @@ class ProfileSetupBloc extends Bloc<ProfileSetupEvent, ProfileSetupState> {
   final ProfileSetupRepository repo = ProfileSetupRepository();
 
   ProfileSetupBloc() : super(InitialState()) {
-    /// Pick multiple images
+    /// Pick multiple images (without cropping)
     on<PickImageEvent>((event, emit) async {
       try {
         emit(PickImageLoadingState());
         final ImagePicker picker = ImagePicker();
         final List<XFile> pickedFiles = await picker.pickMultiImage(
-          limit: event.limit ?? 5,
+          limit: event.limit,
         );
 
         if (pickedFiles.isNotEmpty) {
@@ -30,6 +31,15 @@ class ProfileSetupBloc extends Bloc<ProfileSetupEvent, ProfileSetupState> {
       } catch (e) {
         emit(PickImageFailureState(e.toString()));
       }
+    });
+
+    /// Pick cropped images (after cropping)
+    on<PickCroppedImagesEvent>((event, emit) {
+      final remainingSlots = 5 - _images.length;
+      final filesToAdd = event.images.take(remainingSlots).toList();
+      _images.addAll(filesToAdd);
+
+      emit(PickImageLoadedState(List.from(_images)));
     });
 
     /// Remove an image
@@ -51,16 +61,17 @@ class ProfileSetupBloc extends Bloc<ProfileSetupEvent, ProfileSetupState> {
       emit(ProfileSetupSubmitLoadingState());
       try {
         final response = await repo.profileSetup(
-          bio: event.bio ?? '',
-          age: event.age ?? '',
-          height: event.height ?? '',
-          education: event.education ?? '',
-          profession: event.profession ?? '',
-          salary: event.salary ?? '',
-          permanentLocation: event.permanentLocation ?? '',
-          workLocation: event.workLocation ?? '',
+          bio: event.bio,
+          age: event.age,
+          height: event.height,
+          education: event.education,
+          profession: event.profession,
+          salary: event.salary,
+          permanentLocation: event.permanentLocation,
+          workLocation: event.workLocation,
           images: _images, // ✅ pass XFile list directly
         );
+
         if (response['status'] == "success") {
           emit(
             ProfileSetupSubmitSuccessState(
@@ -68,7 +79,6 @@ class ProfileSetupBloc extends Bloc<ProfileSetupEvent, ProfileSetupState> {
             ),
           );
         } else {
-          // ✅ Emit the failure state
           emit(
             ProfileSetupSubmitFailureState(
               response['message'] ?? "Failed to submit profile",

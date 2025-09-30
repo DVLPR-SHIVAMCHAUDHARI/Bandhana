@@ -46,7 +46,6 @@ class AuthRepository extends Repository {
         };
       }
     } catch (e) {
-      logger.e(e);
       rethrow;
     }
   }

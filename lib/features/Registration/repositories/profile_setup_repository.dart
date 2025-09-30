@@ -1,5 +1,3 @@
-import 'package:bandhana/core/const/user_model.dart';
-import 'package:bandhana/core/services/local_db_sevice.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:bandhana/core/const/globals.dart';

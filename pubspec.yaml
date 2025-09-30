@@ -68,10 +68,18 @@ dependencies:
   dio: ^5.9.0
   shimmer: ^3.0.0
   image_cropper: ^10.0.0+1
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/ic_launcher.png" # your app logo
+  adaptive_icon_background: "#ffffff" # (optional) background color
+  adaptive_icon_foreground: "assets/images/ic_launcher.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -155,38 +155,44 @@ class RequestCard extends StatelessWidget {
                 ),
               ),
               20.horizontalSpace,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${user.fullname}, ${user.age}",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: Typo.bold,
-                      fontSize: 18.sp,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${user.fullname}, ${user.age}",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: Typo.bold,
+                        fontSize: 18.sp,
+                      ),
                     ),
-                  ),
-                  Text(
-                    user.profession ?? "",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: Typo.medium,
-                      fontSize: 14.sp,
+                    Text(
+                      user.profession! ?? "",
+                      overflow: TextOverflow.ellipsis,
+
+                      maxLines: 2,
+                      softWrap: true,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: Typo.medium,
+                        fontSize: 14.sp,
+                      ),
                     ),
-                  ),
-                  Text(
-                    user.hobbies
-                            ?.map((h) => "#${h.hobbyName}")
-                            .take(3)
-                            .join(" • ") ??
-                        "",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: Typo.medium,
-                      fontSize: 12.sp,
+                    Text(
+                      user.hobbies
+                              ?.map((h) => "#${h.hobbyName}")
+                              .take(3)
+                              .join(" • ") ??
+                          "",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: Typo.medium,
+                        fontSize: 12.sp,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
