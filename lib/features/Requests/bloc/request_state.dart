@@ -15,3 +15,28 @@ class RecievedRequestsErrorState extends RequestState {
   final String error;
   RecievedRequestsErrorState(this.error);
 }
+
+class SentRequestsLoadingState extends RequestState {}
+
+class SentRequestsLoadedState extends RequestState {
+  final List<HomeUserModel> users;
+  SentRequestsLoadedState(this.users);
+}
+
+class SentRequestsErrorState extends RequestState {
+  final String error;
+  SentRequestsErrorState(this.error);
+}
+
+// Reject Request
+class RejectRequestLoadingState extends RequestState {}
+
+class RejectRequestSuccessState extends RequestState {
+  final String message;
+  RejectRequestSuccessState(this.message);
+}
+
+class RejectRequestErrorState extends RequestState {
+  final String error;
+  RejectRequestErrorState(this.error);
+}

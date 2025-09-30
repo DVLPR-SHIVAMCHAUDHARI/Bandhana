@@ -19,6 +19,7 @@ class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
     on<SwitchImageEvent>(_switchImage);
     on<ToggleFavoriteEvent>(_toggleFavorite);
     on<SendRequestEvent>(sendRequest);
+    on<AcceptRequestEvent>(acceptRequest);
   }
 
   Future<void> _onGetUserDetailById(
@@ -87,6 +88,29 @@ class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
       }
     } catch (e) {
       emit(SendRequestErrorState(e.toString()));
+    }
+  }
+
+  // --- Accept Request ---
+  acceptRequest(AcceptRequestEvent event, Emitter emit) async {
+    emit(AcceptRequestLoadingState());
+    try {
+      final result = await repo.acceptRequest(id: event.id);
+
+      if (result["status"] == "Success") {
+        // Correct path
+        final displayText =
+            result["Response"]?["Status"]?["DisplayText"] ?? "Success";
+        emit(AcceptRequestLoadedState(displayText));
+      } else {
+        emit(
+          AcceptRequestErrorState(
+            result["Response"]?.toString() ?? "Unknown error",
+          ),
+        );
+      }
+    } catch (e) {
+      emit(AcceptRequestErrorState(e.toString()));
     }
   }
 }

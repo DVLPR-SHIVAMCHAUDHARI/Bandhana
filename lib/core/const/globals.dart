@@ -76,6 +76,7 @@ enum Routes {
 enum ProfileMode {
   viewOther, // viewing someone's profile → Show Interest
   incomingRequest, // user received a request → Accept/Reject
+  outgoingRequest, // user sent a request → Accept/Reject
 }
 
 enum ProfileType { pro, normal }

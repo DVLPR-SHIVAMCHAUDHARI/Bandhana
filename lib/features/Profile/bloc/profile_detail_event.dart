@@ -29,3 +29,10 @@ class SendRequestEvent extends ProfileDetailEvent {
   @override
   List<Object?> get props => [id];
 }
+
+class AcceptRequestEvent extends ProfileDetailEvent {
+  final String id;
+  AcceptRequestEvent(this.id);
+  @override
+  List<Object?> get props => [id];
+}

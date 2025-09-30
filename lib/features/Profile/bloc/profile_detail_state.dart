@@ -87,3 +87,24 @@ class SendRequestErrorState extends GetProfileDetailState {
   @override
   List<Object?> get props => [message];
 }
+
+// --- Accept Request States ---
+class AcceptRequestLoadingState extends ProfileDetailState {}
+
+class AcceptRequestLoadedState extends ProfileDetailState {
+  final String message;
+
+  AcceptRequestLoadedState(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class AcceptRequestErrorState extends ProfileDetailState {
+  final String message;
+
+  AcceptRequestErrorState(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

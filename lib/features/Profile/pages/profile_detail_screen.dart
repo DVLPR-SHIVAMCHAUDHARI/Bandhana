@@ -8,10 +8,14 @@ import 'package:bandhana/features/Profile/bloc/profile_detail_event.dart';
 import 'package:bandhana/features/Profile/bloc/profile_detail_state.dart';
 import 'package:bandhana/features/Profile/model/user_detail_model.dart';
 import 'package:bandhana/features/Profile/widgets/compatibility_check_dialog.dart';
+import 'package:bandhana/features/Requests/bloc/request_bloc.dart';
+import 'package:bandhana/features/Requests/bloc/request_event.dart';
+import 'package:bandhana/features/Requests/bloc/request_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileDetailedScreen extends StatelessWidget {
   const ProfileDetailedScreen({
@@ -31,6 +35,9 @@ class ProfileDetailedScreen extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (_) => ProfileDetailBloc()..add(GetUserDetailById(id)),
+        ),
+        BlocProvider(
+          create: (_) => RequestBloc(), // Added for Reject
         ),
       ],
       child: Scaffold(
@@ -78,7 +85,6 @@ class ProfileDetailedScreen extends StatelessWidget {
   }
 
   // --- buildBottombar ---
-
   SafeArea buildBottombar(BuildContext context) {
     return SafeArea(
       child: Container(
@@ -182,68 +188,153 @@ class ProfileDetailedScreen extends StatelessWidget {
                   ),
                 ],
               )
-            : Row(
+            : mode == "incomingRequest"
+            ? Row(
                 children: [
+                  // 🔹 Reject Button
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24.w,
-                          vertical: 14.h,
-                        ),
-                      ),
-                      child: Text(
-                        "Skip",
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontFamily: Typo.bold,
-                          fontSize: 16.sp,
-                        ),
-                      ),
+                    child: BlocConsumer<RequestBloc, RequestState>(
+                      listener: (context, state) {
+                        if (state is RejectRequestSuccessState) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Request rejected successfully"),
+                            ),
+                          );
+                          router.goNamed(
+                            Routes.request.name,
+                          ); // Navigate back to requests list
+                        } else if (state is RejectRequestErrorState) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Error: ${state.error}")),
+                          );
+                        }
+                      },
+                      builder: (context, state) {
+                        if (state is RejectRequestLoadingState) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          );
+                        }
+                        return OutlinedButton(
+                          onPressed: () {
+                            context.read<RequestBloc>().add(
+                              RejectRecievedRequest(
+                                userId: int.parse(id),
+                              ), // Safe int
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: AppColors.primary),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 24.w,
+                              vertical: 14.h,
+                            ),
+                          ),
+                          child: Text(
+                            "Reject",
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontFamily: Typo.bold,
+                              fontSize: 16.sp,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
+
                   10.horizontalSpace,
+
+                  // 🔹 Accept Button
                   Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        ProfileType.normal.name == "normal"
-                            ? router.pushNamed(Routes.choosePlan.name)
-                            : router.pushNamed(Routes.chatList.name);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 24.r,
-                              offset: Offset(4, 8),
-                              color: AppColors.primaryOpacity,
+                    child: BlocConsumer<ProfileDetailBloc, ProfileDetailState>(
+                      listener: (context, state) {
+                        if (state is AcceptRequestLoadedState) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Request accepted successfully"),
                             ),
-                          ],
-                          gradient: AppColors.buttonGradient,
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 32.w,
-                          vertical: 14.h,
-                        ),
-                        child: Text(
-                          textAlign: TextAlign.center,
-                          "Accept Request",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: Typo.bold,
-                            fontSize: 16.sp,
+                          );
+                          // Navigate to chat screen
+                          router.pushNamed(Routes.chatList.name);
+                        } else if (state is AcceptRequestErrorState) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Error: ${state.message}")),
+                          );
+                        }
+                      },
+                      builder: (context, state) {
+                        if (state is AcceptRequestLoadingState) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          );
+                        }
+                        return InkWell(
+                          onTap: () {
+                            context.read<ProfileDetailBloc>().add(
+                              AcceptRequestEvent(id), // Safe int
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 24.r,
+                                  offset: Offset(4, 8),
+                                  color: AppColors.primaryOpacity,
+                                ),
+                              ],
+                              gradient: AppColors.buttonGradient,
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 32.w,
+                              vertical: 14.h,
+                            ),
+                            child: Text(
+                              textAlign: TextAlign.center,
+                              "Accept Request",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: Typo.bold,
+                                fontSize: 16.sp,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ],
+              )
+            : OutlinedButton(
+                onPressed: () {},
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 14.h,
+                  ),
+                ),
+                child: Text(
+                  "Withdraw Request",
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontFamily: Typo.bold,
+                    fontSize: 16.sp,
+                  ),
+                ),
               ),
       ),
     );

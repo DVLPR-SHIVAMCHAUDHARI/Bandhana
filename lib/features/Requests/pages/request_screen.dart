@@ -6,6 +6,7 @@ import 'package:bandhana/features/Home/models/home_user_model.dart';
 import 'package:bandhana/features/Requests/bloc/request_bloc.dart';
 import 'package:bandhana/features/Requests/bloc/request_event.dart';
 import 'package:bandhana/features/Requests/bloc/request_state.dart';
+import 'package:bandhana/features/Requests/shared_widgets/request_card_shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,6 +28,19 @@ class _RequestScreenState extends State<RequestScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     context.read<RequestBloc>().add(GetRecievedRequests());
+
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) return;
+
+      final bloc = context.read<RequestBloc>();
+      if (_tabController.index == 0 &&
+          bloc.state is! RecievedRequestsLoadedState) {
+        bloc.add(GetRecievedRequests());
+      } else if (_tabController.index == 1 &&
+          bloc.state is! SentRequestsLoadedState) {
+        bloc.add(GetSentRequests());
+      }
+    });
   }
 
   @override
@@ -35,15 +49,26 @@ class _RequestScreenState extends State<RequestScreen>
     super.dispose();
   }
 
-  Widget _buildRequestList(List<HomeUserModel> users) {
+  Widget _buildRequestList(List<HomeUserModel> users, String tab) {
+    if (users.isEmpty) {
+      return Center(
+        child: Text(
+          "No new requests",
+          style: TextStyle(
+            color: AppColors.headingblack,
+            fontSize: 16.sp,
+            fontFamily: Typo.medium,
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
       padding: EdgeInsets.symmetric(vertical: 16.h),
       itemCount: users.length + 1,
       itemBuilder: (context, index) {
-        if (index == users.length) {
-          return SizedBox(height: 100.h);
-        }
-        return RequestCard(user: users[index]);
+        if (index == users.length) return SizedBox(height: 100.h);
+        return RequestCard(user: users[index], tab: tab);
       },
     );
   }
@@ -79,13 +104,35 @@ class _RequestScreenState extends State<RequestScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                BlocBuilder<RequestBloc, RequestState>(
+                /// Received tab
+                BlocConsumer<RequestBloc, RequestState>(
+                  listener: (context, state) {
+                    if (state is RejectRequestSuccessState) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Request rejected successfully"),
+                        ),
+                      );
+                      context.read<RequestBloc>().add(GetRecievedRequests());
+                    } else if (state is RejectRequestErrorState) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error: ${state.error}")),
+                      );
+                    }
+                  },
                   builder: (context, state) {
-                    if (state is RecievedRequestsLoadingState) {
-                      return const Center(child: CircularProgressIndicator());
+                    if (state is RecievedRequestsLoadingState ||
+                        state is RejectRequestLoadingState) {
+                      return ListView.builder(
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        itemCount: 3,
+                        itemBuilder: (context, index) =>
+                            const RequestCardShimmer(),
+                      ).paddingHorizontal(24.w);
                     } else if (state is RecievedRequestsLoadedState) {
                       return _buildRequestList(
                         state.users,
+                        "received",
                       ).paddingHorizontal(24.w);
                     } else if (state is RecievedRequestsErrorState) {
                       return Center(child: Text(state.error));
@@ -93,7 +140,28 @@ class _RequestScreenState extends State<RequestScreen>
                     return const SizedBox();
                   },
                 ),
-                Center(child: Text("TODO: Sent requests list")),
+
+                /// Sent tab
+                BlocBuilder<RequestBloc, RequestState>(
+                  builder: (context, state) {
+                    if (state is SentRequestsLoadingState) {
+                      return ListView.builder(
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        itemCount: 3,
+                        itemBuilder: (context, index) =>
+                            const RequestCardShimmer(),
+                      ).paddingHorizontal(24.w);
+                    } else if (state is SentRequestsLoadedState) {
+                      return _buildRequestList(
+                        state.users,
+                        "sent",
+                      ).paddingHorizontal(24.w);
+                    } else if (state is SentRequestsErrorState) {
+                      return Center(child: Text(state.error));
+                    }
+                    return const SizedBox();
+                  },
+                ),
               ],
             ),
           ),
@@ -105,7 +173,9 @@ class _RequestScreenState extends State<RequestScreen>
 
 class RequestCard extends StatelessWidget {
   final HomeUserModel user;
-  const RequestCard({super.key, required this.user});
+  final String tab;
+
+  const RequestCard({super.key, required this.user, required this.tab});
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +190,7 @@ class RequestCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // top row
+          /// Top row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -132,20 +202,11 @@ class RequestCard extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              Text(
-                "30 min ago", // TODO: replace with real time if available
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: Typo.medium,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ],
           ),
           20.verticalSpace,
 
-          // profile row
+          /// Profile row
           Row(
             children: [
               CircleAvatar(
@@ -168,9 +229,8 @@ class RequestCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      user.profession! ?? "",
+                      user.profession ?? "",
                       overflow: TextOverflow.ellipsis,
-
                       maxLines: 2,
                       softWrap: true,
                       style: TextStyle(
@@ -198,71 +258,109 @@ class RequestCard extends StatelessWidget {
           ),
           20.verticalSpace,
 
-          // buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 12.h,
-                    ),
-                  ),
-                  child: Text(
-                    "Reject",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: Typo.semiBold,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                ),
-              ),
-              10.horizontalSpace,
-              Expanded(
-                child: InkWell(
-                  onTap: () {
-                    router.goNamed(
-                      Routes.profileDetail.name,
-                      pathParameters: {
-                        "match": user.matchPercentage.toString(),
-                        "mode": ProfileMode.incomingRequest.name,
-                        "id": user.userId.toString(),
-                      },
-                    );
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: AppColors.buttonGradient,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 12.h,
-                    ),
-                    child: Text(
-                      "View & Accept",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: Typo.semiBold,
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          /// Buttons
+          _buildButtons(context),
         ],
       ),
     );
+  }
+
+  Widget _buildButtons(BuildContext context) {
+    if (tab == "received") {
+      return Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () {
+                context.read<RequestBloc>().add(
+                  RejectRecievedRequest(userId: user.userId!),
+                );
+              },
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.white),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+              ),
+              child: Text(
+                "Reject",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: Typo.semiBold,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+          ),
+          10.horizontalSpace,
+          Expanded(
+            child: InkWell(
+              onTap: () {
+                router.goNamed(
+                  Routes.profileDetail.name,
+                  pathParameters: {
+                    "match": user.matchPercentage.toString(),
+                    "mode": ProfileMode.incomingRequest.name,
+                    "id": user.userId.toString(),
+                  },
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: AppColors.buttonGradient,
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+                child: Text(
+                  "View & Accept",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: Typo.semiBold,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: () {
+                router.goNamed(
+                  Routes.profileDetail.name,
+                  pathParameters: {
+                    "match": user.matchPercentage.toString(),
+                    "mode": ProfileMode.outgoingRequest.name,
+                    "id": user.userId.toString(),
+                  },
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: AppColors.buttonGradient,
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+                child: Text(
+                  "View Profile",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: Typo.semiBold,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
   }
 }
