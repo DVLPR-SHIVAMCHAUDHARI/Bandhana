@@ -2,9 +2,10 @@ import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/features/Profile/bloc/profile_detail_bloc.dart';
-import 'package:bandhana/features/Profile/bloc/profile_detail_event.dart';
-import 'package:bandhana/features/Profile/bloc/profile_detail_state.dart';
+import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_bloc.dart';
+import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_event.dart';
+import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_state.dart';
+
 import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
 import 'package:bandhana/features/master_apis/bloc/master_event.dart';
 import 'package:bandhana/features/master_apis/bloc/master_state.dart';
@@ -33,7 +34,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ProfileDetailBloc(),
+      create: (_) => ProfileDetailApprovedBloc(),
       child: Scaffold(
         body: BlocBuilder<MasterBloc, MasterState>(
           buildWhen: (prev, curr) =>
@@ -51,7 +52,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               final YourDetailModel user = state.yourDetail;
 
               // Initialize ProfileDetailBloc with this user
-              final profileBloc = context.read<ProfileDetailBloc>();
+              final profileBloc = context.read<ProfileDetailApprovedBloc>();
               profileBloc.add(
                 GetUserDetailById(user.profileDetails!.id.toString()),
               );
@@ -160,7 +161,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       user.profileSetup!.profileUrl5,
     ];
 
-    return BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
+    return BlocBuilder<ProfileDetailApprovedBloc, ProfileDetailApprovedState>(
       builder: (context, state) {
         String imageUrl = avatars[centerIndex] ?? '';
         int highlightedIndex = centerIndex;
@@ -243,7 +244,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
     return SizedBox(
       height: 160.h,
-      child: BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
+      child: BlocBuilder<ProfileDetailApprovedBloc, ProfileDetailApprovedState>(
         builder: (context, state) {
           List<Map<String, dynamic>> avatarPositions = List.generate(
             avatars.length,
@@ -301,7 +302,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 child: GestureDetector(
                   onTap: () {
                     if (index != highlightedIndex) {
-                      context.read<ProfileDetailBloc>().add(
+                      context.read<ProfileDetailApprovedBloc>().add(
                         SwitchImageEvent(index, avatarPositions),
                       );
                     }

@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/user_model.dart';
+import 'package:bandhana/features/Home/models/home_user_model.dart';
 import 'package:bandhana/features/master_apis/models/basic_compatiblity_model.dart';
 import 'package:bandhana/features/master_apis/models/district_model.dart';
 import 'package:bandhana/features/master_apis/models/family_details_model.dart';
@@ -371,7 +374,7 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
         if (result["status"] == "Success") {
           UserModel model = UserModel.fromJson(result["response"]);
 
-          emit(GetProfileStatusLoadedState());
+          emit(GetProfileStatusLoadedState(model));
         } else {
           emit(GetProfileSetupErrorState(result["response"].toString()));
         }
@@ -381,5 +384,59 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
     });
 
     // 🔥 Load initial events safely
+    on<ToggleFavoriteEvent>(_onToggleFavorite);
+    on<GetFavoriteListEvent>(fetchUsers);
+    on<SkipProfileEvent>(skipProfile);
+  }
+
+  Future<void> _onToggleFavorite(
+    ToggleFavoriteEvent event,
+    Emitter<MasterState> emit,
+  ) async {
+    emit(ToggleFavoriteLoading());
+    try {
+      final isAdded = await repo.toggleFavorite(event.userId, add: event.add);
+      emit(ToggleFavoriteSuccess(userId: event.userId, isFavorite: isAdded));
+    } catch (e) {
+      emit(ToggleFavoriteError(e.toString()));
+    }
+  }
+
+  Future<void> fetchUsers(
+    GetFavoriteListEvent event,
+    Emitter<MasterState> emit,
+  ) async {
+    emit(FetchFavoritesLoadingState());
+    try {
+      final response = await repo.getFavoriteList();
+
+      if (response["status"] == "Success") {
+        final List<HomeUserModel> users = response["response"];
+        log("🎯 Emitting Loaded with ${users.length} users");
+        emit(FetchFavoritesLoadedState(users));
+      } else {
+        emit(FetchFavoritesFailureState(response["response"].toString()));
+      }
+    } catch (e, st) {
+      log("❌ Error in fetchUsers: $e", stackTrace: st);
+      emit(FetchFavoritesFailureState(e.toString()));
+    }
+  }
+
+  Future<void> skipProfile(
+    SkipProfileEvent event,
+    Emitter<MasterState> emit,
+  ) async {
+    emit(SkipProfileLoadingState());
+    try {
+      var response = await repo.skipProfile(id: event.userId);
+      if (response["status"] == "Success") {
+        emit(SkipProfileLoadedState(response["response"]));
+      } else {
+        emit(SkipProfileFailureState(response["response"]));
+      }
+    } catch (e) {
+      emit(SkipProfileFailureState(e.toString()));
+    }
   }
 }

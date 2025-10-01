@@ -29,8 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // fire APIs once on home load
     context.read<MasterBloc>().add(GetYourDetails());
-
-    context.read<HomeBloc>().add(FetchUsersEvent()); // ✅ moved from build
+    context.read<HomeBloc>().add(FetchUsersEvent());
   }
 
   @override
@@ -41,26 +40,28 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async {
-              // Trigger your API calls again
               context.read<MasterBloc>().add(GetYourDetails());
-
               context.read<HomeBloc>().add(FetchUsersEvent());
-
-              // Optionally wait for a short duration for smooth effect
               await Future.delayed(const Duration(seconds: 1));
             },
             child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(
+              physics: const AlwaysScrollableScrollPhysics(
                 parent: ClampingScrollPhysics(),
-              ), // ✅ needed for pull-to-refresh
+              ),
               child: Column(
                 children: [
                   _buildBanner(),
-
                   10.verticalSpace,
                   _buildTitle(),
                   25.verticalSpace,
-                  BlocBuilder<HomeBloc, HomeState>(
+                  BlocConsumer<HomeBloc, HomeState>(
+                    listener: (context, state) {
+                      if (state is FetchUserFailureState) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Failed to load users")),
+                        );
+                      }
+                    },
                     builder: (context, state) {
                       if (state is FetchUsersLoadingState) {
                         return ListView.builder(
@@ -81,6 +82,23 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemBuilder: (context, index) {
                             final user = users[index];
                             return ProfileCard(
+                              viewProfile: () {
+                                router.pushNamed(
+                                  Routes.profileDetail.name,
+                                  pathParameters: {
+                                    "mode": ProfileMode.viewOther.name,
+                                    "id": user.userId.toString(),
+                                    "match": user.matchPercentage.toString(),
+                                  },
+                                );
+                              },
+                              onSkip: () {
+                                // Skip logic: remove current user from list
+                                context.read<HomeBloc>().add(
+                                  SkipUserEvent(userId: user.userId.toString()),
+                                );
+                              },
+                              isFavorite: user.isFavorite,
                               id: user.userId.toString(),
                               image: user.profileUrl1,
                               age: user.age?.toString() ?? "-",
@@ -94,12 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         );
-                      } else if (state is FetchUserFailureState) {
-                        return const Center(
-                          child: Text("Failed to load users"),
-                        );
                       }
-
                       return const Center(child: CircularProgressIndicator());
                     },
                   ),
@@ -128,15 +141,22 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           GestureDetector(
             onTap: () => router.goNamed(Routes.myProfile.name),
-            child: _buildUserHeaderInfo(), // ✅ one BlocBuilder instead of two
+            child: _buildUserHeaderInfo(),
           ),
           Row(
             children: [
-              IconButton(
-                onPressed: () {
+              InkWell(
+                onTap: () {
+                  router.pushNamed(Routes.favorite.name);
+                },
+                child: const Icon(Icons.favorite_border, color: Colors.white),
+              ),
+              10.horizontalSpace,
+              InkWell(
+                onTap: () {
                   router.pushNamed(Routes.notification.name);
                 },
-                icon: const Icon(
+                child: const Icon(
                   Icons.notifications_outlined,
                   color: Colors.white,
                 ),
@@ -161,8 +181,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 🔹 User Avatar (from Setup API)
-  /// 🔹 User Avatar + Details combined
   Widget _buildUserHeaderInfo() {
     return BlocBuilder<MasterBloc, MasterState>(
       buildWhen: (prev, curr) =>
@@ -231,24 +249,19 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
 
-        // fallback from local DB
-        final localUser = localDb.getUserData();
+        // fallback
         return Row(
           children: [
             const CircleAvatar(radius: 21, child: Icon(Icons.person)),
             9.horizontalSpace,
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: const [
                 Text(
-                  localUser?.fullname ?? "Guest User",
-                  style: TextStyle(
-                    fontFamily: Typo.semiBold,
-                    color: Colors.white,
-                    fontSize: 14.sp,
-                  ),
+                  "Guest User",
+                  style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
-                const Text("Loading...", style: TextStyle(color: Colors.white)),
+                Text("Loading...", style: TextStyle(color: Colors.white)),
               ],
             ),
           ],
@@ -257,7 +270,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 🔹 Banner Gradient + SVG
   Widget _buildBanner() {
     return ClipRect(
       child: Align(
@@ -276,7 +288,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 🔹 Title
   Widget _buildTitle() {
     return Column(
       children: [

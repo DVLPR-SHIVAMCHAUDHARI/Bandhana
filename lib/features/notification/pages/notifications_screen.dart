@@ -1,113 +1,155 @@
-import 'package:bandhana/core/const/app_colors.dart';
+import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:bandhana/features/notification/bloc/notification_bloc.dart';
+import 'package:bandhana/features/notification/bloc/notification_event.dart';
+import 'package:bandhana/features/notification/bloc/notification_state.dart';
+import 'package:bandhana/features/notification/model/notification_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
+class NotificationScreen extends StatelessWidget {
+  const NotificationScreen({super.key});
+
+  String timeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inMinutes < 60) {
+      return "${difference.inMinutes} min ago";
+    } else if (difference.inHours < 24) {
+      return "${difference.inHours} hr ago";
+    } else {
+      return "${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Dummy notifications for now
-    final notifications = [
-      {
-        "title": "New Match Found!",
-        "body": "You and Anjali Pawar are 80% compatible.",
-        "time": "5 min ago",
-      },
-      {
-        "title": "Request Accepted",
-        "body": "John Doe has accepted your request.",
-        "time": "20 min ago",
-      },
-      {
-        "title": "New Message",
-        "body": "You have a new message from Riya.",
-        "time": "1 hr ago",
-      },
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Notifications",
-          style: TextStyle(
-            fontFamily: Typo.bold,
-            fontSize: 22.sp,
-            color: AppColors.headingblack,
-          ),
+    return BlocProvider(
+      create: (_) => NotificationBloc()..add(FetchNotificationsEvent()),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Notifications"),
+          backgroundColor: Colors.white,
+          elevation: 0,
         ),
-        backgroundColor: AppColors.white,
-        elevation: 0,
-      ),
-      body: ListView.separated(
-        padding: EdgeInsets.all(16.w),
-        itemCount: notifications.length,
-        separatorBuilder: (_, __) => 12.verticalSpace,
-        itemBuilder: (context, index) {
-          final notif = notifications[index];
-          return Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Icon / Avatar
-                CircleAvatar(
-                  radius: 24.r,
-                  backgroundColor: Colors.pinkAccent,
-                  child: const Icon(Icons.notifications, color: Colors.white),
-                ),
-                16.horizontalSpace,
+        body: BlocConsumer<NotificationBloc, NotificationState>(
+          listener: (context, state) {
+            if (state is NotificationError) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
+            } else if (state is NotificationActionSuccess) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
 
-                // Texts
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        notif["title"]!,
-                        style: TextStyle(
-                          fontFamily: Typo.semiBold,
-                          fontSize: 16.sp,
-                          color: AppColors.headingblack,
+              // Refresh notifications after an action
+              context.read<NotificationBloc>().add(FetchNotificationsEvent());
+            }
+          },
+          builder: (context, state) {
+            if (state is NotificationLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is NotificationLoaded) {
+              List<NotificationModel> notifications = state.notifications;
+
+              // Sort by latest first
+              notifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+              if (notifications.isEmpty) {
+                return const Center(child: Text("No notifications"));
+              }
+
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context.read<NotificationBloc>().add(
+                    FetchNotificationsEvent(),
+                  );
+                },
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: notifications.length,
+                  itemBuilder: (context, index) {
+                    final notif = notifications[index];
+                    return Dismissible(
+                      key: Key(notif.notificationsId.toString()),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      onDismissed: (_) {
+                        context.read<NotificationBloc>().add(
+                          DeleteNotificationEvent(notif.notificationsId),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: notif.isViewed == 0
+                              ? Colors.blue.withOpacity(0.1)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            child: Text(notif.fromUserFullname[0]),
+                          ),
+                          title: Text(
+                            notif.notification,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16.sp,
+                              fontFamily: Typo.semiBold,
+                            ),
+                          ),
+                          subtitle: Text(timeAgo(notif.createdAt)),
+                          trailing: notif.isViewed == 0
+                              ? const Icon(
+                                  Icons.circle,
+                                  color: Colors.blue,
+                                  size: 12,
+                                )
+                              : null,
+                          onLongPress: () {
+                            if (notif.isViewed == 1) {
+                              context.read<NotificationBloc>().add(
+                                MarkAsUnreadEvent(notif.notificationsId),
+                              );
+                            }
+                          },
+                          onTap: () {
+                            if (notif.isViewed == 0) {
+                              context.read<NotificationBloc>().add(
+                                MarkAsReadEvent(notif.notificationsId),
+                              );
+                            }
+                            router.goNamed("request");
+                          },
                         ),
                       ),
-                      4.verticalSpace,
-                      Text(
-                        notif["body"]!,
-                        style: TextStyle(
-                          fontFamily: Typo.medium,
-                          fontSize: 14.sp,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                      8.verticalSpace,
-                      Text(
-                        notif["time"]!,
-                        style: TextStyle(
-                          fontFamily: Typo.medium,
-                          fontSize: 12.sp,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              ],
-            ),
-          );
-        },
+              );
+            } else if (state is NotificationError) {
+              return Center(child: Text(state.message));
+            }
+            return const SizedBox();
+          },
+        ),
       ),
     );
   }

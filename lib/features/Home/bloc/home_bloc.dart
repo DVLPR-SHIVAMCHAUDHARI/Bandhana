@@ -10,6 +10,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeRepository repo = HomeRepository();
   HomeBloc() : super(InitialState()) {
     on<FetchUsersEvent>(fetchUsers);
+    // home_bloc.dart
+    on<SkipUserEvent>((event, emit) {
+      if (state is FetchUserLoadedState) {
+        final currentList = List.of((state as FetchUserLoadedState).list);
+        currentList.removeWhere(
+          (user) => user.userId.toString() == event.userId,
+        );
+
+        emit(FetchUserLoadedState(currentList));
+      }
+    });
   }
 
   Future<void> fetchUsers(

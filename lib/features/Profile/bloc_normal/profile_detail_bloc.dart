@@ -1,50 +1,32 @@
-// In 'profile_detail_bloc.dart'
-
-import 'package:bandhana/features/Profile/bloc/profile_detail_event.dart';
-import 'package:bandhana/features/Profile/bloc/profile_detail_state.dart';
-import 'package:bandhana/features/Profile/model/user_detail_model.dart';
+import 'package:bandhana/features/Home/models/home_user_model.dart';
+import 'package:bandhana/features/Profile/bloc_normal/profile_detail_event.dart';
+import 'package:bandhana/features/Profile/bloc_normal/profile_detail_state.dart';
 import 'package:bandhana/features/Profile/repository/profile_repository.dart';
+import 'package:bandhana/features/master_apis/repository/master_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
-  UserDetailModel? _currentUser;
-
-  final int centerIndex = 3;
-  final ProfileRepository repo = ProfileRepository();
-
+  HomeUserModel? _currentUser;
+  final int centerIndex = 3; // Default center avatar
   bool _isFavorite = false;
 
+  final ProfileRepository repo = ProfileRepository();
+  final MasterRepo masterRepo = MasterRepo();
+
   ProfileDetailBloc() : super(InitialState()) {
-    on<GetUserDetailById>(_onGetUserDetailById);
     on<SwitchImageEvent>(_switchImage);
-    on<ToggleFavoriteEvent>(_toggleFavorite);
-    on<SendRequestEvent>(sendRequest);
-    on<AcceptRequestEvent>(acceptRequest);
+    on<ToggleFavoriteEvent>(_onToggleFavorite);
+    on<SendRequestEvent>(_sendRequest);
+    on<AcceptRequestEvent>(_acceptRequest);
   }
 
-  Future<void> _onGetUserDetailById(
-    GetUserDetailById event,
-    Emitter<ProfileDetailState> emit,
-  ) async {
-    emit(ProfileDetailLoading());
-    try {
-      final result = await repo.getUserById(id: event.id);
-
-      if (result["status"] == "Success") {
-        final UserDetailModel user = result["response"] as UserDetailModel;
-        _currentUser = user;
-
-        emit(ProfileDetailLoaded(user, isFavorite: _isFavorite));
-      } else {
-        emit(
-          ProfileDetailError(result["response"]?.toString() ?? "Unknown error"),
-        );
-      }
-    } catch (e) {
-      emit(ProfileDetailError(e.toString()));
-    }
+  /// Set current user before switching images or toggling favorite
+  void setCurrentUser(user) {
+    _currentUser = user;
+    emit(ProfileDetailLoaded(user, isFavorite: _isFavorite));
   }
 
+  /// --- Image Switching ---
   void _switchImage(SwitchImageEvent event, Emitter<ProfileDetailState> emit) {
     if (_currentUser == null) return;
 
@@ -61,22 +43,32 @@ class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
     emit(SwitchImageState(newAvatars, centerIndex, _currentUser!, _isFavorite));
   }
 
-  void _toggleFavorite(
+  /// --- Toggle Favorite ---
+
+  Future<void> _onToggleFavorite(
     ToggleFavoriteEvent event,
     Emitter<ProfileDetailState> emit,
-  ) {
-    if (_currentUser == null) return;
-
-    _isFavorite = !_isFavorite;
-
-    emit(FavoriteToggledState(_isFavorite, _currentUser!));
+  ) async {
+    emit(ToggleFavoriteLoading());
+    try {
+      final isAdded = await masterRepo.toggleFavorite(
+        event.userId,
+        add: event.add,
+      );
+      emit(ToggleFavoriteSuccess(userId: event.userId, isFavorite: isAdded));
+    } catch (e) {
+      emit(ToggleFavoriteError(e.toString()));
+    }
   }
 
-  sendRequest(SendRequestEvent event, Emitter emit) async {
+  /// --- Send Request (unchanged) ---
+  void _sendRequest(
+    SendRequestEvent event,
+    Emitter<ProfileDetailState> emit,
+  ) async {
     emit(SendRequestLoadingState());
     try {
       final result = await repo.sendRequest(id: event.id);
-
       if (result["status"] == "Success") {
         emit(SendRequestLoadedState(result["response"]));
       } else {
@@ -91,21 +83,20 @@ class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
     }
   }
 
-  // --- Accept Request ---
-  acceptRequest(AcceptRequestEvent event, Emitter emit) async {
+  /// --- Accept Request (unchanged) ---
+  void _acceptRequest(
+    AcceptRequestEvent event,
+    Emitter<ProfileDetailState> emit,
+  ) async {
     emit(AcceptRequestLoadingState());
     try {
       final result = await repo.acceptRequest(id: event.id);
-
       if (result["status"] == "Success") {
-        // Correct path
-        final displayText =
-            result["Response"]?["Status"]?["DisplayText"] ?? "Success";
-        emit(AcceptRequestLoadedState(displayText));
+        emit(AcceptRequestLoadedState(result["response"]["DisplayText"]));
       } else {
         emit(
           AcceptRequestErrorState(
-            result["Response"]?.toString() ?? "Unknown error",
+            result["response"]?.toString() ?? "Unknown error",
           ),
         );
       }

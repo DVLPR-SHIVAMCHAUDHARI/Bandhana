@@ -19,8 +19,10 @@ import 'package:bandhana/features/Home/pages/homescreen.dart';
 import 'package:bandhana/features/HomeAnimation/pages/home_animation_screen.dart';
 import 'package:bandhana/features/Onboarding/pages/first_welcome_screen.dart';
 import 'package:bandhana/features/Onboarding/pages/onboarding_screen.dart';
-import 'package:bandhana/features/Profile/bloc/profile_detail_bloc.dart';
+import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_bloc.dart';
+import 'package:bandhana/features/Profile/bloc_normal/profile_detail_bloc.dart';
 import 'package:bandhana/features/Profile/pages/message_requested_screen.dart';
+import 'package:bandhana/features/Profile/pages/profile_detail_approved.dart';
 import 'package:bandhana/features/Profile/pages/profile_detail_screen.dart';
 import 'package:bandhana/features/Registration/pages/edit_profile_screen.dart';
 import 'package:bandhana/features/Registration/pages/family_details_screen.dart';
@@ -29,6 +31,7 @@ import 'package:bandhana/features/Requests/bloc/request_bloc.dart';
 import 'package:bandhana/features/Requests/pages/request_screen.dart';
 import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
 import 'package:bandhana/features/Subscription/pages/choose_your_plans_screen.dart';
+import 'package:bandhana/features/favourites/pages/favourites_screen.dart';
 import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
 import 'package:bandhana/features/master_apis/bloc/master_event.dart';
 import 'package:bandhana/features/navbar/pages/navbar.dart';
@@ -37,6 +40,7 @@ import 'package:bandhana/features/Registration/pages/my_profile_screen.dart';
 import 'package:bandhana/features/Registration/pages/profile_setup_screen.dart';
 import 'package:bandhana/features/notification/pages/notifications_screen.dart';
 import 'package:bandhana/features/splashScreen/page/splash_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -62,6 +66,7 @@ enum Routes {
   request,
   chatList,
   profileDetail,
+  profileDetailApproved,
   messageRequested,
   choosePlan,
   myProfile,
@@ -71,6 +76,7 @@ enum Routes {
   chat,
   familyDetails,
   notification,
+  favorite,
 }
 
 enum ProfileMode {
@@ -160,20 +166,26 @@ final GoRouter router = GoRouter(
         // hide navbar on specific paths
         final hideNavbarForPaths = [
           "/homescreen/profileDetail",
-          "/homescreen/profileDetail/messageRequested",
+          "/discover/profileDetailApproved",
+          "/homescreen/messageRequested",
           "/homescreen/notification",
           "/homescreen/choosePlan",
           "/homescreen/myProfile",
+          "/homescreen/favorite",
           "/homescreen/myProfile/editProfile",
           "/chatList/chat",
-        ];
+        ]; //on all this screen no material found
 
         final currentPath = state.uri.toString();
         final showNavbar = !hideNavbarForPaths.any(
           (path) => currentPath.startsWith(path),
         );
 
-        return showNavbar ? Navbar(child: child) : child;
+        return Scaffold(
+          body: showNavbar
+              ? Navbar(child: child) // with navbar
+              : child, // without navbar, but still inside Scaffold
+        );
       },
       routes: [
         GoRoute(
@@ -189,7 +201,9 @@ final GoRouter router = GoRouter(
               name: Routes.myProfile.name,
               builder: (context, state) => BlocProvider(
                 create: (context) => ProfileSetupBloc(),
-                child: MyProfileScreen(),
+                child: MyProfileScreen(
+                  // id: localDb.getUserData()!.userId.toString(),
+                ),
               ),
               routes: [
                 GoRoute(
@@ -205,7 +219,12 @@ final GoRouter router = GoRouter(
             GoRoute(
               path: "notification",
               name: Routes.notification.name,
-              builder: (context, state) => NotificationsScreen(),
+              builder: (context, state) => NotificationScreen(),
+            ),
+            GoRoute(
+              path: "favorite",
+              name: Routes.favorite.name,
+              builder: (context, state) => FavoritesScreen(),
             ),
             GoRoute(
               path: "profileDetail/:mode/:id/:match",
@@ -221,13 +240,11 @@ final GoRouter router = GoRouter(
                   mode: state.pathParameters['mode'] ?? "viewOther",
                 ),
               ),
-              routes: [
-                GoRoute(
-                  path: "messageRequested",
-                  name: Routes.messageRequested.name,
-                  builder: (context, state) => MessageRequestedScreen(),
-                ),
-              ],
+            ),
+            GoRoute(
+              path: "messageRequested",
+              name: Routes.messageRequested.name,
+              builder: (context, state) => MessageRequestedScreen(),
             ),
             GoRoute(
               path: "choosePlan",
@@ -246,6 +263,25 @@ final GoRouter router = GoRouter(
             create: (context) => DiscoverBloc(),
             child: DiscoverScreen(),
           ),
+          routes: [
+            GoRoute(
+              path: "profileDetailApproved/:mode/:id/:match",
+              name: Routes.profileDetailApproved.name,
+              builder: (context, state) => MultiBlocProvider(
+                providers: [
+                  BlocProvider(
+                    create: (context) => ProfileDetailApprovedBloc(),
+                  ),
+                  BlocProvider(create: (context) => HomeBloc()),
+                ],
+                child: ProfileDetailedApprovedScreen(
+                  match: state.pathParameters['match'] ?? "50",
+                  id: state.pathParameters['id'] ?? "1",
+                  mode: state.pathParameters['mode'] ?? "viewOther",
+                ),
+              ),
+            ),
+          ],
         ),
         GoRoute(
           path: "/chatList",

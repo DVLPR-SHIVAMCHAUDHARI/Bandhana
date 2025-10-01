@@ -35,8 +35,10 @@ class HomeUserModel {
   String? travelPreferences;
   String? petFriendly;
   String? dailyRoutine;
+  int? isFavorite;
 
   HomeUserModel({
+    this.isFavorite,
     this.userId,
     this.matchPercentage,
     this.patnerLifeStyle,
@@ -78,6 +80,9 @@ class HomeUserModel {
   HomeUserModel.fromJson(Map<String, dynamic> json) {
     if (json["user_id"] is int) {
       userId = json["user_id"];
+    }
+    if (json["is_favorite"] is int) {
+      isFavorite = json["is_favorite"];
     }
     if (json["match_percentage"] is int) {
       matchPercentage = json["match_percentage"];
@@ -195,6 +200,7 @@ class HomeUserModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data["user_id"] = userId;
+    data["is_favorite"] = isFavorite;
     data["match_percentage"] = matchPercentage;
     data["patner_life_style"] = patnerLifeStyle;
     data["fullname"] = fullname;

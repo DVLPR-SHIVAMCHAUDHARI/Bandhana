@@ -1,3 +1,5 @@
+import 'package:bandhana/core/const/user_model.dart';
+import 'package:bandhana/features/Home/models/home_user_model.dart';
 import 'package:bandhana/features/master_apis/models/basic_compatiblity_model.dart';
 import 'package:bandhana/features/master_apis/models/district_model.dart';
 import 'package:bandhana/features/master_apis/models/family_details_model.dart';
@@ -23,7 +25,10 @@ import 'package:bandhana/features/master_apis/models/education_model.dart';
 import 'package:bandhana/features/master_apis/models/profession_model.dart';
 import 'package:bandhana/features/master_apis/models/hobby_model.dart';
 
-abstract class MasterState extends Equatable {}
+abstract class MasterState extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 // Initial
 class InitialState extends MasterState {
@@ -520,13 +525,70 @@ class GetProfileStatusLoadingState extends MasterState {
 }
 
 class GetProfileStatusLoadedState extends MasterState {
+  final UserModel user;
+  GetProfileStatusLoadedState(this.user);
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [user];
 }
 
 class GetProfileStatusErrorState extends MasterState {
   final String message;
   GetProfileStatusErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+class ToggleFavoriteLoading extends MasterState {}
+
+class ToggleFavoriteSuccess extends MasterState {
+  final String userId;
+  final bool isFavorite;
+
+  ToggleFavoriteSuccess({required this.userId, required this.isFavorite});
+}
+
+class ToggleFavoriteError extends MasterState {
+  final String message;
+
+  ToggleFavoriteError(this.message);
+}
+
+class FetchFavoritesLoadingState extends MasterState {}
+
+class FetchFavoritesLoadedState extends MasterState {
+  final List<HomeUserModel> list;
+
+  FetchFavoritesLoadedState(this.list);
+
+  @override
+  List<Object?> get props => [list];
+}
+
+class FetchFavoritesFailureState extends MasterState {
+  final String? message;
+
+  FetchFavoritesFailureState(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class SkipProfileLoadingState extends MasterState {}
+
+class SkipProfileLoadedState extends MasterState {
+  final String? message;
+
+  SkipProfileLoadedState(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class SkipProfileFailureState extends MasterState {
+  final String? message;
+
+  SkipProfileFailureState(this.message);
+
   @override
   List<Object?> get props => [message];
 }

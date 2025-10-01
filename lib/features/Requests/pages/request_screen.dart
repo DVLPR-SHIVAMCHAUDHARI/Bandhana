@@ -297,13 +297,17 @@ class RequestCard extends StatelessWidget {
           Expanded(
             child: InkWell(
               onTap: () {
+                logger.e(
+                  "Tapped user id: ${user.userId}",
+                ); // This will now print
                 router.goNamed(
                   Routes.profileDetail.name,
                   pathParameters: {
-                    "match": user.matchPercentage.toString(),
+                    "match": (user.matchPercentage ?? 0).toString(),
                     "mode": ProfileMode.incomingRequest.name,
                     "id": user.userId.toString(),
                   },
+                  extra: user, // <-- pass the HomeUserModel object
                 );
               },
               child: Container(
@@ -339,6 +343,7 @@ class RequestCard extends StatelessWidget {
                     "mode": ProfileMode.outgoingRequest.name,
                     "id": user.userId.toString(),
                   },
+                  extra: user, // <-- pass the HomeUserModel object
                 );
               },
               child: Container(

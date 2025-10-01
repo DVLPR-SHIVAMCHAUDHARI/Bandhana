@@ -2,15 +2,24 @@ import 'package:bandhana/core/const/app_colors.dart';
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/numberextension.dart';
 import 'package:bandhana/core/const/typography.dart';
+import 'package:bandhana/features/Home/bloc/home_bloc.dart';
+import 'package:bandhana/features/Home/bloc/home_event.dart';
+import 'package:bandhana/features/Home/bloc/home_state.dart';
+import 'package:bandhana/features/Home/models/home_user_model.dart';
 
-import 'package:bandhana/features/Profile/bloc/profile_detail_bloc.dart';
-import 'package:bandhana/features/Profile/bloc/profile_detail_event.dart';
-import 'package:bandhana/features/Profile/bloc/profile_detail_state.dart';
-import 'package:bandhana/features/Profile/model/user_detail_model.dart';
+import 'package:bandhana/features/Profile/bloc_normal/profile_detail_bloc.dart';
+import 'package:bandhana/features/Profile/bloc_normal/profile_detail_event.dart';
+import 'package:bandhana/features/Profile/bloc_normal/profile_detail_state.dart';
+
 import 'package:bandhana/features/Profile/widgets/compatibility_check_dialog.dart';
 import 'package:bandhana/features/Requests/bloc/request_bloc.dart';
 import 'package:bandhana/features/Requests/bloc/request_event.dart';
 import 'package:bandhana/features/Requests/bloc/request_state.dart';
+import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
+import 'package:bandhana/features/master_apis/bloc/master_event.dart'
+    hide ToggleFavoriteEvent;
+import 'package:bandhana/features/master_apis/bloc/master_state.dart'
+    hide ToggleFavoriteSuccess;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,35 +42,40 @@ class ProfileDetailedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => ProfileDetailBloc()..add(GetUserDetailById(id)),
-        ),
-        BlocProvider(
-          create: (_) => RequestBloc(), // Added for Reject
-        ),
+        BlocProvider(create: (_) => HomeBloc()..add(FetchUsersEvent())),
+        BlocProvider(create: (_) => RequestBloc()),
+        BlocProvider(create: (_) => ProfileDetailBloc()),
+        BlocProvider(create: (_) => MasterBloc()..add(GetprofileStatus())),
       ],
       child: Scaffold(
-        body: BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
+        body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
-            if (state is ProfileDetailLoading) {
+            if (state is FetchUsersLoadingState) {
               return const Center(child: CircularProgressIndicator());
-            } else if (state is ProfileDetailError) {
+            } else if (state is FetchUserFailureState) {
               return Center(child: Text(state.message!));
-            }
+            } else if (state is FetchUserLoadedState) {
+              final int? userId = int.tryParse(id);
+              HomeUserModel? user;
 
-            UserDetailModel? user;
+              // Try using extra if available
+              user = GoRouterState.of(context).extra as HomeUserModel?;
 
-            if (state is ProfileDetailLoaded) {
-              user = state.user;
-            } else if (state is SwitchImageState) {
-              user = state.user;
-            } else if (state is FavoriteToggledState) {
-              user = state.user;
-            }
+              // fallback to HomeBloc list if extra is null
+              if (user == null &&
+                  state is FetchUserLoadedState &&
+                  userId != null) {
+                user = state.list.cast<HomeUserModel?>().firstWhere(
+                  (u) => u?.userId == userId,
+                  orElse: () => null,
+                );
+              }
 
-            if (user != null) {
+              // If user is still null, show error
+              if (user == null) {
+                return const Center(child: Text("User not found"));
+              }
               return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -130,7 +144,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                     child: BlocConsumer<ProfileDetailBloc, ProfileDetailState>(
                       listener: (context, state) {
                         if (state is SendRequestLoadedState) {
-                          router.pushNamed(Routes.messageRequested.name);
+                          router.goNamed(Routes.messageRequested.name);
                         } else if (state is SendRequestErrorState) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(state.message)),
@@ -146,42 +160,51 @@ class ProfileDetailedScreen extends StatelessWidget {
                           );
                         }
 
-                        return InkWell(
-                          onTap: () {
-                            if (localDb.getUserData()!.paymentDone == 0) {
-                              router.pushNamed(Routes.choosePlan.name);
-                            } else {
-                              context.read<ProfileDetailBloc>().add(
-                                SendRequestEvent(id),
-                              );
+                        return BlocBuilder<MasterBloc, MasterState>(
+                          builder: (context, state) {
+                            bool paid =
+                                false; //if this is false then how am i able to trigger this  send request?
+                            if (state is GetProfileStatusLoadedState) {
+                              paid = state.user.paymentDone != 0;
                             }
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 24.r,
-                                  offset: Offset(4, 8),
-                                  color: AppColors.primaryOpacity,
+                            return InkWell(
+                              onTap: () {
+                                if (!paid) {
+                                  router.pushNamed(Routes.choosePlan.name);
+                                } else {
+                                  context.read<ProfileDetailBloc>().add(
+                                    SendRequestEvent(id),
+                                  );
+                                }
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 24.r,
+                                      offset: Offset(4, 8),
+                                      color: AppColors.primaryOpacity,
+                                    ),
+                                  ],
+                                  gradient: AppColors.buttonGradient,
+                                  borderRadius: BorderRadius.circular(20.r),
                                 ),
-                              ],
-                              gradient: AppColors.buttonGradient,
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 32.w,
-                              vertical: 14.h,
-                            ),
-                            child: Text(
-                              textAlign: TextAlign.center,
-                              "Show Interest",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: Typo.bold,
-                                fontSize: 16.sp,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 32.w,
+                                  vertical: 14.h,
+                                ),
+                                child: Text(
+                                  "Show Interest",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: Typo.bold,
+                                    fontSize: 16.sp,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         );
                       },
                     ),
@@ -191,7 +214,6 @@ class ProfileDetailedScreen extends StatelessWidget {
             : mode == "incomingRequest"
             ? Row(
                 children: [
-                  // 🔹 Reject Button
                   Expanded(
                     child: BlocConsumer<RequestBloc, RequestState>(
                       listener: (context, state) {
@@ -201,9 +223,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                               content: Text("Request rejected successfully"),
                             ),
                           );
-                          router.goNamed(
-                            Routes.request.name,
-                          ); // Navigate back to requests list
+                          router.goNamed(Routes.request.name);
                         } else if (state is RejectRequestErrorState) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text("Error: ${state.error}")),
@@ -221,9 +241,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                         return OutlinedButton(
                           onPressed: () {
                             context.read<RequestBloc>().add(
-                              RejectRecievedRequest(
-                                userId: int.parse(id),
-                              ), // Safe int
+                              RejectRecievedRequest(userId: int.parse(id)),
                             );
                           },
                           style: OutlinedButton.styleFrom(
@@ -251,7 +269,6 @@ class ProfileDetailedScreen extends StatelessWidget {
 
                   10.horizontalSpace,
 
-                  // 🔹 Accept Button
                   Expanded(
                     child: BlocConsumer<ProfileDetailBloc, ProfileDetailState>(
                       listener: (context, state) {
@@ -261,8 +278,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                               content: Text("Request accepted successfully"),
                             ),
                           );
-                          // Navigate to chat screen
-                          router.pushNamed(Routes.chatList.name);
+                          router.goNamed(Routes.chatList.name);
                         } else if (state is AcceptRequestErrorState) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text("Error: ${state.message}")),
@@ -280,7 +296,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                         return InkWell(
                           onTap: () {
                             context.read<ProfileDetailBloc>().add(
-                              AcceptRequestEvent(id), // Safe int
+                              AcceptRequestEvent(id),
                             );
                           },
                           child: Container(
@@ -315,64 +331,38 @@ class ProfileDetailedScreen extends StatelessWidget {
                   ),
                 ],
               )
-            : OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppColors.primary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 14.h,
-                  ),
-                ),
-                child: Text(
-                  "Withdraw Request",
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontFamily: Typo.bold,
-                    fontSize: 16.sp,
-                  ),
-                ),
-              ),
+            : SizedBox(),
       ),
     );
   }
 
-  // --- _buildMainImage (FIXED isFavorite LOGIC) ---
-  Widget _buildMainImage(BuildContext context, UserDetailModel user) {
-    // 5 profile URLs
+  // --- _buildMainImage ---
+  Widget _buildMainImage(BuildContext context, HomeUserModel user) {
     final List<String?> avatars = [
-      user.profileSetup!.profileUrl1,
-      user.profileSetup!.profileUrl2,
-      user.profileSetup!.profileUrl3,
-      user.profileSetup!.profileUrl4,
-      user.profileSetup!.profileUrl5,
+      user!.profileUrl1,
+      user!.profileUrl2,
+      user!.profileUrl3,
+      user!.profileUrl4,
+      user!.profileUrl5,
     ];
 
     return BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
       builder: (context, state) {
         String imageUrl;
-        int centerIndex = 3; // default center avatar
-
-        // ✅ FIX: Initialize isFavorite to false as it is not dependent on the UserDetailModel yet.
+        int centerIndex = 3;
         bool isFavorite = false;
 
         if (state is ProfileDetailLoaded) {
           isFavorite = state.isFavorite;
-        } else if (state is FavoriteToggledState) {
+        } else if (state is ToggleFavoriteSuccess) {
           isFavorite = state.isFavorite;
         } else if (state is SwitchImageState) {
           isFavorite = state.isFavorite;
         }
 
-        // Determine the image URL based on the latest state
         if (state is SwitchImageState) {
-          // If in SwitchImageState, use the URL array from the state
           imageUrl = state.avatars[centerIndex]['url'];
         } else {
-          // Otherwise, use the original image at the center position
           imageUrl = avatars[centerIndex] ?? '';
         }
 
@@ -388,8 +378,6 @@ class ProfileDetailedScreen extends StatelessWidget {
               errorWidget: (_, __, ___) =>
                   Container(height: 500.h, color: Colors.grey),
             ),
-
-            // Gradient Overlay and Content
             Container(
               height: 550.h,
               decoration: BoxDecoration(
@@ -407,48 +395,38 @@ class ProfileDetailedScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Back Button
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: InkWell(
-                          onTap: () {
-                            mode == ProfileMode.viewOther.name
-                                ? router.goNamed(Routes.homescreen.name)
-                                : router.goNamed(Routes.request.name);
-                          },
-                          child: const CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Icon(Icons.arrow_back, color: Colors.black),
-                          ),
+                      InkWell(
+                        onTap: () {
+                          mode == ProfileMode.viewOther.name
+                              ? router.goNamed(Routes.homescreen.name)
+                              : router.goNamed(Routes.request.name);
+                        },
+                        child: const CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Icon(Icons.arrow_back, color: Colors.black),
                         ),
                       ),
-                      // Favorite Button
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: InkWell(
-                          onTap: () {
-                            context.read<ProfileDetailBloc>().add(
-                              ToggleFavoriteEvent(),
-                            );
-                          },
-                          child: CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_outline,
-                              color: isFavorite ? Colors.pink : Colors.black,
-                            ),
+                      InkWell(
+                        onTap: () {
+                          context.read<ProfileDetailBloc>().add(
+                            ToggleFavoriteEvent(userId: user.userId.toString()),
+                          );
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_outline,
+                            color: isFavorite ? Colors.pink : Colors.black,
                           ),
                         ),
                       ),
                     ],
                   ),
                   200.verticalSpace,
-
-                  // Name + Age
                   Text(
-                    "${user.profileDetails!.fullname}, ${user.profileSetup!.age}",
+                    "${user!.fullname}, ${user!.age}",
                     style: TextStyle(
                       fontSize: 28.sp,
                       fontFamily: Typo.playfairDisplayRegular,
@@ -456,28 +434,20 @@ class ProfileDetailedScreen extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-
                   5.verticalSpace,
-
-                  // Occupation + Location
                   Text(
-                    "${user.profileSetup!.professionName} · ${user.profileDetails!.district}",
+                    "${user!.profession} · ${user!.district}",
                     style: TextStyle(fontSize: 16.sp, color: Colors.white70),
                   ),
-
                   12.verticalSpace,
-
-                  // Tags
                   Wrap(
                     spacing: 8.w,
                     children: List.generate(
-                      user.profileDetails!.hobbies!.length,
-                      (index) => _buildTag(
-                        "#${user.profileDetails!.hobbies![index].hobbyName}",
-                      ),
+                      user!.hobbies!.length,
+                      (index) =>
+                          _buildTag("#${user!.hobbies![index].hobbyName}"),
                     ),
                   ),
-                  40.verticalSpace,
                 ],
               ),
             ),
@@ -488,32 +458,30 @@ class ProfileDetailedScreen extends StatelessWidget {
   }
 
   // --- _buildAvatarStack ---
-  Widget _buildAvatarStack(BuildContext context, UserDetailModel user) {
+  Widget _buildAvatarStack(BuildContext context, HomeUserModel user) {
     final List<String?> avatars = [
-      user.profileSetup!.profileUrl1,
-      user.profileSetup!.profileUrl2,
-      user.profileSetup!.profileUrl3,
-      user.profileSetup!.profileUrl4,
-      user.profileSetup!.profileUrl5,
+      user.profileUrl1,
+      user.profileUrl2,
+      user.profileUrl3,
+      user.profileUrl4,
+      user.profileUrl5,
     ];
 
     const int centerIndex = 3;
 
     return SizedBox(
-      height: 160.h,
+      height: 100.h,
       child: BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
         builder: (context, state) {
-          // Default positions
           List<Map<String, dynamic>> avatarPositions = List.generate(
             avatars.length,
             (index) => {
               'index': index,
               'url': avatars[index] ?? '',
-              // Fan layout logic
               'top': index == centerIndex
                   ? -40.0
                   : index == 1 || index == 2
-                  ? -20.0
+                  ? -15.0
                   : 20.0,
               'left': index == 0
                   ? 0.0
@@ -533,32 +501,8 @@ class ProfileDetailedScreen extends StatelessWidget {
             },
           );
 
-          int highlightedIndex = centerIndex; // Default is the center image
-
-          // Apply positions/urls from state if available
           if (state is SwitchImageState) {
-            // Use the URLs updated by the BLoC
-            avatarPositions = state.avatars.map((avatar) {
-              int idx = avatar['index'];
-              return {
-                ...avatar,
-                // Re-apply the original fan layout top and size logic based on the index
-                'top': idx == centerIndex
-                    ? -40.0
-                    : idx == 1 || idx == 2
-                    ? -15.0
-                    : 20.0,
-                'left': avatarPositions.firstWhere(
-                  (e) => e['index'] == idx,
-                )['left'],
-                'right': avatarPositions.firstWhere(
-                  (e) => e['index'] == idx,
-                )['right'],
-                'size': idx == centerIndex ? 152.h : 100.h,
-              };
-            }).toList();
-            // The highlighted index is always the center one after the swap
-            highlightedIndex = centerIndex;
+            avatarPositions = state.avatars;
           }
 
           return Stack(
@@ -571,8 +515,8 @@ class ProfileDetailedScreen extends StatelessWidget {
                 right: avatar['right'],
                 child: GestureDetector(
                   onTap: () {
-                    if (index != highlightedIndex) {
-                      // Pass the list of current positions to the BLoC for swapping
+                    if (index != centerIndex) {
+                      context.read<ProfileDetailBloc>().setCurrentUser(user);
                       context.read<ProfileDetailBloc>().add(
                         SwitchImageEvent(index, avatarPositions),
                       );
@@ -584,8 +528,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        // Highlight the currently selected/center image
-                        color: index == highlightedIndex
+                        color: index == centerIndex
                             ? AppColors.primary
                             : Colors.transparent,
                         width: 2,
@@ -618,7 +561,7 @@ class ProfileDetailedScreen extends StatelessWidget {
   }
 
   // --- _buildProfileDetails ---
-  Widget _buildProfileDetails(UserDetailModel user) {
+  Widget _buildProfileDetails(HomeUserModel user) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 20.w),
       child: Column(
@@ -642,9 +585,8 @@ class ProfileDetailedScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🔹 Title
                   Text(
-                    "About ${user.profileDetails!.fullname!.split(' ').first}",
+                    "About ${user.fullname!.split(' ').first}",
                     style: TextStyle(
                       fontSize: 24.sp,
                       fontFamily: Typo.playfairBold,
@@ -652,123 +594,50 @@ class ProfileDetailedScreen extends StatelessWidget {
                     ),
                   ),
                   13.verticalSpace,
-
-                  // 🔹 Bio
                   Text(
-                    user.profileSetup!.bio!,
+                    user.bio!,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontFamily: Typo.regular,
                       color: Colors.black87,
                     ),
                   ),
-
                   30.verticalSpace,
-
                   _sectionCard("Personal Details", [
-                    _profileDetail("Full Name", user.profileDetails!.fullname!),
-                    _profileDetail("Age", user.profileSetup!.age.toString()),
-                    _profileDetail("Gender", user.profileDetails!.genderName!),
-                    _profileDetail(
-                      "Date of Birth",
-                      user.profileDetails!.dateOfBirth!,
-                    ),
-                    _profileDetail(
-                      "Religion",
-                      user.profileDetails!.religionName!,
-                    ),
-                    _profileDetail("Caste", user.profileDetails!.casteName!),
-                    _profileDetail(
-                      "Mother Tongue",
-                      user.profileDetails!.motherTongueName!,
-                    ),
-                    _profileDetail(
-                      "Nationality",
-                      user.profileDetails!.nationalityName!,
-                    ),
-                    _profileDetail(
-                      "Blood Group",
-                      user.profileDetails!.bloodGroupName!,
-                    ),
+                    _profileDetail("Full Name", user.fullname!),
+                    _profileDetail("Age", user.age.toString()),
+                    _profileDetail("Gender", user.gender!),
+                    _profileDetail("Date of Birth", user.dateOfBirth!),
+                    _profileDetail("Religion", user.religion!),
+                    _profileDetail("Caste", user.caste!),
+                    _profileDetail("Mother Tongue", user.motherTongue!),
+                    _profileDetail("Nationality", user.nationality!),
                   ], icon: Icons.person),
-
-                  _sectionCard("Family Details", [
-                    _profileDetail(
-                      "Father's Name",
-                      user.familyDetails!.fathersName!,
-                    ),
-                    _profileDetail(
-                      "Mother's Name",
-                      user.familyDetails!.mothersName!,
-                    ),
-                    _profileDetail(
-                      "Family Type",
-                      user.familyDetails!.familyTypeName!,
-                    ),
-                    _profileDetail(
-                      "Family Status",
-                      user.familyDetails!.familyStatusName!,
-                    ),
-                    _profileDetail(
-                      "Family Values",
-                      user.familyDetails!.familyValuesName!,
-                    ),
-                  ], icon: Icons.family_restroom),
-
                   _sectionCard("Academics & Profession", [
-                    _profileDetail(
-                      "Education",
-                      user.profileSetup!.educationName!,
-                    ),
-                    _profileDetail(
-                      "Profession",
-                      user.profileSetup!.professionName!,
-                    ),
-                    _profileDetail("Salary", user.profileSetup!.salaryName!),
-                    _profileDetail(
-                      "Work Location",
-                      user.profileSetup!.workLocation!,
-                    ),
-                    _profileDetail(
-                      "Permanent Location",
-                      user.profileSetup!.permanentLocation!,
-                    ),
+                    _profileDetail("Education", user.education!),
+                    _profileDetail("Profession", user.profession!),
+                    _profileDetail("Work Location", user.workLocation!),
+                    _profileDetail("Permanent Location", user.district!),
                   ], icon: Icons.school),
-
                   _sectionCard("Lifestyle & Preferences", [
-                    _profileDetail(
-                      "Diet",
-                      user.patnerLifeStylePreferences!.diet!,
-                    ),
-                    _profileDetail(
-                      "Smoking Habit",
-                      user.patnerLifeStylePreferences!.smokingHabit!,
-                    ),
-                    _profileDetail(
-                      "Drinking Habit",
-                      user.patnerLifeStylePreferences!.drinkingHabit!,
-                    ),
-                    _profileDetail(
-                      "Fitness Activity",
-                      user.patnerLifeStylePreferences!.fitnessActivity!,
-                    ),
+                    _profileDetail("Diet", user.dite!),
+                    _profileDetail("Smoking Habit", user.smokingHabit!),
+                    _profileDetail("Drinking Habit", user.drinkingHabit!),
+                    _profileDetail("Fitness Activity", user.fitnessActivity!),
                     _profileDetail(
                       "Travel Preferences",
-                      user.patnerLifeStylePreferences!.travelPreferences!,
+                      user.travelPreferences!,
                     ),
                   ], icon: Icons.favorite),
-
                   _sectionCard("Hobbies", [
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: user.profileDetails!.hobbies!
+                      children: user.hobbies!
                           .map((h) => Chip(label: Text(h.hobbyName!)))
                           .toList(),
                     ),
-                  ], icon: Icons.sports_esports),
-
-                  SizedBox(height: 80.h),
+                  ], icon: Icons.sports_handball),
                 ],
               ),
             ),
@@ -778,81 +647,56 @@ class ProfileDetailedScreen extends StatelessWidget {
     );
   }
 
-  //section method
-  // Update sectionCard to accept an IconData
+  // --- _sectionCard ---
   Widget _sectionCard(String title, List<Widget> children, {IconData? icon}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        20.verticalSpace,
+        Row(
           children: [
-            Row(
-              children: [
-                if (icon != null)
-                  Icon(icon, size: 22, color: AppColors.primary),
-                if (icon != null) const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+            if (icon != null) Icon(icon, size: 22),
+            if (icon != null) 8.widthBox,
+            Text(
+              title,
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
-            ...children,
           ],
         ),
-      ),
+        12.verticalSpace,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: children,
+        ),
+      ],
     );
   }
 
-  // --- Helper Methods ---
-  Widget _profileDetail(String title, String value) {
+  // --- _profileDetail ---
+  Widget _profileDetail(String label, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6.h),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 180.w,
-            child: Text(
-              '$title :',
-              style: TextStyle(fontFamily: Typo.bold, fontSize: 18.sp),
-            ),
+            width: 150.w,
+            child: Text(label, style: TextStyle(fontWeight: FontWeight.w600)),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(fontFamily: Typo.medium, fontSize: 18.sp),
-            ),
-          ),
+          Expanded(child: Text(value)),
         ],
       ),
     );
   }
-}
 
-Widget _buildTag(String label) {
-  return Container(
-    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-    decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.2),
-      borderRadius: BorderRadius.circular(16.r),
-      border: Border.all(color: Colors.white.withOpacity(0.4)),
-    ),
-    child: Text(
-      label,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 12.sp,
-        fontFamily: Typo.medium,
+  // --- _buildTag ---
+  Widget _buildTag(String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: Colors.white24,
+        borderRadius: BorderRadius.circular(20.r),
       ),
-    ),
-  );
+      child: Text(text, style: TextStyle(color: Colors.white)),
+    );
+  }
 }

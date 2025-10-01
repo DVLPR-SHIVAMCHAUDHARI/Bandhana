@@ -1,6 +1,7 @@
 import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/const/user_model.dart';
 import 'package:bandhana/core/repository/repository.dart';
+import 'package:bandhana/features/Home/models/home_user_model.dart';
 
 class MasterRepo extends Repository {
   // Nationality
@@ -299,6 +300,73 @@ class MasterRepo extends Repository {
     } catch (e) {
       logger.e(e);
       rethrow;
+    }
+  }
+
+  Future<bool> toggleFavorite(String userId, {bool add = true}) async {
+    final endpoint = add ? '/matched/add-favorite' : '/matched/remove-favorite';
+
+    final response = await dio.post(
+      endpoint,
+      queryParameters: {"user_id": userId},
+    );
+
+    final status = response.data['Response']?['Status'];
+    if (status != null && status['DisplayText'] == 'Success') {
+      return add; // return current favorite state
+    } else {
+      final msg =
+          response.data['Response']?['Status']?['ErrorMessage'] ??
+          'Failed to toggle favorite';
+      throw Exception(msg);
+    }
+  }
+
+  Future<Map<String, dynamic>> getFavoriteList() async {
+    try {
+      final response = await dio.get("/matched/get-favorite");
+
+      final status = response.data["Response"]?["Status"];
+      if (status != null && status["StatusCode"] == "0") {
+        final List<dynamic> list =
+            response.data["Response"]?["ResponseData"]?["list"] ?? [];
+
+        final users = list.map((e) => HomeUserModel.fromJson(e)).toList();
+
+        return {
+          "status": "Success",
+          "response": users, // ✅ Already typed list
+        };
+      } else {
+        return {
+          "status": "Failure",
+          "response": status?["DisplayText"] ?? "Failed to fetch favorites",
+        };
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  skipProfile({id}) async {
+    try {
+      var response = await dio.post(
+        "/matched/skip-profile",
+        queryParameters: {"user_id": id},
+      );
+
+      final statusCode = response.data["Response"]["Status"]["StatusCode"];
+      final displayText =
+          response.data["Response"]["Status"]["DisplayText"] ??
+          "Unknown response";
+
+      if (statusCode == "0") {
+        return {"response": displayText, "status": "Success"};
+      } else {
+        return {"response": displayText, "status": "failure"};
+      }
+    } catch (e) {
+      return {"response": e.toString(), "status": "failure"};
     }
   }
 }

@@ -4,7 +4,7 @@ import 'package:bandhana/features/Home/models/home_user_model.dart';
 class DiscoverRepository extends Repository {
   Future<Map<String, dynamic>> getUserList() async {
     try {
-      var response = await dio.get("/matched/home-landing");
+      var response = await dio.get("/matched/discover");
       if (response.data["Response"]["Status"]["StatusCode"] == "0") {
         final List<dynamic> list =
             response.data["Response"]["ResponseData"]["list"];

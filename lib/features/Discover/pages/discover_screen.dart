@@ -1,7 +1,11 @@
+import 'package:bandhana/core/const/globals.dart';
 import 'package:bandhana/core/sharedWidgets/profile_shimmer.dart';
 import 'package:bandhana/features/Discover/bloc/discover_bloc.dart';
 import 'package:bandhana/features/Discover/bloc/discover_event.dart';
 import 'package:bandhana/features/Discover/bloc/discover_state.dart';
+import 'package:bandhana/features/Home/bloc/home_bloc.dart';
+import 'package:bandhana/features/Home/bloc/home_event.dart'
+    hide FetchUsersEvent;
 import 'package:bandhana/features/Home/widgets/profile_card.dart';
 
 import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
@@ -83,6 +87,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         itemBuilder: (context, index) {
                           final user = users[index];
                           return ProfileCard(
+                            viewProfile: () {
+                              router.pushNamed(
+                                Routes.profileDetailApproved.name,
+                                pathParameters: {
+                                  "mode": ProfileMode.viewOther.name,
+                                  "id": user.userId.toString(),
+                                  "match": user.matchPercentage.toString(),
+                                },
+                              );
+                            },
+                            onSkip: () {},
+                            isFavorite: user.isFavorite,
                             id: user.userId.toString(),
                             image: user.profileUrl1,
                             age: user.age?.toString() ?? "-",

@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
 
-abstract class ProfileDetailEvent extends Equatable {
+abstract class ProfileDetailApprovedEvent extends Equatable {
   @override
   List<Object?> get props => [];
 }
 
-class SwitchImageEvent extends ProfileDetailEvent {
+class SwitchImageEvent extends ProfileDetailApprovedEvent {
   final int selectedIndex;
   final List<Map<String, dynamic>> avatars;
 
@@ -14,23 +14,23 @@ class SwitchImageEvent extends ProfileDetailEvent {
   List<Object?> get props => [avatars, selectedIndex];
 }
 
-class ToggleFavoriteEvent extends ProfileDetailEvent {}
+class ToggleFavoriteEvent extends ProfileDetailApprovedEvent {}
 
-class GetUserDetailById extends ProfileDetailEvent {
+class GetUserDetailById extends ProfileDetailApprovedEvent {
   final String id;
   GetUserDetailById(this.id);
   @override
   List<Object?> get props => [id];
 }
 
-class SendRequestEvent extends ProfileDetailEvent {
+class SendRequestEvent extends ProfileDetailApprovedEvent {
   final String id;
   SendRequestEvent(this.id);
   @override
   List<Object?> get props => [id];
 }
 
-class AcceptRequestEvent extends ProfileDetailEvent {
+class AcceptRequestEvent extends ProfileDetailApprovedEvent {
   final String id;
   AcceptRequestEvent(this.id);
   @override

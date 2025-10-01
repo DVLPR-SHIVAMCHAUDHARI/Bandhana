@@ -95,3 +95,21 @@ class GetLifestylePreferences extends MasterEvent {}
 class GetYourDetails extends MasterEvent {}
 
 class GetprofileStatus extends MasterEvent {}
+
+class ToggleFavoriteEvent extends MasterEvent {
+  final String userId;
+  final bool add; // true to add, false to remove
+
+  ToggleFavoriteEvent({required this.userId, this.add = true});
+}
+
+class GetFavoriteListEvent extends MasterEvent {}
+
+class SkipProfileEvent extends MasterEvent {
+  final String userId;
+
+  SkipProfileEvent({required this.userId});
+
+  @override
+  List<Object?> get props => [userId];
+}
