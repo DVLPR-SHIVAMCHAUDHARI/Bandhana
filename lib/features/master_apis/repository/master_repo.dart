@@ -1,7 +1,7 @@
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/user_model.dart';
-import 'package:bandhana/core/repository/repository.dart';
-import 'package:bandhana/features/Home/models/home_user_model.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/user_model.dart';
+import 'package:MilanMandap/core/repository/repository.dart';
+import 'package:MilanMandap/features/Home/models/home_user_model.dart';
 
 class MasterRepo extends Repository {
   // Nationality

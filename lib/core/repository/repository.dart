@@ -1,5 +1,5 @@
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/services/tokenservice.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/services/tokenservice.dart';
 import 'package:dio/dio.dart';
 
 abstract class Repository {

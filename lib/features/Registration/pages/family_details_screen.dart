@@ -1,25 +1,26 @@
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/saveNextButton.dart';
-import 'package:bandhana/core/const/snack_bar.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
-import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
-import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
-import 'package:bandhana/features/Registration/Bloc/family_details_bloc/family_detail_bloc.dart';
-import 'package:bandhana/features/Registration/Bloc/family_details_bloc/family_detail_event.dart';
-import 'package:bandhana/features/Registration/Bloc/family_details_bloc/family_detail_state.dart';
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart';
-import 'package:bandhana/features/master_apis/bloc/master_state.dart';
-import 'package:bandhana/features/master_apis/models/family_type_model.dart';
-import 'package:bandhana/features/master_apis/models/family_status_model.dart';
-import 'package:bandhana/features/master_apis/models/family_values_model.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/saveNextButton.dart';
+import 'package:MilanMandap/core/const/snack_bar.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/sharedWidgets/app_dropdown.dart';
+import 'package:MilanMandap/core/sharedWidgets/apptextfield.dart';
+import 'package:MilanMandap/features/Authentication/widgets/phone_field.dart';
+import 'package:MilanMandap/features/Registration/Bloc/family_details_bloc/family_detail_bloc.dart';
+import 'package:MilanMandap/features/Registration/Bloc/family_details_bloc/family_detail_event.dart';
+import 'package:MilanMandap/features/Registration/Bloc/family_details_bloc/family_detail_state.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_state.dart';
+import 'package:MilanMandap/features/master_apis/models/family_type_model.dart';
+import 'package:MilanMandap/features/master_apis/models/family_status_model.dart';
+import 'package:MilanMandap/features/master_apis/models/family_values_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FamilyDetailsScreen extends StatefulWidget {
-  const FamilyDetailsScreen({super.key});
+  FamilyDetailsScreen({super.key, required this.type});
+  String type;
 
   @override
   State<FamilyDetailsScreen> createState() => _FamilyDetailsScreenState();
@@ -432,7 +433,10 @@ class _FamilyDetailsScreenState extends State<FamilyDetailsScreen> {
                           message: state.message,
                           color: Colors.green,
                         );
-                        router.goNamed(Routes.compatablity1.name);
+                        router.goNamed(
+                          Routes.compatablity1.name,
+                          pathParameters: {"type2": "normal"},
+                        );
                         context.read<MasterBloc>().add(GetprofileStatus());
                       } else if (state is FamilyDetailFailure) {
                         snackbar(context, message: state.message);
@@ -455,7 +459,12 @@ class _FamilyDetailsScreenState extends State<FamilyDetailsScreen> {
   }
 
   void submitFamilyDetails() {
-    if (formKey.currentState!.validate()) {
+    final isFormValid = formKey.currentState!.validate();
+
+    final areSiblingCountsSelected =
+        selectedBrothers != null && selectedSisters != null;
+
+    if (isFormValid && areSiblingCountsSelected) {
       bloc.add(
         SubmitFamilyDetailEvent(
           fathersName: fatherNameController.text,
@@ -466,11 +475,14 @@ class _FamilyDetailsScreenState extends State<FamilyDetailsScreen> {
           mothersOccupation: motherOccupationController.text,
           mothersContact: "$selectedMothersCode${motherContactController.text}"
               .trim(),
+
           noOfBrothers: selectedBrothers!,
           noOfSisters: selectedSisters!,
+
           familyType: selectedFamilyType?.id.toString() ?? "",
           familyStatus: selectedFamilyStatus?.id.toString() ?? "",
           familyValues: selectedFamilyValues?.id.toString() ?? "",
+
           maternalUncleMamasName: mamaNameController.text,
           maternalUncleMamasVillage: mamaVillageController.text,
           mamasKulClan: mamaKulController.text,
@@ -478,7 +490,18 @@ class _FamilyDetailsScreenState extends State<FamilyDetailsScreen> {
         ),
       );
     } else {
-      snackbar(context, message: "Please fill all required fields");
+      String message = "Please fill all required fields.";
+
+      if (!areSiblingCountsSelected) {
+        message = "Please select the count for both Brothers and Sisters.";
+      }
+
+      snackbar(
+        context,
+        title: "Incomplete Form",
+        color: Colors.red,
+        message: message,
+      );
     }
   }
 }

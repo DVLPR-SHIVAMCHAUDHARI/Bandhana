@@ -1,9 +1,9 @@
 import 'dart:developer';
 
-import 'package:bandhana/features/Home/bloc/home_event.dart';
-import 'package:bandhana/features/Home/bloc/home_state.dart';
-import 'package:bandhana/features/Home/models/home_user_model.dart';
-import 'package:bandhana/features/Home/repository/home_repository.dart';
+import 'package:MilanMandap/features/Home/bloc/home_event.dart';
+import 'package:MilanMandap/features/Home/bloc/home_state.dart';
+import 'package:MilanMandap/features/Home/models/home_user_model.dart';
+import 'package:MilanMandap/features/Home/repository/home_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:bandhana/core/const/asset_urls.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/numberextension.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/sharedWidgets/background_widget.dart';
+import 'package:MilanMandap/core/const/asset_urls.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/numberextension.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/sharedWidgets/background_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';

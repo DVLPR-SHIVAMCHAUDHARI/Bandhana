@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/repository/repository.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/repository/repository.dart';
 
 class ProfileSetupRepository extends Repository {
   /// Submits profile data along with up to 5 images

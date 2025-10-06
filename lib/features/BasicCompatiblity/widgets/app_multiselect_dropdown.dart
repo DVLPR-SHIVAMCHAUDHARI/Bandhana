@@ -1,4 +1,4 @@
-import 'package:bandhana/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class MultiSelectDropdown extends FormField<List<String>> {

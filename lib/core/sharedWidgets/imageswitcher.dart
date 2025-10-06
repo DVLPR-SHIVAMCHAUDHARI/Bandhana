@@ -1,5 +1,5 @@
-import 'package:bandhana/features/Profile/bloc_normal/profile_detail_bloc.dart';
-import 'package:bandhana/features/Profile/bloc_normal/profile_detail_state.dart';
+import 'package:MilanMandap/features/Profile/bloc_normal/profile_detail_bloc.dart';
+import 'package:MilanMandap/features/Profile/bloc_normal/profile_detail_state.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

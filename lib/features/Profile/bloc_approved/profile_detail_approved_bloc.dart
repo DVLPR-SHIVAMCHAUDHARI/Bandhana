@@ -1,9 +1,9 @@
 // In 'profile_detail_approved_bloc.dart'
 
-import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_event.dart';
-import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_state.dart';
-import 'package:bandhana/features/Profile/model/user_detail_model.dart';
-import 'package:bandhana/features/Profile/repository/profile_repository.dart';
+import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_event.dart';
+import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_state.dart';
+import 'package:MilanMandap/features/Profile/model/user_detail_model.dart';
+import 'package:MilanMandap/features/Profile/repository/profile_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileDetailApprovedBloc

@@ -1,9 +1,9 @@
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/features/notification/bloc/notification_bloc.dart';
-import 'package:bandhana/features/notification/bloc/notification_event.dart';
-import 'package:bandhana/features/notification/bloc/notification_state.dart';
-import 'package:bandhana/features/notification/model/notification_model.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/features/notification/bloc/notification_bloc.dart';
+import 'package:MilanMandap/features/notification/bloc/notification_event.dart';
+import 'package:MilanMandap/features/notification/bloc/notification_state.dart';
+import 'package:MilanMandap/features/notification/model/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

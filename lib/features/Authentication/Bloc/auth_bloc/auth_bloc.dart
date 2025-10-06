@@ -1,9 +1,9 @@
 import 'dart:developer';
 
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_event.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_state.dart';
-import 'package:bandhana/features/Authentication/Repositories/auth_repository.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_event.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_state.dart';
+import 'package:MilanMandap/features/Authentication/Repositories/auth_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {

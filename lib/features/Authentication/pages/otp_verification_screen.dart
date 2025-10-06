@@ -1,15 +1,15 @@
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/numberextension.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/services/local_db_sevice.dart';
-import 'package:bandhana/core/sharedWidgets/primary_button.dart';
-import 'package:bandhana/features/Authentication/Bloc/OtpBloc/otp_bloc.dart';
-import 'package:bandhana/features/Authentication/Bloc/OtpBloc/otp_event.dart';
-import 'package:bandhana/features/Authentication/Bloc/OtpBloc/otp_state.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_bloc.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_event.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_state.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/numberextension.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/services/local_db_sevice.dart';
+import 'package:MilanMandap/core/sharedWidgets/primary_button.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/OtpBloc/otp_bloc.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/OtpBloc/otp_event.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/OtpBloc/otp_state.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_bloc.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_event.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -193,20 +193,32 @@ class OtpVerificationScreen extends StatelessWidget {
                           } else if (user.profileSetup == 0) {
                             router.goNamed(
                               Routes.profilesetup.name,
-                              pathParameters: {"type1": "normal"},
+                              pathParameters: {"type1": "normal", 'age': "0"},
                             );
                             return;
                           } else if (user.documentVerification == 0) {
-                            router.goNamed(Routes.docVerification.name);
+                            router.goNamed(
+                              Routes.docVerification.name,
+                              pathParameters: {"type5": "normal"},
+                            );
                             return;
                           } else if (user.partnerExpectations == 0) {
-                            router.goNamed(Routes.compatablity1.name);
+                            router.goNamed(
+                              Routes.compatablity1.name,
+                              pathParameters: {"type3": "normal"},
+                            );
                             return;
                           } else if (user.partnerLifeStyle == 0) {
-                            router.goNamed(Routes.compatablity2.name);
+                            router.goNamed(
+                              Routes.compatablity2.name,
+                              pathParameters: {"type4": "normal"},
+                            );
                             return;
                           } else if (user.familyDetails == 0) {
-                            router.goNamed(Routes.familyDetails.name);
+                            router.goNamed(
+                              Routes.familyDetails.name,
+                              pathParameters: {"type2": "normal"},
+                            );
                             return;
                           }
 

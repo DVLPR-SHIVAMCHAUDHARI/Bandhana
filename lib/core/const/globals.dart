@@ -1,47 +1,46 @@
-import 'package:bandhana/core/services/local_db_sevice.dart';
-import 'package:bandhana/core/services/request_permission_service.dart';
-import 'package:bandhana/core/services/tokenservice.dart';
-import 'package:bandhana/features/About&Info/pages/about_screen.dart';
-import 'package:bandhana/features/About&Info/pages/privacy_policy_screen.dart';
-import 'package:bandhana/features/Authentication/pages/otp_verification_screen.dart';
-import 'package:bandhana/features/Authentication/pages/sign_in_screen.dart';
-import 'package:bandhana/features/Authentication/pages/signup_screen.dart';
-import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_bloc.dart';
-import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_screen1.dart';
-import 'package:bandhana/features/BasicCompatiblity/pages/basic_compablity_screen2.dart';
-import 'package:bandhana/features/Chat/pages/chat_list_screen.dart';
-import 'package:bandhana/features/Chat/pages/chat_screen.dart';
-import 'package:bandhana/features/Discover/bloc/discover_bloc.dart';
-import 'package:bandhana/features/Discover/pages/discover_screen.dart';
-import 'package:bandhana/features/DocumentVerification/pages/document_verification_screen.dart';
-import 'package:bandhana/features/Home/bloc/home_bloc.dart';
-import 'package:bandhana/features/Home/pages/homescreen.dart';
-import 'package:bandhana/features/HomeAnimation/pages/home_animation_screen.dart';
-import 'package:bandhana/features/Onboarding/pages/first_welcome_screen.dart';
-import 'package:bandhana/features/Onboarding/pages/onboarding_screen.dart';
-import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_bloc.dart';
-import 'package:bandhana/features/Profile/bloc_normal/profile_detail_bloc.dart';
-import 'package:bandhana/features/Profile/pages/message_requested_screen.dart';
-import 'package:bandhana/features/Profile/pages/profile_detail_approved.dart';
-import 'package:bandhana/features/Profile/pages/profile_detail_screen.dart';
-import 'package:bandhana/features/Registration/pages/edit_profile_screen.dart';
-import 'package:bandhana/features/Registration/pages/family_details_screen.dart';
-import 'package:bandhana/features/Registration/pages/registration_screen.dart';
-import 'package:bandhana/features/Requests/bloc/request_bloc.dart';
-import 'package:bandhana/features/Requests/pages/request_screen.dart';
-import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
-import 'package:bandhana/features/Subscription/pages/choose_your_plans_screen.dart';
-import 'package:bandhana/features/favourites/pages/favourites_screen.dart';
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart';
-import 'package:bandhana/features/navbar/pages/navbar.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_bloc.dart';
-import 'package:bandhana/features/Registration/pages/my_profile_screen.dart';
-import 'package:bandhana/features/Registration/pages/profile_setup_screen.dart';
-import 'package:bandhana/features/notification/pages/notifications_screen.dart';
-import 'package:bandhana/features/splashScreen/page/splash_screen.dart';
+import 'package:MilanMandap/core/services/local_db_sevice.dart';
+import 'package:MilanMandap/core/services/request_permission_service.dart';
+import 'package:MilanMandap/core/services/tokenservice.dart';
+import 'package:MilanMandap/features/About&Info/pages/about_screen.dart';
+import 'package:MilanMandap/features/About&Info/pages/privacy_policy_screen.dart';
+import 'package:MilanMandap/features/Authentication/pages/otp_verification_screen.dart';
+import 'package:MilanMandap/features/Authentication/pages/sign_in_screen.dart';
+import 'package:MilanMandap/features/Authentication/pages/signup_screen.dart';
+import 'package:MilanMandap/features/BasicCompatiblity/bloc/basic_compablity_bloc.dart';
+import 'package:MilanMandap/features/BasicCompatiblity/pages/basic_compablity_screen1.dart';
+import 'package:MilanMandap/features/BasicCompatiblity/pages/basic_compablity_screen2.dart';
+import 'package:MilanMandap/features/Chat/pages/chat_list_screen.dart';
+import 'package:MilanMandap/features/Chat/pages/chat_screen.dart';
+import 'package:MilanMandap/features/Discover/bloc/discover_bloc.dart';
+import 'package:MilanMandap/features/Discover/pages/discover_screen.dart';
+import 'package:MilanMandap/features/DocumentVerification/pages/document_verification_screen.dart';
+import 'package:MilanMandap/features/Home/bloc/home_bloc.dart';
+import 'package:MilanMandap/features/Home/pages/homescreen.dart';
+import 'package:MilanMandap/features/HomeAnimation/pages/home_animation_screen.dart';
+import 'package:MilanMandap/features/Onboarding/pages/first_welcome_screen.dart';
+import 'package:MilanMandap/features/Onboarding/pages/onboarding_screen.dart';
+import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_bloc.dart';
+import 'package:MilanMandap/features/Profile/bloc_normal/profile_detail_bloc.dart';
+import 'package:MilanMandap/features/Profile/pages/message_requested_screen.dart';
+import 'package:MilanMandap/features/Profile/pages/profile_detail_approved.dart';
+import 'package:MilanMandap/features/Profile/pages/profile_detail_screen.dart';
+import 'package:MilanMandap/features/Registration/pages/edit_profile_screen.dart';
+import 'package:MilanMandap/features/Registration/pages/family_details_screen.dart';
+import 'package:MilanMandap/features/Registration/pages/registration_screen.dart';
+import 'package:MilanMandap/features/Requests/bloc/request_bloc.dart';
+import 'package:MilanMandap/features/Requests/pages/request_screen.dart';
+import 'package:MilanMandap/features/Subscription/bloc/subscription_bloc.dart';
+import 'package:MilanMandap/features/Subscription/pages/choose_your_plans_screen.dart';
+import 'package:MilanMandap/features/favourites/pages/favourites_screen.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
+import 'package:MilanMandap/features/navbar/pages/navbar.dart';
+import 'package:MilanMandap/features/Registration/Bloc/profile_setup_bloc/profile_setup_bloc.dart';
+import 'package:MilanMandap/features/Registration/pages/my_profile_screen.dart';
+import 'package:MilanMandap/features/Registration/pages/profile_setup_screen.dart';
+import 'package:MilanMandap/features/notification/pages/notifications_screen.dart';
+import 'package:MilanMandap/features/splashScreen/page/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
@@ -106,7 +105,7 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 /// --------------------------- GO ROUTER ---------------------------
 final GoRouter router = GoRouter(
   navigatorKey: navigatorKey,
-  // initialLocation: "/register/normal/profilesetup/normal",
+  // initialLocation: "/register/:type",
   routes: [
     // Splash
     GoRoute(
@@ -172,6 +171,8 @@ final GoRouter router = GoRouter(
           "/homescreen/choosePlan",
           "/homescreen/myProfile",
           "/homescreen/favorite",
+          "/homescreen/privacyPolicy",
+          "/homescreen/about",
           "/homescreen/myProfile/editProfile",
           "/chatList/chat",
         ]; //on all this screen no material found
@@ -196,6 +197,16 @@ final GoRouter router = GoRouter(
             child: HomeScreen(),
           ),
           routes: [
+            GoRoute(
+              path: "privacyPolicy",
+              name: Routes.privacyPolicy.name,
+              builder: (context, state) => PrivacyPolicyScreen(),
+            ),
+            GoRoute(
+              path: "about",
+              name: Routes.about.name,
+              builder: (context, state) => AboutScreen(),
+            ),
             GoRoute(
               path: "myProfile",
               name: Routes.myProfile.name,
@@ -308,65 +319,51 @@ final GoRouter router = GoRouter(
 
     // Other screens outside ShellRoute
     GoRoute(
+      path: "/compatablity2/:type4",
+      name: Routes.compatablity2.name,
+      builder: (context, state) => BlocProvider(
+        create: (_) => UserPreferencesBloc(),
+        child: BasicCompablityScreen2(
+          type: state.pathParameters["type4"] ?? "normal",
+        ),
+      ),
+    ),
+    GoRoute(
+      path: "/familyDetails/:type2",
+      name: Routes.familyDetails.name,
+      builder: (context, state) =>
+          FamilyDetailsScreen(type: state.pathParameters["type2"] ?? "normal"),
+    ),
+    GoRoute(
+      path: "/compatablity1/:type3",
+      name: Routes.compatablity1.name,
+      builder: (context, state) => BlocProvider(
+        create: (_) => UserPreferencesBloc(),
+        child: BasicCompablityScreen1(
+          type: state.pathParameters["type3"] ?? "normal",
+        ),
+      ),
+    ),
+    GoRoute(
+      path: "/docVerification/:type5",
+      name: Routes.docVerification.name,
+      builder: (context, state) => DocumentVerificationScreen(
+        type: state.pathParameters["type5"] ?? "normal",
+      ),
+    ),
+    GoRoute(
       path: "/register/:type",
       name: Routes.register.name,
       builder: (context, state) =>
           RegistrationScreen(type: state.pathParameters["type"] ?? "normal"),
-      routes: [
-        GoRoute(
-          path: "profilesetup/:type1",
-          name: Routes.profilesetup.name,
-          builder: (context, state) => ProfileSetupScreen(
-            type: state.pathParameters["type1"] ?? "normal",
-          ),
-          routes: [
-            GoRoute(
-              path: "familyDetails",
-              name: Routes.familyDetails.name,
-              builder: (context, state) => FamilyDetailsScreen(),
-              routes: [
-                GoRoute(
-                  path: "compatablity1",
-                  name: Routes.compatablity1.name,
-                  builder: (context, state) => BlocProvider(
-                    create: (_) => UserPreferencesBloc(),
-                    child: BasicCompablityScreen1(),
-                  ),
-                  routes: [
-                    GoRoute(
-                      path: "compatablity2",
-                      name: Routes.compatablity2.name,
-                      builder: (context, state) => BlocProvider(
-                        create: (_) => UserPreferencesBloc(),
-                        child: BasicCompablityScreen2(),
-                      ),
-                      routes: [
-                        GoRoute(
-                          path: "docVerification",
-                          name: Routes.docVerification.name,
-                          builder: (context, state) =>
-                              DocumentVerificationScreen(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    ),
-
-    GoRoute(
-      path: "/privacyPolicy",
-      name: Routes.privacyPolicy.name,
-      builder: (context, state) => PrivacyPolicyScreen(),
     ),
     GoRoute(
-      path: "/about",
-      name: Routes.about.name,
-      builder: (context, state) => AboutScreen(),
+      path: "/profilesetup/:type1/:age",
+      name: Routes.profilesetup.name,
+      builder: (context, state) => ProfileSetupScreen(
+        type: state.pathParameters["type1"] ?? "normal",
+        age: state.pathParameters['age'] ?? "",
+      ),
     ),
   ],
 );

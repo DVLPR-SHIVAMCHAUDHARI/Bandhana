@@ -1,13 +1,15 @@
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/numberextension.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/numberextension.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_state.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_state.dart';
 
 class AppMenuDrawer extends StatefulWidget {
   const AppMenuDrawer({super.key});
@@ -41,7 +43,22 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
               const Divider(),
               _buildSettingsSection(context),
               _buildSupportTile(),
-              _buildWhoViewedCard(),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Opacity(opacity: 0.4, child: _buildWhoViewedCard()),
+                  Chip(
+                    backgroundColor: AppColors.primaryOpacity,
+                    label: Text(
+                      "Comming Soon",
+                      style: TextStyle(
+                        color: Colors.pinkAccent.shade400,
+                        fontFamily: Typo.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -188,7 +205,9 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
           leading: const Icon(Icons.notifications_none),
           title: const Text("Notifications"),
           trailing: const Icon(Icons.circle, size: 8, color: Colors.red),
-          onTap: () {},
+          onTap: () {
+            router.goNamed(Routes.notification.name);
+          },
         ),
       ],
     );

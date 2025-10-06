@@ -1,4 +1,4 @@
-import 'package:bandhana/core/const/asset_urls.dart';
+import 'package:MilanMandap/core/const/asset_urls.dart';
 
 import '../model/onboarding_model.dart';
 
@@ -6,7 +6,7 @@ class OnboardingRepo {
   static List<OnboardingModel> pages = [
     OnboardingModel(
       imagePath: Urls.igOnboarding1,
-      title: "Welcome to Bandhana",
+      title: "Welcome to Milan Mandap",
       subtitle:
           "Find your match, start your story – the best matrimony chat app to brighten your day!",
     ),

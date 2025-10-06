@@ -1,41 +1,41 @@
 import 'dart:developer';
 
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/saveNextButton.dart';
-import 'package:bandhana/core/const/snack_bar.dart';
-import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
-import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
-import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
-import 'package:bandhana/features/Registration/Bloc/registration_bloc/registration_bloc.dart';
-import 'package:bandhana/features/Registration/Bloc/registration_bloc/registration_event.dart';
-import 'package:bandhana/features/Registration/Bloc/registration_bloc/registration_state.dart';
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart';
-import 'package:bandhana/features/master_apis/bloc/master_state.dart';
-import 'package:bandhana/features/master_apis/models/blood_group_model.dart';
-import 'package:bandhana/features/master_apis/models/caste_model.dart';
-import 'package:bandhana/features/master_apis/models/district_model.dart';
-import 'package:bandhana/features/master_apis/models/gender_model.dart';
-import 'package:bandhana/features/master_apis/models/marital_model.dart';
-import 'package:bandhana/features/master_apis/models/mother_tongue_model.dart';
-import 'package:bandhana/features/master_apis/models/nationality_model.dart';
-import 'package:bandhana/features/master_apis/models/religion_model.dart';
-import 'package:bandhana/features/master_apis/models/state_model.dart';
-import 'package:bandhana/features/master_apis/models/register_profile_model.dart.dart';
-import 'package:bandhana/features/master_apis/models/zodiac_model.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/saveNextButton.dart';
+import 'package:MilanMandap/core/const/snack_bar.dart';
+import 'package:MilanMandap/core/sharedWidgets/app_dropdown.dart';
+import 'package:MilanMandap/core/sharedWidgets/apptextfield.dart';
+import 'package:MilanMandap/features/Authentication/widgets/phone_field.dart';
+import 'package:MilanMandap/features/Registration/Bloc/registration_bloc/registration_bloc.dart';
+import 'package:MilanMandap/features/Registration/Bloc/registration_bloc/registration_event.dart';
+import 'package:MilanMandap/features/Registration/Bloc/registration_bloc/registration_state.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_state.dart';
+import 'package:MilanMandap/features/master_apis/models/blood_group_model.dart';
+import 'package:MilanMandap/features/master_apis/models/caste_model.dart';
+import 'package:MilanMandap/features/master_apis/models/district_model.dart';
+import 'package:MilanMandap/features/master_apis/models/gender_model.dart';
+import 'package:MilanMandap/features/master_apis/models/marital_model.dart';
+import 'package:MilanMandap/features/master_apis/models/mother_tongue_model.dart';
+import 'package:MilanMandap/features/master_apis/models/nationality_model.dart';
+import 'package:MilanMandap/features/master_apis/models/religion_model.dart';
+import 'package:MilanMandap/features/master_apis/models/state_model.dart';
+import 'package:MilanMandap/features/master_apis/models/register_profile_model.dart.dart';
+import 'package:MilanMandap/features/master_apis/models/zodiac_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/typography.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/typography.dart';
 
 class RegistrationScreen extends StatefulWidget {
   RegistrationScreen({super.key, required this.type});
   String type;
 
+  int ageValue = 0;
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
@@ -105,18 +105,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     bloc.add(GetZodiacEvent());
   }
 
-  Widget _buildDatePicker(String title, String hint) {
+  Widget _buildDatePicker(String title, String hint, gender) {
     final today = DateTime.now();
-    final earliestDate = DateTime(
-      today.year - 100,
-      today.month,
-      today.day,
-    ); // optional: max age 100
+    final earliestDate = DateTime(today.year - 100, today.month, today.day);
     final latestDate = DateTime(
-      today.year - 18,
+      today.year - (gender == "Male" ? 21 : 18),
       today.month,
       today.day,
-    ); // minimum age 21
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,11 +134,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               firstDate: earliestDate,
               lastDate: latestDate,
             );
+
             if (picked != null) {
+              // ✅ Calculate age here
+              final age = _calculateAge(picked);
+
               setState(() {
                 dob = picked;
                 dobController.text = DateFormat('yyyy-MM-dd').format(picked);
+                widget.ageValue = age; // <-- store this in your state
               });
+
+              debugPrint('Selected DOB: $picked');
+              debugPrint('Calculated Age: $age');
             }
           },
           child: AbsorbPointer(
@@ -173,6 +177,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         16.verticalSpace,
       ],
     );
+  }
+
+  // 🔹 Age calculation function
+  int _calculateAge(DateTime birthDate) {
+    final today = DateTime.now();
+    int age = today.year - birthDate.year;
+    if (today.month < birthDate.month ||
+        (today.month == birthDate.month && today.day < birthDate.day)) {
+      age--;
+    }
+    return age;
   }
 
   Widget _buildTimePicker(String title, String hint) {
@@ -620,7 +635,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 16.verticalSpace,
 
                 // Date & Time Pickers
-                _buildDatePicker("Date of Birth", "01/07/2025"),
+                _buildDatePicker(
+                  "Date of Birth",
+                  "01/07/2025",
+                  gender?.name ?? "male",
+                ),
                 16.verticalSpace,
                 _buildTimePicker("Birth time", "01:10 pm"),
                 16.verticalSpace,
@@ -850,7 +869,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 AppTextField(
                   isRequired: true,
                   title: "Kul(clan)",
-                  hint: "Kul/gotra",
+                  hint: "Kul",
                   controller: kulController,
                 ),
                 16.verticalSpace,
@@ -886,100 +905,84 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 // Save & Next
                 BlocProvider(
                   create: (context) => RegistrationBloc(),
-                  child: Builder(
-                    builder: (context) {
-                      return BlocBuilder<RegistrationBloc, RegistrationState>(
-                        builder: (context, state) {
-                          return SaveandNextButtons(
-                            onNext: () {
-                              // Validate the form first
-                              if (_formKey.currentState!.validate()) {
-                                final number =
-                                    "$selectedCode${contactController.text}";
-                                if (gender == null ||
-                                    selectedNationality == null ||
-                                    selectedState == null ||
-                                    selectedDistrict == null ||
-                                    selectedZodiac == null ||
-                                    religion == null ||
-                                    caste == null ||
-                                    motherTongue == null ||
-                                    maritalStatus == null ||
-                                    bloodGroup == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        "Please select all required fields",
-                                      ),
-                                    ),
-                                  );
-                                  return;
-                                } else if (selectedHobbyIds.isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        "Please select at least one hobby",
-                                      ),
-                                    ),
-                                  );
-                                  return;
-                                }
-
-                                // Send event to bloc
-                                context.read<RegistrationBloc>().add(
-                                  RegisterUserEvent(
-                                    fullName: fullNameController.text.trim(),
-                                    genderId: gender!.id!,
-                                    nationalityId: selectedNationality!.id!,
-                                    stateId: selectedState!.stateId!,
-                                    districtId: selectedDistrict!.districtId!,
-                                    birthPlace: birthPlace.text.trim(),
-                                    dateOfBirth: dobController.text,
-                                    birthTime: birthTimeController.text,
-                                    zodiacId: selectedZodiac!.id!,
-                                    religionId: religion!.id!,
-                                    casteId: caste!.id!,
-                                    maritalStatusId: maritalStatus!.id!,
-                                    hobbiesList: selectedHobbyIds.toList(),
-                                    motherTongueId: motherTongue!.id!,
-                                    bloodGroupId: bloodGroup!.id!,
-                                    disability: disability ?? 'No',
-                                    specificDisability: specificDisability.text
-                                        .trim(),
-                                    kul: kulController.text.trim(),
-                                    contactNumber:
-                                        "$selectedCode${contactController.text}"
-                                            .trim(),
-                                    email: emailController.text.trim(),
-                                  ),
-                                );
-
-                                // Navigate to next screen after submission
-                                widget.type == "edit"
-                                    ? snackbar(
-                                        context,
-                                        color: Colors.green,
-                                        message: "Success",
-                                        title: "Great",
-                                      )
-                                    : router.goNamed(Routes.profilesetup.name);
-                                context.read<MasterBloc>().add(
-                                  GetprofileStatus(),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      "Please fill all required fields",
-                                    ),
-                                  ),
-                                );
-                              }
+                  child: BlocListener<RegistrationBloc, RegistrationState>(
+                    listener: (context, state) {
+                      if (state is RegistrationSuccess) {
+                        // ✅ Navigate after backend success
+                        if (widget.type == "edit") {
+                          snackbar(
+                            context,
+                            color: Colors.green,
+                            message: "Profile updated successfully!",
+                            title: "Success",
+                          );
+                        } else {
+                          log(widget.ageValue.toString());
+                          router.goNamed(
+                            Routes.profilesetup.name,
+                            pathParameters: {
+                              "type1": "normal",
+                              "age": widget.ageValue.toString(),
                             },
                           );
-                        },
-                      );
+                        }
+
+                        // refresh profile status after navigation
+                        context.read<MasterBloc>().add(GetprofileStatus());
+                      }
+
+                      if (state is RegistrationFailure) {
+                        snackbar(
+                          context,
+                          color: Colors.red,
+                          message: state.message ?? "Something went wrong",
+                          title: "Error",
+                        );
+                      }
                     },
+                    child: BlocBuilder<RegistrationBloc, RegistrationState>(
+                      builder: (context, state) {
+                        if (state is RegistrationLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return SaveandNextButtons(
+                          onNext: () {
+                            if (_formKey.currentState!.validate()) {
+                              // (Your validation + payload building here)
+                              context.read<RegistrationBloc>().add(
+                                RegisterUserEvent(
+                                  fullName: fullNameController.text.trim(),
+                                  genderId: gender!.id!,
+                                  nationalityId: selectedNationality!.id!,
+                                  stateId: selectedState!.stateId!,
+                                  districtId: selectedDistrict!.districtId!,
+                                  birthPlace: birthPlace.text.trim(),
+                                  dateOfBirth: dobController.text,
+                                  birthTime: birthTimeController.text,
+                                  zodiacId: selectedZodiac!.id!,
+                                  religionId: religion!.id!,
+                                  casteId: caste!.id!,
+                                  maritalStatusId: maritalStatus!.id!,
+                                  hobbiesList: selectedHobbyIds.toList(),
+                                  motherTongueId: motherTongue!.id!,
+                                  bloodGroupId: bloodGroup!.id!,
+                                  disability: disability ?? 'No',
+                                  specificDisability: specificDisability.text
+                                      .trim(),
+                                  kul: kulController.text.trim(),
+                                  contactNumber:
+                                      "$selectedCode${contactController.text}"
+                                          .trim(),
+                                  email: emailController.text.trim(),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],

@@ -1,4 +1,4 @@
-import 'package:bandhana/features/notification/model/notification_model.dart';
+import 'package:MilanMandap/features/notification/model/notification_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class NotificationState extends Equatable {

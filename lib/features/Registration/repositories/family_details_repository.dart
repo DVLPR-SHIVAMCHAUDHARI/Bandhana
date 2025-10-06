@@ -1,7 +1,5 @@
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/user_model.dart';
-import 'package:bandhana/core/repository/repository.dart';
-import 'package:bandhana/core/services/local_db_sevice.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/repository/repository.dart';
 import 'package:dio/dio.dart';
 
 class FamilyDetailRepository extends Repository {

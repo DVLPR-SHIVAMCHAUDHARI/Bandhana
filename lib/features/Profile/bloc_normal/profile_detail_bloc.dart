@@ -1,8 +1,8 @@
-import 'package:bandhana/features/Home/models/home_user_model.dart';
-import 'package:bandhana/features/Profile/bloc_normal/profile_detail_event.dart';
-import 'package:bandhana/features/Profile/bloc_normal/profile_detail_state.dart';
-import 'package:bandhana/features/Profile/repository/profile_repository.dart';
-import 'package:bandhana/features/master_apis/repository/master_repo.dart';
+import 'package:MilanMandap/features/Home/models/home_user_model.dart';
+import 'package:MilanMandap/features/Profile/bloc_normal/profile_detail_event.dart';
+import 'package:MilanMandap/features/Profile/bloc_normal/profile_detail_state.dart';
+import 'package:MilanMandap/features/Profile/repository/profile_repository.dart';
+import 'package:MilanMandap/features/master_apis/repository/master_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {

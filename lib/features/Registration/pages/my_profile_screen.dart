@@ -1,15 +1,14 @@
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/numberextension.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_bloc.dart';
-import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_event.dart';
-import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_state.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_bloc.dart';
+import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_event.dart';
+import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_state.dart';
 
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart';
-import 'package:bandhana/features/master_apis/bloc/master_state.dart';
-import 'package:bandhana/features/master_apis/models/your_detail_model.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_state.dart';
+import 'package:MilanMandap/features/master_apis/models/your_detail_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -198,7 +197,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  50.verticalSpace,
+                  // 50.verticalSpace,
                   Text(
                     "${user.profileDetails!.fullname}, ${user.profileSetup!.age}",
                     style: TextStyle(
@@ -223,7 +222,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                     ),
                   ),
-                  40.verticalSpace,
+                  60.verticalSpace,
                 ],
               ),
             ),
@@ -243,7 +242,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     ];
 
     return SizedBox(
-      height: 160.h,
+      height: 100.h,
       child: BlocBuilder<ProfileDetailApprovedBloc, ProfileDetailApprovedState>(
         builder: (context, state) {
           List<Map<String, dynamic>> avatarPositions = List.generate(
@@ -293,6 +292,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
           return Stack(
             clipBehavior: Clip.none,
+            alignment: Alignment.center,
             children: List.generate(avatarPositions.length, (index) {
               final avatar = avatarPositions[index];
               return Positioned(
@@ -345,7 +345,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 16.h),
         Card(
           margin: EdgeInsets.symmetric(horizontal: 16.w),
           child: Padding(

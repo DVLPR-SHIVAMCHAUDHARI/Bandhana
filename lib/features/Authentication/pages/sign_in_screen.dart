@@ -1,17 +1,17 @@
-import 'package:bandhana/core/const/asset_urls.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/snack_bar.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/sharedWidgets/background_widget.dart';
-import 'package:bandhana/core/sharedWidgets/primary_button.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_bloc.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_event.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_state.dart';
-import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/snack_bar.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/sharedWidgets/applogocomplete.dart';
+import 'package:MilanMandap/core/sharedWidgets/background_widget.dart';
+import 'package:MilanMandap/core/sharedWidgets/primary_button.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_bloc.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_event.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_state.dart';
+import 'package:MilanMandap/features/Authentication/widgets/phone_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 
 class SigninScreen extends StatefulWidget {
   const SigninScreen({super.key});
@@ -60,32 +60,10 @@ class _SigninScreenState extends State<SigninScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         40.verticalSpace,
+
                         // ✅ Logo
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Vivah",
-                              style: TextStyle(
-                                fontFamily: Typo.kugile,
-                                fontSize: 35.sp,
-                                color: const Color(0xff404040),
-                              ),
-                            ),
-                            8.horizontalSpace,
-                            SvgPicture.asset(Urls.icSplashLogo, height: 61.h),
-                          ],
-                        ),
-                        Text(
-                          "Bandhana",
-                          style: TextStyle(
-                            color: const Color(0xff404040),
-                            fontFamily: Typo.kugile,
-                            fontSize: 38.sp,
-                          ),
-                        ),
-                        104.verticalSpace,
+                        AppLogo(colorr: AppColors.primary),
+                        14.verticalSpace,
 
                         // Title
                         Text(

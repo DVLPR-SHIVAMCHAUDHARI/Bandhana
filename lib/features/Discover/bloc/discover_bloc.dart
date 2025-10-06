@@ -1,9 +1,9 @@
 import 'dart:developer';
 
-import 'package:bandhana/features/Discover/bloc/discover_event.dart';
-import 'package:bandhana/features/Discover/bloc/discover_state.dart';
-import 'package:bandhana/features/Discover/repository/discover_repository.dart';
-import 'package:bandhana/features/Home/models/home_user_model.dart';
+import 'package:MilanMandap/features/Discover/bloc/discover_event.dart';
+import 'package:MilanMandap/features/Discover/bloc/discover_state.dart';
+import 'package:MilanMandap/features/Discover/repository/discover_repository.dart';
+import 'package:MilanMandap/features/Home/models/home_user_model.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 

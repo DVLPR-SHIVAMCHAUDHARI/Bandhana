@@ -1,24 +1,24 @@
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/numberextension.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/features/Home/bloc/home_bloc.dart';
-import 'package:bandhana/features/Home/bloc/home_event.dart';
-import 'package:bandhana/features/Home/bloc/home_state.dart';
-import 'package:bandhana/features/Home/models/home_user_model.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/numberextension.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/features/Home/bloc/home_bloc.dart';
+import 'package:MilanMandap/features/Home/bloc/home_event.dart';
+import 'package:MilanMandap/features/Home/bloc/home_state.dart';
+import 'package:MilanMandap/features/Home/models/home_user_model.dart';
 
-import 'package:bandhana/features/Profile/bloc_normal/profile_detail_bloc.dart';
-import 'package:bandhana/features/Profile/bloc_normal/profile_detail_event.dart';
-import 'package:bandhana/features/Profile/bloc_normal/profile_detail_state.dart';
+import 'package:MilanMandap/features/Profile/bloc_normal/profile_detail_bloc.dart';
+import 'package:MilanMandap/features/Profile/bloc_normal/profile_detail_event.dart';
+import 'package:MilanMandap/features/Profile/bloc_normal/profile_detail_state.dart';
 
-import 'package:bandhana/features/Profile/widgets/compatibility_check_dialog.dart';
-import 'package:bandhana/features/Requests/bloc/request_bloc.dart';
-import 'package:bandhana/features/Requests/bloc/request_event.dart';
-import 'package:bandhana/features/Requests/bloc/request_state.dart';
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart'
+import 'package:MilanMandap/features/Profile/widgets/compatibility_check_dialog.dart';
+import 'package:MilanMandap/features/Requests/bloc/request_bloc.dart';
+import 'package:MilanMandap/features/Requests/bloc/request_event.dart';
+import 'package:MilanMandap/features/Requests/bloc/request_state.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart'
     hide ToggleFavoriteEvent;
-import 'package:bandhana/features/master_apis/bloc/master_state.dart'
+import 'package:MilanMandap/features/master_apis/bloc/master_state.dart'
     hide ToggleFavoriteSuccess;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -62,9 +62,7 @@ class ProfileDetailedScreen extends StatelessWidget {
               user = GoRouterState.of(context).extra as HomeUserModel?;
 
               // fallback to HomeBloc list if extra is null
-              if (user == null &&
-                  state is FetchUserLoadedState &&
-                  userId != null) {
+              if (user == null && userId != null) {
                 user = state.list.cast<HomeUserModel?>().firstWhere(
                   (u) => u?.userId == userId,
                   orElse: () => null,
@@ -339,11 +337,11 @@ class ProfileDetailedScreen extends StatelessWidget {
   // --- _buildMainImage ---
   Widget _buildMainImage(BuildContext context, HomeUserModel user) {
     final List<String?> avatars = [
-      user!.profileUrl1,
-      user!.profileUrl2,
-      user!.profileUrl3,
-      user!.profileUrl4,
-      user!.profileUrl5,
+      user.profileUrl1,
+      user.profileUrl2,
+      user.profileUrl3,
+      user.profileUrl4,
+      user.profileUrl5,
     ];
 
     return BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
@@ -426,7 +424,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                   ),
                   200.verticalSpace,
                   Text(
-                    "${user!.fullname}, ${user!.age}",
+                    "${user.fullname}, ${user.age}",
                     style: TextStyle(
                       fontSize: 28.sp,
                       fontFamily: Typo.playfairDisplayRegular,
@@ -436,16 +434,16 @@ class ProfileDetailedScreen extends StatelessWidget {
                   ),
                   5.verticalSpace,
                   Text(
-                    "${user!.profession} · ${user!.district}",
+                    "${user.profession} · ${user.district}",
                     style: TextStyle(fontSize: 16.sp, color: Colors.white70),
                   ),
                   12.verticalSpace,
                   Wrap(
                     spacing: 8.w,
                     children: List.generate(
-                      user!.hobbies!.length,
+                      user.hobbies!.length,
                       (index) =>
-                          _buildTag("#${user!.hobbies![index].hobbyName}"),
+                          _buildTag("#${user.hobbies![index].hobbyName}"),
                     ),
                   ),
                 ],

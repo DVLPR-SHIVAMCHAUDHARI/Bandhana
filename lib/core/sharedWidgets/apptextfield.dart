@@ -15,6 +15,7 @@ class AppTextField extends StatelessWidget {
   final validator;
   final int? lines;
   final Function(String)? onChanged; // ✅ Added
+  final length;
 
   const AppTextField({
     super.key,
@@ -29,6 +30,7 @@ class AppTextField extends StatelessWidget {
     this.suffixIcon,
     this.isRequired = false,
     this.onChanged, // ✅ Added
+    this.length,
   });
 
   @override
@@ -65,6 +67,7 @@ class AppTextField extends StatelessWidget {
             fontFamily: Typo.semiBold,
             color: Colors.black,
           ),
+          maxLength: length,
           maxLines: lines ?? 1,
           decoration: InputDecoration(
             maintainHintSize: true,

@@ -6,7 +6,7 @@
         android:maxSdkVersion="32"/>
 
     <application
-        android:label="bandhana"
+        android:label="Milan Mandap"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"

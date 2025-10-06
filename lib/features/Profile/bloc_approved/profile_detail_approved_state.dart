@@ -1,6 +1,6 @@
 // In 'profile_detail_approved_state.dart'
 
-import 'package:bandhana/features/Profile/model/user_detail_model.dart';
+import 'package:MilanMandap/features/Profile/model/user_detail_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class ProfileDetailApprovedState extends Equatable {

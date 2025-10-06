@@ -1,5 +1,5 @@
-import 'package:bandhana/core/repository/repository.dart';
-import 'package:bandhana/features/Home/models/home_user_model.dart';
+import 'package:MilanMandap/core/repository/repository.dart';
+import 'package:MilanMandap/features/Home/models/home_user_model.dart';
 
 class DiscoverRepository extends Repository {
   Future<Map<String, dynamic>> getUserList() async {

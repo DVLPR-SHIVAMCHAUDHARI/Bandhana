@@ -1,4 +1,4 @@
-import 'package:bandhana/features/Registration/repositories/registration_repository.dart';
+import 'package:MilanMandap/features/Registration/repositories/registration_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'registration_event.dart';
 import 'registration_state.dart';

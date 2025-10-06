@@ -1,6 +1,6 @@
-import 'package:bandhana/core/repository/repository.dart';
+import 'package:MilanMandap/core/repository/repository.dart';
 
-import 'package:bandhana/features/Profile/model/user_detail_model.dart';
+import 'package:MilanMandap/features/Profile/model/user_detail_model.dart';
 
 class ProfileRepository extends Repository {
   Future<Map<String, dynamic>> getUserById({id}) async {

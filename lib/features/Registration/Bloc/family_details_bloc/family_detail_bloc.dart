@@ -1,4 +1,4 @@
-import 'package:bandhana/features/Registration/repositories/family_details_repository.dart';
+import 'package:MilanMandap/features/Registration/repositories/family_details_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'family_detail_event.dart';
 import 'family_detail_state.dart';

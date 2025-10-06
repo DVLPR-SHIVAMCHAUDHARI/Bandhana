@@ -1,5 +1,4 @@
-import 'package:bandhana/features/Home/models/home_user_model.dart';
-import 'package:bandhana/features/Profile/model/user_detail_model.dart';
+import 'package:MilanMandap/features/Home/models/home_user_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class ProfileDetailState extends Equatable {

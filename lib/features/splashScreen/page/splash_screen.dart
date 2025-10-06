@@ -1,8 +1,8 @@
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/asset_urls.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/numberextension.dart';
-import 'package:bandhana/core/services/local_db_sevice.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/asset_urls.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/numberextension.dart';
+import 'package:MilanMandap/core/services/local_db_sevice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   animate() async {
-    await Future.delayed(const Duration(milliseconds: 800), () {
+    await Future.delayed(const Duration(milliseconds: 1000), () {
       setState(() {
         isAnimate = true;
       });
@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     await Future.delayed(const Duration(milliseconds: 1600));
 
-    // Make sure Hive box is initialized
+    // Initialize Hive/local DB
     await LocalDbService.instance.init();
 
     // Load token from secure storage
@@ -45,43 +45,68 @@ class _SplashScreenState extends State<SplashScreen> {
       return;
     }
 
-    if (token.accessToken != null && token.accessToken!.isNotEmpty) {
-      final user = localDb.getUserData();
-      logger.e(user);
-      if (user != null) {
-        if (user.profileDetails == 0) {
-          router.goNamed(
-            Routes.register.name,
-            pathParameters: {"type": "normal"},
-          );
-          return;
-        } else if (user.profileSetup == 0) {
-          router.goNamed(
-            Routes.profilesetup.name,
-            pathParameters: {"type1": "normal"},
-          );
-          return;
-        } else if (user.familyDetails == 0) {
-          router.goNamed(Routes.familyDetails.name);
-          return;
-        } else if (user.partnerExpectations == 0) {
-          router.goNamed(Routes.compatablity1.name);
-          return;
-        } else if (user.partnerLifeStyle == 0) {
-          router.goNamed(Routes.compatablity2.name);
-          return;
-        } else if (user.documentVerification == 0) {
-          router.goNamed(Routes.docVerification.name);
-          return;
-        }
-        router.goNamed(Routes.homescreen.name);
-      } else {
-        // Token exists but user not in local DB → force logout or go to signin
-        router.goNamed(Routes.signin.name);
-      }
-    } else {
+    final user = localDb.getUserData();
+
+    if (token.accessToken == null ||
+        token.accessToken!.isEmpty ||
+        user == null) {
+      // No token or no user → go to signin
       router.goNamed(Routes.signin.name);
+      return;
     }
+
+    // Route user based on their setup status
+    if (user.profileDetails == 0) {
+      router.goNamed(Routes.register.name, pathParameters: {"type": "normal"});
+      return;
+    }
+
+    if (user.profileSetup == 0) {
+      router.goNamed(
+        Routes.profilesetup.name,
+        pathParameters: {
+          "type1": "normal",
+          "age": "0", // must provide
+        },
+      );
+
+      return;
+    }
+
+    if (user.familyDetails == 0) {
+      router.goNamed(
+        Routes.familyDetails.name,
+        pathParameters: {"type2": "normal"},
+      );
+      return;
+    }
+
+    if (user.partnerExpectations == 0) {
+      router.goNamed(
+        Routes.compatablity1.name,
+        pathParameters: {"type2": "normal"},
+      );
+      return;
+    }
+
+    if (user.partnerLifeStyle == 0) {
+      router.goNamed(
+        Routes.compatablity2.name,
+        pathParameters: {"type4": "normal"},
+      );
+      return;
+    }
+
+    if (user.documentVerification == 0) {
+      router.goNamed(
+        Routes.docVerification.name,
+        pathParameters: {"type5": "normal"},
+      );
+      return;
+    }
+
+    // All setup done → go to home
+    router.goNamed(Routes.homescreen.name);
   }
 
   @override
@@ -102,32 +127,43 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Stack(
             children: [
               Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  300.verticalSpace,
                   Center(
                     child: SizedBox(
                       width: double.infinity.w,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          30.horizontalSpace,
                           AnimatedOpacity(
                             duration: const Duration(milliseconds: 1200),
                             opacity: isAnimate ? 1.0 : 0,
                             curve: Curves.easeIn,
-                            child: SvgPicture.asset(
-                              Urls.icBandhanaNameLogo,
-                              color: isAnimate ? Colors.white : Colors.black,
-                              height: 66.26.h,
-                              width: 226.08.w,
+                            child: SizedBox(
+                              height: 200.26.h,
+                              // width: 226.08.w,
+                              child: Image.asset(
+                                Urls.igMilanMandap,
+                                color: isAnimate ? Colors.white : Colors.black,
+                              ),
                             ),
+                            // child: SvgPicture.asset(
+                            //   Urls.icMilanMandapNameLogo,
+                            //   // Urls.igMilanMandap,
+                            //   color: isAnimate ? Colors.white : Colors.black,
+                            //   height: 66.26.h,
+                            //   width: 226.08.w,
+                            // ),
                           ),
                           2.widthBox,
                           AnimatedSlide(
                             duration: const Duration(milliseconds: 1200),
                             curve: Curves.easeInOut,
                             offset: isAnimate
-                                ? const Offset(0, -0.2)
-                                : const Offset(-1.5, 0),
+                                ? Offset(-1, -0.4)
+                                : Offset(-3, -0.4),
                             child: SvgPicture.asset(
                               Urls.icSplashLogo,
                               color: isAnimate ? Colors.white : Colors.black,

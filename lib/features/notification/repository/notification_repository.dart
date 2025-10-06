@@ -1,5 +1,5 @@
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/repository/repository.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/repository/repository.dart';
 
 class NotificationRepository extends Repository {
   /// Fetch all notifications

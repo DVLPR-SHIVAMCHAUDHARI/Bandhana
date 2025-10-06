@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'package:bandhana/core/const/user_model.dart';
+import 'package:MilanMandap/core/const/user_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 

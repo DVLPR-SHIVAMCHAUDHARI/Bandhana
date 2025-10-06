@@ -1,18 +1,15 @@
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/sharedWidgets/profile_shimmer.dart';
-import 'package:bandhana/features/Discover/bloc/discover_bloc.dart';
-import 'package:bandhana/features/Discover/bloc/discover_event.dart';
-import 'package:bandhana/features/Discover/bloc/discover_state.dart';
-import 'package:bandhana/features/Home/bloc/home_bloc.dart';
-import 'package:bandhana/features/Home/bloc/home_event.dart'
-    hide FetchUsersEvent;
-import 'package:bandhana/features/Home/widgets/profile_card.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/sharedWidgets/profile_shimmer.dart';
+import 'package:MilanMandap/features/Discover/bloc/discover_bloc.dart';
+import 'package:MilanMandap/features/Discover/bloc/discover_event.dart';
+import 'package:MilanMandap/features/Discover/bloc/discover_state.dart';
+import 'package:MilanMandap/features/Home/widgets/profile_card.dart';
 
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
 import 'package:flutter/material.dart';
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/typography.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/typography.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

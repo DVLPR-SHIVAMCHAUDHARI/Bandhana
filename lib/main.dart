@@ -1,7 +1,7 @@
-import 'package:bandhana/core/const/app_theme.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/services/tokenservice.dart';
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/core/const/app_theme.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/services/tokenservice.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,11 +15,11 @@ void main() async {
 
   logger.d("Stored token (in TokenServices): ${TokenServices().accessToken}");
   logger.d("Saved user in Hive: ${localDb.getUserData()}");
-  runApp(Bandhana());
+  runApp(MilanMandap());
 }
 
-class Bandhana extends StatelessWidget {
-  const Bandhana({super.key});
+class MilanMandap extends StatelessWidget {
+  const MilanMandap({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class Bandhana extends StatelessWidget {
           providers: [BlocProvider(create: (_) => MasterBloc())],
           child: MaterialApp.router(
             color: Colors.white,
-            title: "Bandhana",
+            title: "MilanMandap",
             theme: AppTheme.lightTheme,
             // darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.system,

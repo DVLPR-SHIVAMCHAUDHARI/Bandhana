@@ -1,21 +1,22 @@
+import 'dart:developer';
 import 'dart:io';
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/saveNextButton.dart';
-import 'package:bandhana/core/const/snack_bar.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
-import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_bloc.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_event.dart';
-import 'package:bandhana/features/Registration/Bloc/profile_setup_bloc/profile_setup_state.dart';
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart';
-import 'package:bandhana/features/master_apis/bloc/master_state.dart';
-import 'package:bandhana/features/master_apis/models/education_model.dart';
-import 'package:bandhana/features/master_apis/models/profession_model.dart';
-import 'package:bandhana/features/master_apis/models/salary_model.dart';
-import 'package:bandhana/features/master_apis/models/profile_setup_model.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/saveNextButton.dart';
+import 'package:MilanMandap/core/const/snack_bar.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/sharedWidgets/app_dropdown.dart';
+import 'package:MilanMandap/core/sharedWidgets/apptextfield.dart';
+import 'package:MilanMandap/features/Registration/Bloc/profile_setup_bloc/profile_setup_bloc.dart';
+import 'package:MilanMandap/features/Registration/Bloc/profile_setup_bloc/profile_setup_event.dart';
+import 'package:MilanMandap/features/Registration/Bloc/profile_setup_bloc/profile_setup_state.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_state.dart';
+import 'package:MilanMandap/features/master_apis/models/education_model.dart';
+import 'package:MilanMandap/features/master_apis/models/profession_model.dart';
+import 'package:MilanMandap/features/master_apis/models/salary_model.dart';
+import 'package:MilanMandap/features/master_apis/models/profile_setup_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,9 +24,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
-  ProfileSetupScreen({super.key, required this.type});
+  ProfileSetupScreen({super.key, required this.type, required this.age});
   String type;
-
+  String age;
   @override
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
 }
@@ -51,6 +52,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   @override
   void initState() {
+    log(widget.age);
+    ageController.text = widget.age;
+
     super.initState();
     bloc = ProfileSetupBloc();
 
@@ -75,31 +79,31 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   /// Prefill form from API
   void _prefill(ProfileSetupModel profile) {
-    bioController.text = profile.bio ?? "";
-    ageController.text = profile.age?.toString() ?? "";
-    heightController.text = profile.height?.toString() ?? "";
-    permanentLocationController.text = profile.permanentLocation ?? "";
-    workLocationController.text = profile.workLocation ?? "";
+    setState(() {
+      bioController.text = profile.bio ?? "";
+      ageController.text = (profile.age?.toString()) ?? widget.age;
+      heightController.text = profile.height?.toString() ?? "";
+      permanentLocationController.text = profile.permanentLocation ?? "";
+      workLocationController.text = profile.workLocation ?? "";
 
-    selectedEducation = profile.education != null
-        ? EducationModel(
-            id: profile.education,
-            education: profile.educationName,
-          )
-        : null;
+      selectedEducation = profile.education != null
+          ? EducationModel(
+              id: profile.education,
+              education: profile.educationName,
+            )
+          : null;
 
-    selectedProfession = profile.profession != null
-        ? ProfessionModel(
-            id: profile.profession,
-            profession: profile.professionName,
-          )
-        : null;
+      selectedProfession = profile.profession != null
+          ? ProfessionModel(
+              id: profile.profession,
+              profession: profile.professionName,
+            )
+          : null;
 
-    selectedSalaryRange = profile.salary != null
-        ? SalaryModel(id: profile.salary, salaryRange: profile.salaryName)
-        : null;
-
-    setState(() {});
+      selectedSalaryRange = profile.salary != null
+          ? SalaryModel(id: profile.salary, salaryRange: profile.salaryName)
+          : null;
+    });
   }
 
   /// Pick multiple images and crop (Square only)
@@ -513,7 +517,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           );
                           widget.type == "edit"
                               ? null
-                              : router.goNamed(Routes.familyDetails.name);
+                              : router.goNamed(
+                                  Routes.familyDetails.name,
+                                  pathParameters: {"type2": "normal"},
+                                );
                           context.read<MasterBloc>().add(GetprofileStatus());
                         } else if (state is ProfileSetupSubmitFailureState) {
                           snackbar(

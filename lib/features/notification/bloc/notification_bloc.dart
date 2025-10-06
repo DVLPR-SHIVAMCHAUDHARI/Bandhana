@@ -1,5 +1,5 @@
-import 'package:bandhana/features/notification/model/notification_model.dart';
-import 'package:bandhana/features/notification/repository/notification_repository.dart';
+import 'package:MilanMandap/features/notification/model/notification_model.dart';
+import 'package:MilanMandap/features/notification/repository/notification_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'notification_event.dart';
 import 'notification_state.dart';

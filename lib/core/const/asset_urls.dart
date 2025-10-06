@@ -2,7 +2,7 @@ class Urls {
   static String icSplashLogo = "assets/icons/splashLogo.svg";
   static String icSplashDesignLogo = "assets/icons/splashDesignLogo.svg";
   static String icNameLogo = "assets/icons/nameLogo.svg";
-  static String icBandhanaNameLogo = "assets/icons/bandhanaNameLogo.svg";
+  static String icMilanMandapNameLogo = "assets/icons/MilanMandapNameLogo.svg";
   static String icOnboardingLogo = "assets/icons/onboardingLogo.svg";
   static String icPage = "assets/icons/page.svg";
   static String icAdhar = "assets/icons/adharIcon.svg";
@@ -23,4 +23,6 @@ class Urls {
   static String igOnboarding2 = "assets/images/splash-2.png";
   static String igOnboarding3 = "assets/images/splash-3.png";
   static String igRequestBg = "assets/images/requestBg.png";
+  static String igMilanMandap = "assets/images/milan.png";
+  static String igMilanMandapComplete = "assets/images/milanComplete.png";
 }

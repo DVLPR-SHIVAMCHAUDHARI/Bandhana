@@ -1,5 +1,5 @@
-import 'package:bandhana/features/Subscription/bloc/subscription_event.dart';
-import 'package:bandhana/features/Subscription/bloc/subscription_state.dart';
+import 'package:MilanMandap/features/Subscription/bloc/subscription_event.dart';
+import 'package:MilanMandap/features/Subscription/bloc/subscription_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {

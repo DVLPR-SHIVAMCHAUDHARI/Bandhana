@@ -1,21 +1,16 @@
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/numberextension.dart';
-import 'package:bandhana/core/const/typography.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/typography.dart';
 
-import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_bloc.dart';
-import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_event.dart';
-import 'package:bandhana/features/Profile/bloc_approved/profile_detail_approved_state.dart';
-import 'package:bandhana/features/Profile/model/user_detail_model.dart';
-import 'package:bandhana/features/Profile/widgets/compatibility_check_dialog.dart';
-import 'package:bandhana/features/Requests/bloc/request_bloc.dart';
-import 'package:bandhana/features/Requests/bloc/request_event.dart';
-import 'package:bandhana/features/Requests/bloc/request_state.dart';
+import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_bloc.dart';
+import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_event.dart';
+import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_state.dart';
+import 'package:MilanMandap/features/Profile/model/user_detail_model.dart';
+import 'package:MilanMandap/features/Requests/bloc/request_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 
 class ProfileDetailedApprovedScreen extends StatelessWidget {
   const ProfileDetailedApprovedScreen({

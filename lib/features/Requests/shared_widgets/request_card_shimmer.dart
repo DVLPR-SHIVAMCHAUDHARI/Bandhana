@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:bandhana/core/const/app_colors.dart';
 
 class RequestCardShimmer extends StatelessWidget {
   const RequestCardShimmer({super.key});

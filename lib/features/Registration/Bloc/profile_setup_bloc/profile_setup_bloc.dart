@@ -1,6 +1,5 @@
-import 'dart:io';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/features/Registration/repositories/profile_setup_repository.dart';
+import 'package:MilanMandap/features/Registration/repositories/profile_setup_repository.dart';
+import 'package:MilanMandap/core/const/globals.dart';
 import 'package:bloc/bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'profile_setup_event.dart';

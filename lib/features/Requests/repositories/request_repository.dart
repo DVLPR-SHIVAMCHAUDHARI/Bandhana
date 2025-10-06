@@ -1,4 +1,4 @@
-import 'package:bandhana/core/repository/repository.dart';
+import 'package:MilanMandap/core/repository/repository.dart';
 
 class RequestRepository extends Repository {
   getRecievedRequests() async {

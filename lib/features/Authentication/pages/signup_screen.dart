@@ -1,18 +1,17 @@
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/asset_urls.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
-import 'package:bandhana/core/sharedWidgets/background_widget.dart';
-import 'package:bandhana/core/sharedWidgets/primary_button.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_bloc.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_event.dart';
-import 'package:bandhana/features/Authentication/Bloc/auth_bloc/auth_state.dart';
-import 'package:bandhana/features/Authentication/widgets/phone_field.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/sharedWidgets/applogocomplete.dart';
+import 'package:MilanMandap/core/sharedWidgets/apptextfield.dart';
+import 'package:MilanMandap/core/sharedWidgets/background_widget.dart';
+import 'package:MilanMandap/core/sharedWidgets/primary_button.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_bloc.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_event.dart';
+import 'package:MilanMandap/features/Authentication/Bloc/auth_bloc/auth_state.dart';
+import 'package:MilanMandap/features/Authentication/widgets/phone_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -67,22 +66,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          150.verticalSpace,
+                          50.verticalSpace,
                           // Logo row
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                Urls.icBandhanaNameLogo,
-                                height: 66.h,
-                                color: Colors.black,
-                              ),
-                              8.horizontalSpace,
-                              SvgPicture.asset(Urls.icSplashLogo, height: 61.h),
-                            ],
-                          ),
-                          104.verticalSpace,
+                          AppLogo(colorr: AppColors.primary),
+
                           Text(
                             "Sign Up",
                             style: TextStyle(

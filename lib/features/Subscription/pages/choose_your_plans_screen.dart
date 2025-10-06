@@ -1,8 +1,8 @@
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/features/Subscription/bloc/subscription_bloc.dart';
-import 'package:bandhana/features/Subscription/bloc/subscription_event.dart';
-import 'package:bandhana/features/Subscription/bloc/subscription_state.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/features/Subscription/bloc/subscription_bloc.dart';
+import 'package:MilanMandap/features/Subscription/bloc/subscription_event.dart';
+import 'package:MilanMandap/features/Subscription/bloc/subscription_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -64,7 +64,7 @@ class _ChooseYourPlanScreenState extends State<ChooseYourPlanScreen> {
     var options = {
       'key': 'rzp_test_RLOK74js6vkzZk',
       'amount': amount, // Amount in paise
-      'name': 'Bandhana',
+      'name': 'MilanMandap',
       'description': 'Test Payment',
       'prefill': {
         'contact': '9021262585',

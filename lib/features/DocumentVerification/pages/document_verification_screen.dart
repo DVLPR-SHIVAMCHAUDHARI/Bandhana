@@ -1,23 +1,24 @@
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/features/DocumentVerification/bloc/upload_bloc.dart';
-import 'package:bandhana/features/DocumentVerification/bloc/upload_event.dart';
-import 'package:bandhana/features/DocumentVerification/bloc/upload_state.dart';
-import 'package:bandhana/features/DocumentVerification/shared_widget/upload_image_doc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/features/DocumentVerification/bloc/upload_bloc.dart';
+import 'package:MilanMandap/features/DocumentVerification/bloc/upload_event.dart';
+import 'package:MilanMandap/features/DocumentVerification/bloc/upload_state.dart';
+import 'package:MilanMandap/features/DocumentVerification/shared_widget/upload_image_doc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/asset_urls.dart';
-import 'package:bandhana/core/const/saveNextButton.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/sharedWidgets/app_dropdown.dart';
-import 'package:bandhana/core/sharedWidgets/apptextfield.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/asset_urls.dart';
+import 'package:MilanMandap/core/const/saveNextButton.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/sharedWidgets/app_dropdown.dart';
+import 'package:MilanMandap/core/sharedWidgets/apptextfield.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DocumentVerificationScreen extends StatefulWidget {
-  const DocumentVerificationScreen({super.key});
+  DocumentVerificationScreen({super.key, required this.type});
+  String type;
 
   @override
   State<DocumentVerificationScreen> createState() =>
@@ -39,6 +40,13 @@ class _DocumentVerificationScreenState
     idNumberController.dispose();
     casteNumberController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    casteNumberController.text = "Enter number";
   }
 
   @override
@@ -105,11 +113,40 @@ class _DocumentVerificationScreenState
 
                         if (idType != null) ...[
                           AppTextField(
+                            length: idType == "PAN" ? 10 : 12,
                             title: "$idType Number",
                             hint: "Enter $idType number",
                             controller: idNumberController,
+                            // 👇 NEW: Set Keyboard Type based on ID
+                            keyboardType: idType == "Aadhaar"
+                                ? TextInputType.number
+                                : TextInputType.text,
                             isRequired: true,
+                            // 👇 THE CRITICAL VALIDATOR LOGIC
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "$idType Number is required.";
+                              }
+                              if (idType == "Aadhaar") {
+                                // Aadhaar: Must be 12 digits, must be numeric
+                                if (!RegExp(r'^\d{12}$').hasMatch(value)) {
+                                  return "Aadhaar must be 12 digits.";
+                                }
+                              } else if (idType == "PAN") {
+                                // PAN: Must be 10 characters (5 Alpha, 4 Numeric, 1 Alpha)
+                                // Regex: [A-Z]{5}[0-9]{4}[A-Z]{1}
+                                if (!RegExp(
+                                  r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$',
+                                  caseSensitive: false,
+                                ).hasMatch(value)) {
+                                  return "PAN must be 10 alphanumeric characters (e.g., ABCDE1234F).";
+                                }
+                              }
+                              return null; // Validation passed
+                            },
                           ),
+                          25.verticalSpace,
+
                           16.verticalSpace,
                           documentVerificationTile(
                             context: context,

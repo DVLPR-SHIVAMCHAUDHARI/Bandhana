@@ -1,4 +1,4 @@
-package com.example.bandhana
+package com.example.MilanMandap
 
 import io.flutter.embedding.android.FlutterActivity
 

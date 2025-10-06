@@ -1,7 +1,7 @@
-import 'package:bandhana/core/const/asset_urls.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/asset_urls.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -67,7 +67,7 @@ class OnboardingScreen extends StatelessWidget {
                         Text(
                           state.currentPage.title,
                           style: TextStyle(
-                            fontSize: 32.sp,
+                            fontSize: 30.sp,
                             color: AppColors.primary,
                             fontFamily: Typo.playfairBold,
                           ),

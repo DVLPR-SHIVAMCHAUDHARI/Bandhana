@@ -1,7 +1,7 @@
 // lib/core/bloc/user_preferences/user_preferences_bloc.dart
-import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_event.dart';
-import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_state.dart';
-import 'package:bandhana/features/BasicCompatiblity/repositories/basic_compatiblity_repository.dart';
+import 'package:MilanMandap/features/BasicCompatiblity/bloc/basic_compablity_event.dart';
+import 'package:MilanMandap/features/BasicCompatiblity/bloc/basic_compablity_state.dart';
+import 'package:MilanMandap/features/BasicCompatiblity/repositories/basic_compatiblity_repository.dart';
 import 'package:bloc/bloc.dart';
 
 class UserPreferencesBloc

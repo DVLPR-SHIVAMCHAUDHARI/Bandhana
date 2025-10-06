@@ -1,19 +1,20 @@
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/globals.dart';
-import 'package:bandhana/core/const/snack_bar.dart';
-import 'package:bandhana/core/const/typography.dart';
-import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_bloc.dart';
-import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_event.dart';
-import 'package:bandhana/features/BasicCompatiblity/bloc/basic_compablity_state.dart';
-import 'package:bandhana/features/master_apis/bloc/master_bloc.dart';
-import 'package:bandhana/features/master_apis/bloc/master_event.dart';
-import 'package:bandhana/features/master_apis/bloc/master_state.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/snack_bar.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/features/BasicCompatiblity/bloc/basic_compablity_bloc.dart';
+import 'package:MilanMandap/features/BasicCompatiblity/bloc/basic_compablity_event.dart';
+import 'package:MilanMandap/features/BasicCompatiblity/bloc/basic_compablity_state.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
+import 'package:MilanMandap/features/master_apis/bloc/master_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BasicCompablityScreen2 extends StatefulWidget {
-  const BasicCompablityScreen2({super.key});
+  BasicCompablityScreen2({super.key, required this.type});
+  String type;
 
   @override
   State<BasicCompablityScreen2> createState() => _BasicCompablityScreen2State();
@@ -131,7 +132,10 @@ class _BasicCompablityScreen2State extends State<BasicCompablityScreen2> {
                   title: "Success",
                   message: state.message,
                 );
-                router.goNamed(Routes.docVerification.name);
+                router.goNamed(
+                  Routes.docVerification.name,
+                  pathParameters: {"type": "normal"},
+                );
                 context.read<MasterBloc>().add(GetprofileStatus());
               } else if (state is LifestylePreferencesFailure) {
                 snackbar(context, message: state.message);

@@ -1,5 +1,6 @@
-import 'package:bandhana/core/const/app_colors.dart';
-import 'package:bandhana/core/const/typography.dart';
+import 'package:MilanMandap/core/const/app_colors.dart';
+import 'package:MilanMandap/core/const/typography.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -9,7 +10,7 @@ class AppDropdown<T> extends StatelessWidget {
   final T? value;
   final void Function(T?) onChanged;
   final String title;
-  final bool isRequired; // ✅ NEW
+  final bool isRequired;
 
   const AppDropdown({
     required this.title,
@@ -18,7 +19,7 @@ class AppDropdown<T> extends StatelessWidget {
     required this.items,
     required this.value,
     required this.onChanged,
-    this.isRequired = false, // ✅ default = false
+    this.isRequired = false,
   });
 
   @override
@@ -35,16 +36,11 @@ class AppDropdown<T> extends StatelessWidget {
           ),
         ),
         10.verticalSpace,
-        DropdownButtonFormField<T>(
-          menuMaxHeight: 250.h,
+
+        // ✅ Updated DropdownButtonFormField2
+        DropdownButtonFormField2<T>(
           value: value,
           isExpanded: true,
-          icon: const Icon(Icons.arrow_drop_down),
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontFamily: Typo.regular,
-            color: Colors.black,
-          ),
           decoration: InputDecoration(
             alignLabelWithHint: true,
             filled: true,
@@ -78,6 +74,15 @@ class AppDropdown<T> extends StatelessWidget {
               color: Colors.grey[600],
             ),
           ),
+          iconStyleData: const IconStyleData(
+            icon: Icon(Icons.arrow_drop_down),
+            iconEnabledColor: Colors.black,
+          ),
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontFamily: Typo.regular,
+            color: Colors.black,
+          ),
           items: items
               .map(
                 (e) => DropdownMenuItem<T>(
@@ -95,12 +100,27 @@ class AppDropdown<T> extends StatelessWidget {
               .toList(),
           onChanged: onChanged,
 
-          // ✅ Validator
+          // ✅ Dropdown appearance configuration
+          dropdownStyleData: DropdownStyleData(
+            maxHeight: 250.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16.r),
+              color: Colors.white,
+              border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+            ),
+            offset: const Offset(0, 0), // 👈 opens exactly below
+          ),
+
+          // ✅ Menu item styling
+          menuItemStyleData: MenuItemStyleData(
+            height: 48.h,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+          ),
+
+          // ✅ Validator (same as before)
           validator: isRequired
               ? (val) {
-                  if (val == null) {
-                    return "This field is required";
-                  }
+                  if (val == null) return "This field is required";
                   return null;
                 }
               : null,

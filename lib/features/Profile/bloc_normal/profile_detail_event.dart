@@ -1,4 +1,3 @@
-import 'package:bandhana/features/Home/models/home_user_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class ProfileDetailEvent extends Equatable {
