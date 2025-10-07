@@ -2,12 +2,30 @@ import 'package:MilanMandap/core/const/app_colors.dart';
 import 'package:MilanMandap/core/const/globals.dart';
 import 'package:MilanMandap/core/const/numberextension.dart';
 import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/sharedWidgets/profile_shimmer.dart';
+import 'package:MilanMandap/features/Discover/bloc/discover_bloc.dart';
+import 'package:MilanMandap/features/Discover/bloc/discover_event.dart';
+import 'package:MilanMandap/features/Discover/bloc/discover_state.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class ChatListScreen extends StatelessWidget {
+class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
+
+  @override
+  State<ChatListScreen> createState() => _ChatListScreenState();
+}
+
+class _ChatListScreenState extends State<ChatListScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<DiscoverBloc>().add(FetchUsersEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,47 +42,70 @@ class ChatListScreen extends StatelessWidget {
         ),
         centerTitle: false,
       ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(vertical: 10.h),
-        children: [
-          ChatTile(
-            ontap: () {
-              router.pushNamed(Routes.chat.name);
-            },
-            count: "3",
-            img:
-                "https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg",
-            message: "Haha oh man 🤣🤣🤣",
-            name: "John Doe",
-            time: "20:00",
+      body: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            context.read<DiscoverBloc>().add(FetchUsersEvent());
+            await Future.delayed(const Duration(seconds: 1));
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: ClampingScrollPhysics(),
+            ),
+            child: Column(
+              children: [
+                10.verticalSpace,
+                25.verticalSpace,
+                BlocBuilder<DiscoverBloc, DiscoverState>(
+                  builder: (context, state) {
+                    if (state is FetchUsersLoadingState) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) => ProfileCardShimmer(),
+                        itemCount: 10,
+                      );
+                    } else if (state is FetchUserLoadedState) {
+                      final users = state.list;
+                      if (users.isEmpty) {
+                        return const Center(child: Text("No matches found"));
+                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          final user = users[index];
+                          return ChatTile(
+                            ontap: () {
+                              router.goNamed(
+                                Routes.chat.name,
+                                extra: {
+                                  'id': user.userId,
+                                  'name': user.fullname,
+                                  'image': user.profileUrl1,
+                                },
+                              );
+                            },
+                            img: user.profileUrl1,
+                            name: user.fullname,
+                          );
+                        },
+                      );
+                    } else if (state is FetchUserFailureState) {
+                      return const Center(child: Text("Failed to load users"));
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
+                100.verticalSpace,
+              ],
+            ),
           ),
-          ChatTile(
-            count: "9+",
-            img:
-                "https://static.wikia.nocookie.net/przestepcy/images/a/a9/Iosef_Tarasov.jpg/revision/latest/thumbnail/width/360/height/450?cb=20230411203930",
-            message: "I killed the dog",
-            name: "Iosef Tarasov",
-            time: "20:00",
-          ),
-          ChatTile(
-            count: "4",
-            img:
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLJh47O0sASNk_wdv4a75wiNyewENK7FzD2A&s",
-            message: "Cant find my pencil ✏️",
-            name: "Bowery King",
-            time: "20:00",
-          ),
-          ChatTile(
-            count: "6",
-            img:
-                "https://deadline.com/wp-content/uploads/2023/03/Keanu-Reeves-john-wick-4.jpg",
-            message: "Have you seen my dog? 🐕",
-            name: "John Wick",
-            time: "20:00",
-          ),
-          SizedBox(height: 1000), // now works correctly
-        ],
+        ),
       ),
+      // SizedBox(height: 1000), /÷/ now works correctly
     );
   }
 }
@@ -113,7 +154,7 @@ class ChatTile extends StatelessWidget {
                   ),
                   4.verticalSpace,
                   Text(
-                    message!,
+                    message ?? "Hi",
                     style: TextStyle(
                       color: AppColors.black,
                       fontFamily: Typo.medium,
@@ -130,7 +171,7 @@ class ChatTile extends StatelessWidget {
                 backgroundColor: AppColors.primary,
                 radius: 12.r,
                 child: Text(
-                  count!,
+                  count ?? "10",
                   style: TextStyle(
                     color: Colors.white,
                     fontFamily: Typo.semiBold,
@@ -141,7 +182,7 @@ class ChatTile extends StatelessWidget {
               10.verticalSpace,
 
               Text(
-                time!,
+                time ?? "10",
                 style: TextStyle(
                   color: Colors.grey.shade700,
                   fontFamily: Typo.medium,

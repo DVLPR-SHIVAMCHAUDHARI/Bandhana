@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 
 abstract class Repository {
   final String host = "http://3.110.183.40:4015/Bandhana/api/v1";
-  // final String host = "http://192.168.1.23:4015/Bandhana/api/v1";
+  final String socket = "http://3.110.183.40:4015";
   late final Dio dio;
 
   Repository() {

@@ -297,12 +297,19 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: "/chatList",
           name: Routes.chatList.name,
-          builder: (context, state) => ChatListScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => DiscoverBloc(),
+            child: ChatListScreen(),
+          ),
           routes: [
             GoRoute(
               path: "chat",
               name: Routes.chat.name,
-              builder: (context, state) => ChatScreen(),
+              builder: (context, state) => ChatScreen(
+                id: (state.extra as Map<String, dynamic>)['id'] as int,
+                image: (state.extra as Map<String, dynamic>)['image'] as String,
+                name: (state.extra as Map<String, dynamic>)['name'] as String,
+              ),
             ),
           ],
         ),
