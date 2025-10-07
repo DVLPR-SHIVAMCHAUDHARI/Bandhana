@@ -1,12 +1,15 @@
-import 'dart:developer';
+// chat_screen.dart
 
+import 'dart:developer';
+import 'package:MilanMandap/core/const/user_model.dart';
 import 'package:MilanMandap/core/const/app_colors.dart';
 import 'package:MilanMandap/core/const/globals.dart';
 import 'package:MilanMandap/core/const/numberextension.dart';
 import 'package:MilanMandap/core/const/snack_bar.dart';
 import 'package:MilanMandap/core/const/typography.dart';
-import 'package:MilanMandap/core/const/user_model.dart';
 import 'package:MilanMandap/core/repository/repository.dart';
+
+import 'package:MilanMandap/core/services/local_db_sevice.dart';
 import 'package:MilanMandap/features/Chat/models/messagemodel.dart';
 import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
 import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
@@ -17,6 +20,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart' as emoji;
+
+// Global instance of the local database service
+final LocalDbService localDb = LocalDbService.instance;
 
 class ChatScreen extends StatefulWidget {
   ChatScreen({
@@ -35,41 +42,40 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final FocusNode focusNode = FocusNode();
+  bool _emojiShowing = false;
 
-  // Initial dummy messages for a better starting experience
-  List<Messagemodel> messages = [
-    Messagemodel(
-      message:
-          "Hi Ananya, good to connect with you here 😊\nI really liked your profile – especially your passion for fitness and reading.\nHow's your week going?",
-      type: "source", // isMe: true
-      time: "09:41",
-    ),
-    Messagemodel(
-      message:
-          "Hi John, thank you 😊\nGlad to connect as well. My week’s been good so far – just the usual work hustle.\nHow about yours?",
-      type: "destination", // isMe: false
-      time: "09:41",
-    ),
-  ];
-
-  UserModel user = UserModel(); // Holds the current user's data
+  List<Messagemodel> messages = [];
+  UserModel user = UserModel();
   late IO.Socket socket;
   bool _isConnected = false;
 
   @override
   void initState() {
     super.initState();
-    // 1. Start fetching the current user's profile status immediately
     context.read<MasterBloc>().add(GetprofileStatus());
+
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        if (_emojiShowing) {
+          setState(() {
+            _emojiShowing = false;
+          });
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
-    if (_isConnected) {
+    if (_isConnected && user.userId != null) {
+      // 💡 SAVE MESSAGES ON DISPOSE
+      localDb.saveChatMessages(user.userId!, widget.id, messages);
       socket.disconnect();
     }
     messageController.dispose();
     _scrollController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -78,9 +84,37 @@ class _ChatScreenState extends State<ChatScreen> {
     return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
   }
 
+  /// Loads saved messages from Hive.
+  void _loadMessages() {
+    if (user.userId == null) return;
+
+    final savedMessages = localDb.getChatMessages(user.userId!, widget.id);
+
+    // Add a simple initial message if history is empty
+    if (savedMessages.isEmpty) {
+      messages = [
+        Messagemodel(
+          message: "Welcome! Say hello to ${widget.name}.",
+          type: "destination",
+          time: _formatTime(DateTime.now()),
+        ),
+      ];
+    } else {
+      messages = savedMessages;
+    }
+
+    setState(() {});
+
+    // Ensure scrolling to the bottom if there are messages
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
+
   /// Establishes the Socket.IO connection and sets up listeners.
   void connect() {
-    // Prevent double connection and ensure we have a valid User ID
     if (user.userId == null || _isConnected) return;
 
     socket = IO.io("http://3.110.183.40:4015", <String, dynamic>{
@@ -93,12 +127,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
     socket.onConnect((data) {
       log("Socket Connected. ID: ${socket.id}");
-
-      // 1. Sign In / Authenticate the user with their ID
       socket.emit("signin", user.userId);
       log("Emitted signin with UserID: ${user.userId}");
 
-      // 2. Set up listener for incoming messages
       socket.on("message", (msg) {
         log("Message received from server: $msg");
         _handleIncomingMessage(msg);
@@ -116,16 +147,14 @@ class _ChatScreenState extends State<ChatScreen> {
       final String messageText = data['message'] as String? ?? '...';
       final int? currentUserId = user.userId;
 
-      // Ensure the message is from the person we are currently chatting with
       if (currentUserId != null && sourceId == widget.id) {
         setMessage(
-          type: "destination", // Incoming message
+          type: "destination",
           message: messageText,
           time: _formatTime(DateTime.now()),
         );
       }
     }
-    // Simple string messages could also be handled, but Map is safer.
   }
 
   /// Sends the message via Socket.IO.
@@ -142,10 +171,9 @@ class _ChatScreenState extends State<ChatScreen> {
           type: ContentType.failure,
         );
       } else {
-        log('Cannot send message: User ID not loaded or Socket not connected.');
         snackbar(
           context,
-          message: "Connection not ready. Please wait or relogin.",
+          message: "Connection not ready.",
           title: "Connection Error",
           type: ContentType.failure,
         );
@@ -153,7 +181,6 @@ class _ChatScreenState extends State<ChatScreen> {
       return;
     }
 
-    // 1. Emit the message to the server
     socket.emit("message", {
       "message": text,
       "sourceId": currentUserId,
@@ -162,9 +189,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
     log("Message sent to server: $text");
 
-    // 2. Optimistically update the UI
+    // Optimistically update the UI
     setMessage(
-      type: "source", // Outgoing message
+      type: "source",
       message: text,
       time: _formatTime(DateTime.now()),
     );
@@ -183,9 +210,12 @@ class _ChatScreenState extends State<ChatScreen> {
       time: time ?? _formatTime(DateTime.now()),
     );
 
-    // Use Future.microtask to delay scrolling until after the next build frame
-    // This reliably ensures that the maxScrollExtent has been updated.
-    Future.microtask(() {
+    setState(() {
+      messages.add(messageModel);
+    });
+
+    // Ensure scrolling happens after the UI updates
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -194,131 +224,171 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       }
     });
+  }
 
-    // Update state to add the new message
-    setState(() {
-      messages.add(messageModel);
-    });
+  // Widget to build the emoji picker
+  Widget _buildEmojiContainer() {
+    return Offstage(
+      offstage: !_emojiShowing,
+      child: SizedBox(
+        height: 250,
+        child: emoji.EmojiPicker(
+          textEditingController: messageController,
+          config: const emoji.Config(
+            checkPlatformCompatibility: true,
+            emojiViewConfig: emoji.EmojiViewConfig(
+              columns: 7,
+              backgroundColor: Color(0xFFFAFAFA),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Light shade of primary color (0xffFC6B85) for sent messages
+
     return Scaffold(
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            // BlocListener to fetch user data and initiate connection
-            BlocListener<MasterBloc, MasterState>(
-              listener: (context, state) {
-                if (state is GetProfileStatusLoadedState) {
-                  user = state.user;
-                  connect(); // Connect only after the user ID is safely loaded
-                }
-              },
-              child: const SizedBox.shrink(),
-            ),
-
-            // ------------------ Header ------------------
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.w),
-              alignment: Alignment.bottomCenter,
-              height: 100.h,
-              color: AppColors.primary,
-              child: Row(
-                children: [
-                  InkWell(
-                    child: const Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
-                    ),
-                    // Use goNamed for navigation back to the chat list
-                    onTap: () => router.goNamed(Routes.chatList.name),
-                  ),
-                  10.widthBox, // Spacing
-                  CircleAvatar(
-                    maxRadius: 25.r,
-                    backgroundImage: CachedNetworkImageProvider(widget.image),
-                  ),
-                  10.widthBox,
-                  Text(
-                    widget.name, // Display dynamic name from constructor
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontFamily: Typo.bold,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+      body: WillPopScope(
+        onWillPop: () async {
+          if (_emojiShowing) {
+            setState(() {
+              _emojiShowing = false;
+            });
+            return false;
+          }
+          return true;
+        },
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              // BlocListener to fetch user data and initiate connection
+              BlocListener<MasterBloc, MasterState>(
+                listener: (context, state) {
+                  if (state is GetProfileStatusLoadedState) {
+                    user = state.user;
+                    // 💡 LOAD MESSAGES FIRST, THEN CONNECT
+                    _loadMessages();
+                    connect();
+                  }
+                },
+                child: const SizedBox.shrink(),
               ),
-            ),
 
-            // ------------------ Message List ------------------
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController, // Attach the controller
-                padding: const EdgeInsets.all(12),
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  final msg = messages[index];
-                  final isSource =
-                      msg.type == "source"; // "source" means it's 'Me'
-
-                  return Align(
-                    alignment: isSource
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 6),
-                      padding: const EdgeInsets.all(12),
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.7,
+              // ------------------ Header ------------------
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.w),
+                alignment: Alignment.bottomCenter,
+                height: 100.h,
+                color: AppColors.primary,
+                child: Row(
+                  children: [
+                    InkWell(
+                      child: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
                       ),
-                      decoration: BoxDecoration(
-                        color: isSource
-                            ? AppColors.primary
-                            : Colors.grey.shade300,
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(16),
-                          topRight: const Radius.circular(16),
-                          bottomLeft: isSource
-                              ? const Radius.circular(16)
-                              : Radius.zero,
-                          bottomRight: isSource
-                              ? Radius.zero
-                              : const Radius.circular(16),
+                      onTap: () => router.goNamed(Routes.chatList.name),
+                    ),
+                    10.widthBox,
+                    CircleAvatar(
+                      maxRadius: 25.r,
+                      backgroundImage: CachedNetworkImageProvider(widget.image),
+                    ),
+                    10.widthBox,
+                    Text(
+                      widget.name,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontFamily: Typo.bold,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ------------------ Message List ------------------
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(12),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = messages[index];
+                    final isSource = msg.type == "source";
+
+                    return Align(
+                      alignment: isSource
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        padding: const EdgeInsets.all(12).w,
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSource
+                              ? AppColors.primaryFC
+                              : Colors.grey.shade300,
+                          borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(16),
+                            topRight: const Radius.circular(16),
+                            bottomLeft: isSource
+                                ? const Radius.circular(16)
+                                : Radius.zero,
+                            bottomRight: isSource
+                                ? Radius.zero
+                                : const Radius.circular(16),
+                          ),
+                        ),
+                        child: IntrinsicWidth(
+                          // 💡 FIX: Force the content to dictate the width
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // 1. Message Text
+                              Text(
+                                msg.message,
+                                style: TextStyle(
+                                  color: isSource
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+
+                              // 2. Time Text (Pushed to the end of the narrowest width)
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  msg.time ?? _formatTime(DateTime.now()),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: isSource
+                                        ? Colors.white70
+                                        : Colors.black54,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            msg.message,
-                            style: TextStyle(
-                              color: isSource ? Colors.white : Colors.black87,
-                              fontSize: 15,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            msg.time ?? _formatTime(DateTime.now()),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isSource ? Colors.white70 : Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
 
-            // ------------------ Input bar ------------------
-            SafeArea(
-              child: Container(
+              // ------------------ Input bar ------------------
+              Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -331,11 +401,37 @@ class _ChatScreenState extends State<ChatScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: messageController,
-                        decoration: const InputDecoration(
+                        focusNode: focusNode,
+                        keyboardType: TextInputType.multiline,
+                        minLines: 1,
+                        maxLines: 5,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 10,
+                          ),
+                          isDense: true,
+                          prefixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _emojiShowing = !_emojiShowing;
+                              });
+                              if (_emojiShowing) {
+                                focusNode.unfocus();
+                              } else {
+                                focusNode.requestFocus();
+                              }
+                            },
+                            icon: Icon(
+                              _emojiShowing
+                                  ? Icons.keyboard
+                                  : Icons.emoji_emotions,
+                              color: AppColors.primary,
+                            ),
+                          ),
                           border: InputBorder.none,
                           hintText: "Type a message ...",
                         ),
-                        // Allow sending message on pressing 'Enter' on a soft keyboard
                         onFieldSubmitted: (_) => sendMessage(),
                       ),
                     ),
@@ -347,14 +443,19 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       child: IconButton(
                         icon: const Icon(Icons.send, color: Colors.white),
-                        onPressed: sendMessage, // Call the send function
+                        onPressed: sendMessage,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+
+              // ------------------ Emoji Picker ------------------
+              _buildEmojiContainer(),
+
+              SizedBox(height: MediaQuery.of(context).padding.bottom),
+            ],
+          ),
         ),
       ),
     );

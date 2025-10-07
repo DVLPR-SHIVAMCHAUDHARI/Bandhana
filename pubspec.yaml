@@ -77,6 +77,8 @@ dependencies:
   url_launcher: ^6.3.2
   dropdown_button2: ^2.3.9
   socket_io_client: ^3.1.2
+  emoji_picker_flutter: ^4.3.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

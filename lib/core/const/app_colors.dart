@@ -27,6 +27,7 @@ class AppColors {
 
   static Color primary = Color(0xffDF5770);
   static Color primaryFC = Color(0xffFC6B85);
+  static Color primaryLight = Color(0xffFFB0BF);
 
   static Color primaryOpacity = Color(0xffDF5770).withOpacity(0.14);
   static Color white = Color(0xffFFFFFF);

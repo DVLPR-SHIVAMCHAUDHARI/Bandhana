@@ -105,7 +105,7 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 /// --------------------------- GO ROUTER ---------------------------
 final GoRouter router = GoRouter(
   navigatorKey: navigatorKey,
-  // initialLocation: "/register/:type",
+  // initialLocation: "/onboard",
   routes: [
     // Splash
     GoRoute(
