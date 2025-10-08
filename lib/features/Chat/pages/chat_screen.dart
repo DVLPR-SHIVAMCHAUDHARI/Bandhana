@@ -139,7 +139,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _isConnected = false;
     }
 
-    socket = IO.io("http://3.110.183.40:4015", <String, dynamic>{
+    socket = IO.io(socket, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
@@ -368,7 +368,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isSource
-                              ? primaryLight // Use the light shade for sent messages
+                              ? AppColors
+                                    .primaryFC // Use the light shade for sent messages
                               : Colors.grey.shade300,
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
@@ -384,9 +385,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: IntrinsicWidth(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            // Align all content to the end for sent messages
+                            crossAxisAlignment:
+                                //     ? CrossAxisAlignment.end
+                                CrossAxisAlignment.start,
                             children: [
-                              // 1. Message Text
+                              // The message text itself
                               Text(
                                 msg.message,
                                 style: TextStyle(
@@ -396,23 +400,29 @@ class _ChatScreenState extends State<ChatScreen> {
                                   fontSize: 15,
                                 ),
                               ),
-                              const SizedBox(height: 4),
 
-                              // 2. Time Text (Pushed to the end of the narrowest width)
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  msg.time,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: isSource
-                                        ? Colors.white70
-                                        : Colors.black54,
+                              // A little space
+                              4.verticalSpace,
+
+                              // The time, which will also be aligned by the Column's crossAxisAlignment
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  30.horizontalSpace,
+                                  Text(
+                                    msg.time,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: isSource
+                                          ? Colors.white70
+                                          : Colors.black54,
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ],
                           ),
+                          // ...
                         ),
                       ),
                     );

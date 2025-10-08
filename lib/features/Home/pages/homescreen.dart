@@ -2,6 +2,7 @@ import 'package:MilanMandap/core/const/app_colors.dart';
 import 'package:MilanMandap/core/const/asset_urls.dart';
 import 'package:MilanMandap/core/const/globals.dart';
 import 'package:MilanMandap/core/const/typography.dart';
+import 'package:MilanMandap/core/const/user_model.dart';
 import 'package:MilanMandap/core/sharedWidgets/profile_shimmer.dart';
 import 'package:MilanMandap/features/Home/bloc/home_bloc.dart';
 import 'package:MilanMandap/features/Home/bloc/home_event.dart';
@@ -10,6 +11,7 @@ import 'package:MilanMandap/features/Home/widgets/profile_card.dart';
 import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
 import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
 import 'package:MilanMandap/features/master_apis/bloc/master_state.dart';
+import 'package:MilanMandap/features/master_apis/models/your_detail_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // fire APIs once on home load
     context.read<MasterBloc>().add(GetYourDetails());
     context.read<HomeBloc>().add(FetchUsersEvent());
+    context.read<MasterBloc>().add(GetprofileStatus());
   }
 
   @override
@@ -201,6 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         } else if (state is GetYourDetailsLoadedState) {
           final user = state.yourDetail;
+
           return Row(
             children: [
               CircleAvatar(
