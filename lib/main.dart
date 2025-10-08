@@ -2,14 +2,21 @@ import 'package:MilanMandap/core/const/app_theme.dart';
 import 'package:MilanMandap/core/const/globals.dart';
 import 'package:MilanMandap/core/const/user_model.dart';
 import 'package:MilanMandap/core/services/tokenservice.dart';
+import 'package:MilanMandap/features/Chat/chat_system/chat_system_bloc.dart'
+    hide
+        localDb; // Note: This 'hide' suggests a potential import conflict, which is typically resolved by adjusting the BLoC's import path.
 import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+// Assuming 'localDb' is a global instance of LocalDbService and 'token' is TokenServices.instance
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await localDb.init();
+  await localDb.init(); // Initialize the LocalDbService (Hive)
+
+  // Example commented-out code for token and user setup
   // token.storeTokens(
   //   accessToken:
   //       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJfaWQiOjEzLCJpbnZhbGlkX290cCI6MCwidXNlcl9kYXRhIjp7ImlkIjoxMywiZnVsbG5hbWUiOiJQdXJ2YSBMb2toYW5kZSIsImNyZWF0ZWRfYXQiOiIyMDI1LTA5LTI2IDEyOjA0OjUwLjAwMDAwMCIsInBheW1lbnRfZG9uZSI6MCwibW9iaWxlX251bWJlciI6Iis5MTkwMjEwNzYyOTQiLCJwcm9maWxlX3NldHVwIjoxLCJmYW1pbHlfZGV0YWlscyI6MSwicHJvZmlsZV9kZXRhaWxzIjoxLCJwYXJ0bmVyX2xpZmVfc3R5bGUiOjEsInBhcnRuZXJfZXhwZWN0YXRpb25zIjoxLCJkb2N1bWVudF92ZXJpZmljYXRpb24iOjEsImlzX2RvY3VtZW50X3ZlcmlmaWNhdGlvbiI6MX0sImVycm9yIjpmYWxzZSwiY29kZSI6IjAwMCJ9LCJpYXQiOjE3NTk3NDk0ODB9.x3V-BXh5n8A4DH2mI3o2_KEYdXfrCoZt7qQ00-oNTO0",
@@ -34,13 +41,14 @@ void main() async {
   //     "code": "000",
   //   }),
   // );
-  await token.load();
+
+  await token.load(); // Load token from storage
 
   print(token.accessToken);
 
   logger.d("Stored token (in TokenServices): ${TokenServices().accessToken}");
   logger.d("Saved user in Hive: ${localDb.getUserData()}");
-  runApp(MilanMandap());
+  runApp(const MilanMandap());
 }
 
 class MilanMandap extends StatelessWidget {
@@ -52,7 +60,14 @@ class MilanMandap extends StatelessWidget {
       designSize: const Size(428, 926),
       builder: (context, child) {
         return MultiBlocProvider(
-          providers: [BlocProvider(create: (_) => MasterBloc())],
+          providers: [
+            BlocProvider(create: (context) => MasterBloc()),
+
+            // Injecting the localDbService dependency into the ChatSystemBloc
+            // BlocProvider<ChatSystemBloc>(
+            //   create: (context) => ChatSystemBloc(localDbService: localDb),
+            // ),
+          ],
           child: MaterialApp.router(
             color: Colors.white,
             title: "MilanMandap",
@@ -60,6 +75,7 @@ class MilanMandap extends StatelessWidget {
             // darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.system,
             debugShowCheckedModeBanner: false,
+            // Assuming 'router' is defined elsewhere and is a GoRouter or similar config
             routerConfig: router,
           ),
         );

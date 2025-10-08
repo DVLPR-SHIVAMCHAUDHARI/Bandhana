@@ -66,13 +66,19 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  // In _ChatScreenState
   @override
   void dispose() {
     if (_isConnected && user.userId != null) {
-      // 💡 SAVE MESSAGES ON DISPOSE
+      // 1. Remove the listener to prevent memory leaks/setState errors
+      socket.off('message');
+
+      // 2. Save and disconnect
       localDb.saveChatMessages(user.userId!, widget.id, messages);
       socket.disconnect();
+      _isConnected = false; // Reset connection state
     }
+
     messageController.dispose();
     _scrollController.dispose();
     focusNode.dispose();
@@ -103,6 +109,9 @@ class _ChatScreenState extends State<ChatScreen> {
       messages = savedMessages;
     }
 
+    // 💡 FIX 2: Check mounted before calling setState()
+    if (!mounted) return;
+
     setState(() {});
 
     // Ensure scrolling to the bottom if there are messages
@@ -114,34 +123,55 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   /// Establishes the Socket.IO connection and sets up listeners.
+  // In _ChatScreenState
+  /// Establishes the Socket.IO connection and sets up listeners.
   void connect() {
-    if (user.userId == null || _isConnected) return;
+    if (user.userId == null) return;
+
+    // 💡 FIX: If the socket object exists (even if not connected) and we are
+    // trying to connect again, we must explicitly clean up the previous instance
+    // to remove old listeners and avoid message duplication.
+    if (_isConnected) {
+      log("⚠️ Cleaning up existing socket before reconnecting.");
+      // Stop all listeners, disconnect, and reset state.
+      socket.off('message');
+      socket.disconnect();
+      _isConnected = false;
+    }
 
     socket = IO.io("http://3.110.183.40:4015", <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
 
-    _isConnected = true;
-    socket.connect();
+    socket.connect(); // Start the connection
 
     socket.onConnect((data) {
+      // Set _isConnected to true only upon successful connection
+      _isConnected = true;
       log("Socket Connected. ID: ${socket.id}");
       socket.emit("signin", user.userId);
       log("Emitted signin with UserID: ${user.userId}");
 
+      // 💡 The listener is added here, ensuring it's only set up ONCE per active connection.
       socket.on("message", (msg) {
         log("Message received from server: $msg");
         _handleIncomingMessage(msg);
       });
     });
 
-    socket.onDisconnect((_) => log("Socket Disconnected"));
+    socket.onDisconnect((_) {
+      log("Socket Disconnected");
+      _isConnected = false; // Reset connection state
+    });
     socket.onError((err) => log("Socket Error: $err"));
   }
 
   /// Handles incoming message data from the Socket.IO server.
   void _handleIncomingMessage(dynamic data) {
+    // 💡 FIX 3: Check mounted before processing the message
+    if (!mounted) return;
+
     if (data is Map<String, dynamic>) {
       final int? sourceId = data['sourceId'] as int?;
       final String messageText = data['message'] as String? ?? '...';
@@ -210,6 +240,9 @@ class _ChatScreenState extends State<ChatScreen> {
       time: time ?? _formatTime(DateTime.now()),
     );
 
+    // 💡 FIX 4: Check mounted before calling setState() (Crucial fix for line 223)
+    if (!mounted) return;
+
     setState(() {
       messages.add(messageModel);
     });
@@ -249,6 +282,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     // Light shade of primary color (0xffFC6B85) for sent messages
+    const Color primaryLight = Color(0xFFFE98AA);
 
     return Scaffold(
       body: WillPopScope(
@@ -270,7 +304,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 listener: (context, state) {
                   if (state is GetProfileStatusLoadedState) {
                     user = state.user;
-                    // 💡 LOAD MESSAGES FIRST, THEN CONNECT
+                    // LOAD MESSAGES FIRST, THEN CONNECT
                     _loadMessages();
                     connect();
                   }
@@ -334,7 +368,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isSource
-                              ? AppColors.primaryFC
+                              ? primaryLight // Use the light shade for sent messages
                               : Colors.grey.shade300,
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
@@ -348,7 +382,6 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                         ),
                         child: IntrinsicWidth(
-                          // 💡 FIX: Force the content to dictate the width
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +402,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  msg.time ?? _formatTime(DateTime.now()),
+                                  msg.time,
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: isSource
