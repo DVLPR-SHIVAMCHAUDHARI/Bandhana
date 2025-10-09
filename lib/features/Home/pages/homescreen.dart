@@ -1,8 +1,9 @@
+import 'dart:developer';
+
 import 'package:MilanMandap/core/const/app_colors.dart';
 import 'package:MilanMandap/core/const/asset_urls.dart';
 import 'package:MilanMandap/core/const/globals.dart';
 import 'package:MilanMandap/core/const/typography.dart';
-import 'package:MilanMandap/core/const/user_model.dart';
 import 'package:MilanMandap/core/sharedWidgets/profile_shimmer.dart';
 import 'package:MilanMandap/features/Home/bloc/home_bloc.dart';
 import 'package:MilanMandap/features/Home/bloc/home_event.dart';
@@ -11,7 +12,6 @@ import 'package:MilanMandap/features/Home/widgets/profile_card.dart';
 import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
 import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
 import 'package:MilanMandap/features/master_apis/bloc/master_state.dart';
-import 'package:MilanMandap/features/master_apis/models/your_detail_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,6 +26,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isPaymentdone = false;
   @override
   void initState() {
     super.initState();
@@ -107,7 +108,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               age: user.age?.toString() ?? "-",
                               district: user.district ?? "-",
                               match: "${user.matchPercentage ?? 0}",
-                              name: user.fullname ?? "Unknown",
+                              name: isPaymentdone == true
+                                  ? user.fullname!
+                                  : "${user.fullname!.split(" ").first} ${user.fullname!.split(" ").last[0]}" ??
+                                        "No name", //this is goal
                               profession: user.profession ?? "-",
                               hobbies: user.hobbies!
                                   .map((e) => e.hobbyName)
@@ -187,11 +191,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildUserHeaderInfo() {
     return BlocBuilder<MasterBloc, MasterState>(
       buildWhen: (prev, curr) =>
-          curr is GetYourDetailsLoadingState ||
-          curr is GetYourDetailsLoadedState ||
-          curr is GetYourDetailsErrorState,
+          curr is GetProfileStatusLoadingState ||
+          curr is GetProfileStatusLoadedState ||
+          curr is GetProfileStatusErrorState,
       builder: (context, state) {
-        if (state is GetYourDetailsLoadingState) {
+        if (state is GetProfileStatusLoadingState) {
           return Row(
             children: [
               const CircleAvatar(
@@ -202,23 +206,20 @@ class _HomeScreenState extends State<HomeScreen> {
               const Text("Loading...", style: TextStyle(color: Colors.white)),
             ],
           );
-        } else if (state is GetYourDetailsLoadedState) {
-          final user = state.yourDetail;
+        } else if (state is GetProfileStatusLoadedState) {
+          final user = state.user;
+          isPaymentdone = state.user.paymentDone == 0 ? false : true;
+          log(isPaymentdone.toString());
 
           return Row(
             children: [
               CircleAvatar(
                 radius: 21,
                 backgroundImage:
-                    (user.profileDetails!.fullname != null &&
-                        user.profileSetup!.profileUrl1!.isNotEmpty)
-                    ? CachedNetworkImageProvider(
-                        user.profileSetup!.profileUrl1!,
-                      )
+                    (user.fullname != null && user.profileUrl1!.isNotEmpty)
+                    ? CachedNetworkImageProvider(user.profileUrl1!)
                     : null,
-                child:
-                    (user.profileSetup!.profileUrl1 == null ||
-                        user.profileSetup!.profileUrl1!.isEmpty)
+                child: (user.profileUrl1 == null || user.profileUrl1!.isEmpty)
                     ? const Icon(Icons.person)
                     : null,
               ),
@@ -227,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user.profileDetails!.fullname ?? "No name",
+                    user.fullname ?? "No name",
                     style: TextStyle(
                       fontFamily: Typo.semiBold,
                       color: Colors.white,
@@ -235,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Text(
-                    user.profileDetails!.districtName ?? "No district",
+                    user.district ?? "No district",
                     style: TextStyle(
                       fontFamily: Typo.regular,
                       color: Colors.white,
@@ -246,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           );
-        } else if (state is GetYourDetailsErrorState) {
+        } else if (state is GetProfileStatusErrorState) {
           return const Text(
             "Failed to load profile",
             style: TextStyle(color: Colors.red),

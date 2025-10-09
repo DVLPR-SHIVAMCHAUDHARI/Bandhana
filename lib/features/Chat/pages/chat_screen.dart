@@ -7,7 +7,6 @@ import 'package:MilanMandap/core/const/globals.dart';
 import 'package:MilanMandap/core/const/numberextension.dart';
 import 'package:MilanMandap/core/const/snack_bar.dart';
 import 'package:MilanMandap/core/const/typography.dart';
-import 'package:MilanMandap/core/repository/repository.dart';
 
 import 'package:MilanMandap/core/services/local_db_sevice.dart';
 import 'package:MilanMandap/features/Chat/models/messagemodel.dart';
@@ -23,6 +22,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart' as emoji;
 
 // Global instance of the local database service
+
 final LocalDbService localDb = LocalDbService.instance;
 
 class ChatScreen extends StatefulWidget {
@@ -139,12 +139,15 @@ class _ChatScreenState extends State<ChatScreen> {
       _isConnected = false;
     }
 
-    socket = IO.io(socket, <String, dynamic>{
+    socket = IO.io("http://3.110.183.40:4015", <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
 
     socket.connect(); // Start the connection
+
+    // final String socket = "http://3.110.183.40:4015";
+    // String socket = "http://192.168.1.13:4015";
 
     socket.onConnect((data) {
       // Set _isConnected to true only upon successful connection

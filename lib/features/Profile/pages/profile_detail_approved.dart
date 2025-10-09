@@ -359,6 +359,9 @@ class ProfileDetailedApprovedScreen extends StatelessWidget {
         int centerIndex = 3;
         bool isFavorite = false;
 
+        ///here needs to change
+        //bool isFavorite = user.isFavorite == 0 ? false : true ?? false;
+
         if (state is ProfileDetailLoaded) {
           isFavorite = state.isFavorite;
         } else if (state is FavoriteToggledState) {
@@ -449,8 +452,9 @@ class ProfileDetailedApprovedScreen extends StatelessWidget {
                   12.verticalSpace,
                   Wrap(
                     spacing: 8.w,
+                    runSpacing: 8.h,
                     children: List.generate(
-                      user.profileDetails!.hobbies!.length,
+                      4,
                       (index) => _buildTag(
                         "#${user.profileDetails!.hobbies![index].hobbyName}",
                       ),
@@ -482,29 +486,57 @@ class ProfileDetailedApprovedScreen extends StatelessWidget {
         builder: (context, state) {
           List<Map<String, dynamic>> avatarPositions = List.generate(
             avatars.length,
-            (index) => {
-              'index': index,
-              'url': avatars[index] ?? '',
-              'top': index == centerIndex
-                  ? -40.0
-                  : index == 1 || index == 2
-                  ? -20.0
-                  : 20.0,
-              'left': index == 0
-                  ? 0.0
-                  : index == 1
-                  ? 60.w
-                  : index == 2
-                  ? null
-                  : index == 3
-                  ? MediaQuery.sizeOf(context).width * 0.32.w
-                  : null,
-              'right': index == 2
-                  ? 60.w
-                  : index == 4
-                  ? 0.0
-                  : null,
-              'size': index == centerIndex ? 152.h : 100.h,
+            (index) {
+              final screenWidth = MediaQuery.sizeOf(context).width;
+
+              double top;
+              double? left;
+              double? right;
+              double size;
+
+              // 🎯 Scale top offsets proportionally
+              if (index == centerIndex) {
+                top = -0.15 * screenWidth; // about -5% of width
+              } else if (index == 1 || index == 2) {
+                top = -0.02 * screenWidth; // about -2% of width
+              } else {
+                top = 0.03 * screenWidth; // about +3% of width
+              }
+
+              // 🎯 Scale horizontal positions
+              switch (index) {
+                case 0:
+                  left = 0.0;
+                  break;
+                case 1:
+                  left = screenWidth * 0.15;
+                  break;
+                case 2:
+                  right = screenWidth * 0.15;
+                  break;
+                case 3:
+                  left = screenWidth * 0.32;
+                  break;
+                case 4:
+                  right = 0.0;
+                  break;
+                default:
+                  break;
+              }
+
+              // 🎯 Scalable avatar sizes
+              size = index == centerIndex
+                  ? 0.38 * screenWidth
+                  : 0.25 * screenWidth;
+
+              return {
+                'index': index,
+                'url': avatars[index] ?? '',
+                'top': top,
+                'left': left,
+                'right': right,
+                'size': size,
+              };
             },
           );
 
@@ -675,22 +707,27 @@ class ProfileDetailedApprovedScreen extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.h),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontFamily: Typo.regular,
-              color: Colors.black87,
+          SizedBox(
+            width: 120.w, // fixed width for the label
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontFamily: Typo.regular,
+                color: Colors.black87,
+              ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontFamily: Typo.medium,
-              color: Colors.black54,
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontFamily: Typo.medium,
+                color: Colors.black54,
+              ),
             ),
           ),
         ],

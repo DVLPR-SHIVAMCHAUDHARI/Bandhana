@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:MilanMandap/core/const/app_colors.dart';
 import 'package:MilanMandap/core/const/globals.dart';
 import 'package:MilanMandap/core/const/numberextension.dart';
@@ -26,7 +28,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-class ProfileDetailedScreen extends StatelessWidget {
+class ProfileDetailedScreen extends StatefulWidget {
   const ProfileDetailedScreen({
     super.key,
     required this.mode,
@@ -37,6 +39,19 @@ class ProfileDetailedScreen extends StatelessWidget {
   final String mode;
   final String id;
   final String match;
+
+  @override
+  State<ProfileDetailedScreen> createState() => _ProfileDetailedScreenState();
+}
+
+class _ProfileDetailedScreenState extends State<ProfileDetailedScreen> {
+  bool isPaymentdone = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    statusBuilder();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +70,7 @@ class ProfileDetailedScreen extends StatelessWidget {
             } else if (state is FetchUserFailureState) {
               return Center(child: Text(state.message!));
             } else if (state is FetchUserLoadedState) {
-              final int? userId = int.tryParse(id);
+              final int? userId = int.tryParse(widget.id);
               HomeUserModel? user;
 
               // Try using extra if available
@@ -105,7 +120,7 @@ class ProfileDetailedScreen extends StatelessWidget {
           color: Colors.white,
           boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
         ),
-        child: mode == 'viewOther'
+        child: widget.mode == 'viewOther'
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -171,7 +186,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                                   router.pushNamed(Routes.choosePlan.name);
                                 } else {
                                   context.read<ProfileDetailBloc>().add(
-                                    SendRequestEvent(id),
+                                    SendRequestEvent(widget.id),
                                   );
                                 }
                               },
@@ -209,7 +224,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                   ),
                 ],
               )
-            : mode == "incomingRequest"
+            : widget.mode == "incomingRequest"
             ? Row(
                 children: [
                   Expanded(
@@ -239,7 +254,9 @@ class ProfileDetailedScreen extends StatelessWidget {
                         return OutlinedButton(
                           onPressed: () {
                             context.read<RequestBloc>().add(
-                              RejectRecievedRequest(userId: int.parse(id)),
+                              RejectRecievedRequest(
+                                userId: int.parse(widget.id),
+                              ),
                             );
                           },
                           style: OutlinedButton.styleFrom(
@@ -294,7 +311,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                         return InkWell(
                           onTap: () {
                             context.read<ProfileDetailBloc>().add(
-                              AcceptRequestEvent(id),
+                              AcceptRequestEvent(widget.id),
                             );
                           },
                           child: Container(
@@ -348,7 +365,7 @@ class ProfileDetailedScreen extends StatelessWidget {
       builder: (context, state) {
         String imageUrl;
         int centerIndex = 3;
-        bool isFavorite = false;
+        bool isFavorite = user.isFavorite == 0 ? false : true ?? false;
 
         if (state is ProfileDetailLoaded) {
           isFavorite = state.isFavorite;
@@ -395,7 +412,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                     children: [
                       InkWell(
                         onTap: () {
-                          mode == ProfileMode.viewOther.name
+                          widget.mode == ProfileMode.viewOther.name
                               ? router.goNamed(Routes.homescreen.name)
                               : router.goNamed(Routes.request.name);
                         },
@@ -424,7 +441,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                   ),
                   200.verticalSpace,
                   Text(
-                    "${user.fullname}, ${user.age}",
+                    "${isPaymentdone == true ? user.fullname! : "${user.fullname!.split(" ").first} ${user.fullname!.split(" ").last[0]}" ?? "No name"}, ${user.age}",
                     style: TextStyle(
                       fontSize: 28.sp,
                       fontFamily: Typo.playfairDisplayRegular,
@@ -440,6 +457,7 @@ class ProfileDetailedScreen extends StatelessWidget {
                   12.verticalSpace,
                   Wrap(
                     spacing: 8.w,
+                    runSpacing: 8.h,
                     children: List.generate(
                       user.hobbies!.length,
                       (index) =>
@@ -473,29 +491,57 @@ class ProfileDetailedScreen extends StatelessWidget {
         builder: (context, state) {
           List<Map<String, dynamic>> avatarPositions = List.generate(
             avatars.length,
-            (index) => {
-              'index': index,
-              'url': avatars[index] ?? '',
-              'top': index == centerIndex
-                  ? -40.0
-                  : index == 1 || index == 2
-                  ? -15.0
-                  : 20.0,
-              'left': index == 0
-                  ? 0.0
-                  : index == 1
-                  ? 60.w
-                  : index == 2
-                  ? null
-                  : index == 3
-                  ? MediaQuery.sizeOf(context).width * 0.32.w
-                  : null,
-              'right': index == 2
-                  ? 60.w
-                  : index == 4
-                  ? 0.0
-                  : null,
-              'size': index == centerIndex ? 152.h : 100.h,
+            (index) {
+              final screenWidth = MediaQuery.sizeOf(context).width;
+
+              double top;
+              double? left;
+              double? right;
+              double size;
+
+              // 🎯 Scale top offsets proportionally
+              if (index == centerIndex) {
+                top = -0.15 * screenWidth; // about -5% of width
+              } else if (index == 1 || index == 2) {
+                top = -0.02 * screenWidth; // about -2% of width
+              } else {
+                top = 0.03 * screenWidth; // about +3% of width
+              }
+
+              // 🎯 Scale horizontal positions
+              switch (index) {
+                case 0:
+                  left = 0.0;
+                  break;
+                case 1:
+                  left = screenWidth * 0.15;
+                  break;
+                case 2:
+                  right = screenWidth * 0.15;
+                  break;
+                case 3:
+                  left = screenWidth * 0.32;
+                  break;
+                case 4:
+                  right = 0.0;
+                  break;
+                default:
+                  break;
+              }
+
+              // 🎯 Scalable avatar sizes
+              size = index == centerIndex
+                  ? 0.38 * screenWidth
+                  : 0.25 * screenWidth;
+
+              return {
+                'index': index,
+                'url': avatars[index] ?? '',
+                'top': top,
+                'left': left,
+                'right': right,
+                'size': size,
+              };
             },
           );
 
@@ -567,7 +613,7 @@ class ProfileDetailedScreen extends StatelessWidget {
         children: [
           Center(
             child: Text(
-              "$match % Match With Your Profile",
+              "${widget.match} % Match With Your Profile",
               style: TextStyle(
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
@@ -583,8 +629,9 @@ class ProfileDetailedScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ---------- ABOUT ----------
                   Text(
-                    "About ${user.fullname!.split(' ').first}",
+                    "About ${user.fullname?.split(' ').first ?? ''}",
                     style: TextStyle(
                       fontSize: 24.sp,
                       fontFamily: Typo.playfairBold,
@@ -593,46 +640,128 @@ class ProfileDetailedScreen extends StatelessWidget {
                   ),
                   13.verticalSpace,
                   Text(
-                    user.bio!,
+                    user.bio ?? '-',
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontFamily: Typo.regular,
                       color: Colors.black87,
                     ),
                   ),
-                  30.verticalSpace,
+                  35.verticalSpace,
+
+                  // ---------- PERSONAL DETAILS ----------
                   _sectionCard("Personal Details", [
-                    _profileDetail("Full Name", user.fullname!),
-                    _profileDetail("Age", user.age.toString()),
-                    _profileDetail("Gender", user.gender!),
-                    _profileDetail("Date of Birth", user.dateOfBirth!),
-                    _profileDetail("Religion", user.religion!),
-                    _profileDetail("Caste", user.caste!),
-                    _profileDetail("Mother Tongue", user.motherTongue!),
-                    _profileDetail("Nationality", user.nationality!),
+                    _profileDetail(
+                      "Full Name",
+                      isPaymentdone == true
+                          ? user.fullname!
+                          : "${user.fullname!.split(" ").first} ${user.fullname!.split(" ").last[0]}",
+                      false,
+                    ),
+                    _profileDetail("Age", user.age?.toString() ?? '-', false),
+                    _profileDetail("Gender", user.gender ?? '-', false),
+                    _profileDetail(
+                      "Date of Birth",
+                      user.dateOfBirth != null
+                          ? user.dateOfBirth!.split('T').first
+                          : '-',
+                      false,
+                    ),
+                    _profileDetail("Religion", user.religion ?? '-', false),
+                    _profileDetail("Caste", user.caste ?? '-', false),
+                    _profileDetail(
+                      "Mother Tongue",
+                      user.motherTongue ?? '-',
+                      false,
+                    ),
+                    _profileDetail(
+                      "Nationality",
+                      user.nationality ?? '-',
+                      false,
+                    ),
+                    _profileDetail(
+                      "Birth Place",
+                      user.birthPlace ?? '-',
+                      false,
+                    ),
+                    _profileDetail("Zodiac", user.zodiac ?? '-', false),
+                    _profileDetail(
+                      "Birth Time",
+                      user.birthTime != null
+                          ? user.birthTime!.split(':').take(2).join(':')
+                          : '-',
+                      false,
+                    ),
                   ], icon: Icons.person),
+
+                  // ---------- ACADEMICS & PROFESSION ----------
                   _sectionCard("Academics & Profession", [
-                    _profileDetail("Education", user.education!),
-                    _profileDetail("Profession", user.profession!),
-                    _profileDetail("Work Location", user.workLocation!),
-                    _profileDetail("Permanent Location", user.district!),
+                    _profileDetail("Education", user.education ?? '-', false),
+                    _profileDetail("Profession", user.profession ?? '-', false),
+                    _profileDetail(
+                      "Work Location",
+                      user.workLocation ?? '-',
+                      true,
+                    ),
+                    _profileDetail(
+                      "Permanent Location",
+                      user.district ?? '-',
+                      true,
+                    ),
                   ], icon: Icons.school),
+
+                  // ---------- LIFESTYLE & PREFERENCES ----------
                   _sectionCard("Lifestyle & Preferences", [
-                    _profileDetail("Diet", user.dite!),
-                    _profileDetail("Smoking Habit", user.smokingHabit!),
-                    _profileDetail("Drinking Habit", user.drinkingHabit!),
-                    _profileDetail("Fitness Activity", user.fitnessActivity!),
+                    _profileDetail("Diet", user.dite ?? '-', true),
+                    _profileDetail(
+                      "Smoking Habit",
+                      user.smokingHabit ?? '-',
+                      true,
+                    ),
+                    _profileDetail(
+                      "Drinking Habit",
+                      user.drinkingHabit ?? '-',
+                      true,
+                    ),
+                    _profileDetail(
+                      "Fitness Activity",
+                      user.fitnessActivity ?? '-',
+                      true,
+                    ),
+                    _profileDetail(
+                      "Sleep Pattern",
+                      user.sleepPattern ?? '-',
+                      true,
+                    ),
                     _profileDetail(
                       "Travel Preferences",
-                      user.travelPreferences!,
+                      user.travelPreferences ?? '-',
+                      true,
+                    ),
+                    _profileDetail(
+                      "Pet Friendly",
+                      user.petFriendly ?? '-',
+                      true,
+                    ),
+                    _profileDetail(
+                      "Daily Routine",
+                      user.dailyRoutine ?? '-',
+                      true,
                     ),
                   ], icon: Icons.favorite),
+
+                  // ---------- HOBBIES ----------
                   _sectionCard("Hobbies", [
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: 8.w,
+                      runSpacing: 8.h,
                       children: user.hobbies!
-                          .map((h) => Chip(label: Text(h.hobbyName!)))
+                          .map(
+                            (h) => Chip(
+                              label: Text(h.hobbyName ?? '-'),
+                              backgroundColor: AppColors.primaryLight,
+                            ),
+                          )
                           .toList(),
                     ),
                   ], icon: Icons.sports_handball),
@@ -657,7 +786,11 @@ class ProfileDetailedScreen extends StatelessWidget {
             if (icon != null) 8.widthBox,
             Text(
               title,
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                fontFamily: Typo.playfairSemiBold,
+              ),
             ),
           ],
         ),
@@ -671,16 +804,43 @@ class ProfileDetailedScreen extends StatelessWidget {
   }
 
   // --- _profileDetail ---
-  Widget _profileDetail(String label, String value) {
+
+  Widget _profileDetail(String label, String value, bool hide) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
         children: [
           SizedBox(
             width: 150.w,
-            child: Text(label, style: TextStyle(fontWeight: FontWeight.w600)),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontFamily: Typo.bold,
+                fontSize: 16.sp,
+              ),
+            ),
           ),
-          Expanded(child: Text(value)),
+          Expanded(
+            child: Stack(
+              children: [
+                Text(
+                  ": $value",
+                  style: TextStyle(fontFamily: Typo.medium, fontSize: 16.sp),
+                ),
+
+                if (hide)
+                  Positioned.fill(
+                    child: ClipRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
+                        child: Container(color: Colors.white.withOpacity(0.2)),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -695,6 +855,19 @@ class ProfileDetailedScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(text, style: TextStyle(color: Colors.white)),
+    );
+  }
+
+  statusBuilder() {
+    return BlocListener<MasterBloc, MasterState>(
+      listener: (context, state) {
+        bool paid = false;
+        if (state is GetProfileStatusLoadedState) {
+          paid = state.user.paymentDone != 0;
+          isPaymentdone = paid;
+        }
+        // return  SizedBox();
+      },
     );
   }
 }

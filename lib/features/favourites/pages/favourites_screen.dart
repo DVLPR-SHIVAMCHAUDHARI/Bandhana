@@ -77,7 +77,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 return ProfileCard(
                   viewProfile: () {
                     router.pushNamed(
-                      Routes.profileDetail.name,
+                      Routes.profileDetailApproved.name,
                       pathParameters: {
                         "mode": ProfileMode.viewOther.name,
                         "id": user.userId.toString(),

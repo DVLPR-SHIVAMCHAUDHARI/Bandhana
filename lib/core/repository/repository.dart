@@ -2,12 +2,9 @@ import 'package:MilanMandap/core/const/globals.dart';
 import 'package:MilanMandap/core/services/tokenservice.dart';
 import 'package:dio/dio.dart';
 
-final String socket = "http://3.110.183.40:4015";
-// final String socket = "http://192.168.1.3:4015";
-
 abstract class Repository {
   final String host = "http://3.110.183.40:4015/Bandhana/api/v1";
-  // final String host = "http://192.168.1.3:4015/Bandhana/api/v1";
+  // final String host = "http://192.168.1.13:4015/Bandhana/api/v1";
   late final Dio dio;
 
   Repository() {

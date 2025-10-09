@@ -1,9 +1,11 @@
 import 'package:MilanMandap/core/const/app_colors.dart';
 import 'package:MilanMandap/core/const/globals.dart';
+import 'package:MilanMandap/core/const/numberextension.dart';
 import 'package:MilanMandap/core/const/typography.dart';
 import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_bloc.dart';
 import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_event.dart';
 import 'package:MilanMandap/features/Profile/bloc_approved/profile_detail_approved_state.dart';
+import 'package:MilanMandap/features/Registration/pages/edit_profile_screen.dart';
 
 import 'package:MilanMandap/features/master_apis/bloc/master_bloc.dart';
 import 'package:MilanMandap/features/master_apis/bloc/master_event.dart';
@@ -13,6 +15,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -174,7 +177,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           children: [
             CachedNetworkImage(
               imageUrl: imageUrl,
-              height: 550.h,
+              height: 650.h,
               width: double.infinity,
               fit: BoxFit.cover,
               placeholder: (_, __) =>
@@ -247,29 +250,57 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         builder: (context, state) {
           List<Map<String, dynamic>> avatarPositions = List.generate(
             avatars.length,
-            (index) => {
-              'index': index,
-              'url': avatars[index] ?? '',
-              'top': index == centerIndex
-                  ? -40.0
-                  : index == 1 || index == 2
-                  ? -20.0
-                  : 20.0,
-              'left': index == 0
-                  ? 0.0
-                  : index == 1
-                  ? 60.w
-                  : index == 2
-                  ? null
-                  : index == 3
-                  ? MediaQuery.sizeOf(context).width * 0.32.w
-                  : null,
-              'right': index == 2
-                  ? 60.w
-                  : index == 4
-                  ? 0.0
-                  : null,
-              'size': index == centerIndex ? 152.h : 100.h,
+            (index) {
+              final screenWidth = MediaQuery.sizeOf(context).width;
+
+              double top;
+              double? left;
+              double? right;
+              double size;
+
+              // 🎯 Scale top offsets proportionally
+              if (index == centerIndex) {
+                top = -0.15 * screenWidth; // about -5% of width
+              } else if (index == 1 || index == 2) {
+                top = -0.02 * screenWidth; // about -2% of width
+              } else {
+                top = 0.03 * screenWidth; // about +3% of width
+              }
+
+              // 🎯 Scale horizontal positions
+              switch (index) {
+                case 0:
+                  left = 0.0;
+                  break;
+                case 1:
+                  left = screenWidth * 0.15;
+                  break;
+                case 2:
+                  right = screenWidth * 0.15;
+                  break;
+                case 3:
+                  left = screenWidth * 0.32;
+                  break;
+                case 4:
+                  right = 0.0;
+                  break;
+                default:
+                  break;
+              }
+
+              // 🎯 Scalable avatar sizes
+              size = index == centerIndex
+                  ? 0.38 * screenWidth
+                  : 0.25 * screenWidth;
+
+              return {
+                'index': index,
+                'url': avatars[index] ?? '',
+                'top': top,
+                'left': left,
+                'right': right,
+                'size': size,
+              };
             },
           );
 
@@ -352,6 +383,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ---------- ABOUT ----------
                 Text(
                   "About ${user.profileDetails?.fullname?.split(' ').first ?? ''}",
                   style: TextStyle(
@@ -369,48 +401,175 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     color: Colors.black87,
                   ),
                 ),
-                35.verticalSpace,
-                _profileDetail(
-                  "Profession",
-                  user.profileSetup?.professionName ?? '-',
-                ),
-                _profileDetail(
-                  "Education",
-                  user.profileSetup?.educationName ?? '-',
-                ),
-                _profileDetail("Salary", user.profileSetup?.salaryName ?? '-'),
-                _profileDetail(
-                  "Height",
-                  "${user.profileSetup?.height ?? '-'} cm",
-                ),
-                _profileDetail(
-                  "Marital Status",
-                  user.profileDetails?.maritalStatusName ?? '-',
-                ),
-                _profileDetail(
-                  "Work Location",
-                  user.profileSetup?.workLocation ?? '-',
-                ),
-                _profileDetail(
-                  "Permanent Location",
-                  user.profileSetup?.permanentLocation ?? '-',
-                ),
-                _profileDetail(
-                  "Religion",
-                  user.profileDetails?.religionName ?? '-',
-                ),
-                _profileDetail("Caste", user.profileDetails?.casteName ?? '-'),
-                _profileDetail(
-                  "Hobbies",
-                  user.profileDetails!.hobbies!
-                      .map((e) => e.hobbyName)
-                      .toList()
-                      .toString(),
-                ),
-                _profileDetail(
-                  "Mother Tongue",
-                  user.profileDetails?.motherTongueName ?? '-',
-                ),
+
+                // ---------- PERSONAL DETAILS ----------
+                _sectionCard("Personal Details", [
+                  _profileDetail(
+                    "Full Name",
+                    user.profileDetails?.fullname ?? '-',
+                  ),
+                  _profileDetail(
+                    "Gender",
+                    user.profileDetails?.genderName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Marital Status",
+                    user.profileDetails?.maritalStatusName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Religion",
+                    user.profileDetails?.religionName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Caste",
+                    user.profileDetails?.casteName ?? '-',
+                  ),
+                  _profileDetail("Kul", user.profileDetails?.kul ?? '-'),
+                  _profileDetail(
+                    "Birth Place",
+                    user.profileDetails?.birthPlace ?? '-',
+                  ),
+                  _profileDetail(
+                    "Birth Time",
+                    (user.profileDetails?.birthTime != null)
+                        ? user.profileDetails!.birthTime!
+                              .split(':')
+                              .take(2)
+                              .join(':')
+                        : '-',
+                  ),
+                  _profileDetail(
+                    "Birth Date",
+                    user.profileDetails?.dateOfBirth ?? '-',
+                  ),
+                  _profileDetail(
+                    "Blood Group",
+                    user.profileDetails?.bloodGroupName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Zodiac Sign",
+                    user.profileDetails?.zodiacName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Disability",
+                    user.profileDetails?.disablity ?? '-',
+                  ),
+                  _profileDetail(
+                    "Nationality",
+                    user.profileDetails?.nationalityName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Hobbies",
+                    user.profileDetails?.hobbies
+                            ?.map((e) => e.hobbyName)
+                            .join(', ') ??
+                        '-',
+                  ),
+                ], icon: Icons.person),
+
+                // ---------- PROFESSION & ACADEMICS ----------
+                _sectionCard("Profession & Academics", [
+                  _profileDetail(
+                    "Profession",
+                    user.profileSetup?.professionName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Education",
+                    user.profileSetup?.educationName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Salary",
+                    user.profileSetup?.salaryName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Height",
+                    "${user.profileSetup?.height ?? '-'} cm",
+                  ),
+                  _profileDetail(
+                    "Work Location",
+                    user.profileSetup?.workLocation ?? '-',
+                  ),
+                ], icon: Icons.school),
+
+                // ---------- FAMILY DETAILS ----------
+                _sectionCard("Family Details", [
+                  _profileDetail(
+                    "Father's Name",
+                    user.familyDetails?.fathersName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Mother's Name",
+                    user.familyDetails?.mothersName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Father's Occupation",
+                    user.familyDetails?.fathersOccupation ?? '-',
+                  ),
+                  _profileDetail(
+                    "Mother's Occupation",
+                    user.familyDetails?.mothersOccupation ?? '-',
+                  ),
+                  _profileDetail(
+                    "Family Type",
+                    user.familyDetails?.familyTypeName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Family Status",
+                    user.familyDetails?.familyStatusName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Family Values",
+                    user.familyDetails?.familyValuesName ?? '-',
+                  ),
+                  _profileDetail(
+                    "No. of Brothers",
+                    "${user.familyDetails?.noOfBrothers ?? 0}",
+                  ),
+                  _profileDetail(
+                    "No. of Sisters",
+                    "${user.familyDetails?.noOfSisters ?? 0}",
+                  ),
+                  _profileDetail(
+                    "Maternal Uncle's Name",
+                    user.familyDetails?.maternalUncleMamasName ?? '-',
+                  ),
+                  _profileDetail(
+                    "Maternal Uncle's Village",
+                    user.familyDetails?.maternalUncleMamasVillage ?? '-',
+                  ),
+                  _profileDetail(
+                    "Mamas Kul / Clan",
+                    user.familyDetails?.mamasKulClan ?? '-',
+                  ),
+                  _profileDetail(
+                    "Relatives Family Surnames",
+                    user.familyDetails?.relativesFamilySurnames ?? '-',
+                  ),
+                ], icon: Icons.family_restroom),
+
+                // ---------- HOBBIES ----------
+                _sectionCard("Hobbies", [
+                  Wrap(
+                    spacing: 8.w,
+                    runSpacing: 8.h,
+                    children: List.generate(
+                      user.profileDetails!.hobbies!.length,
+                      (index) => Card(
+                        color: AppColors.primaryLight,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Text(
+                          user.profileDetails!.hobbies![index].hobbyName!,
+                          style: TextStyle(
+                            fontFamily: Typo.medium,
+                            fontSize: 16.sp,
+                          ),
+                        ).padding(EdgeInsets.all(12.w)),
+                      ),
+                    ),
+                  ),
+                ], icon: Icons.sports_basketball),
               ],
             ),
           ),
@@ -419,23 +578,26 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 
-  Widget _profileDetail(String title, String value) {
+  Widget _profileDetail(String label, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6.h),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 170.w,
+            width: 150.w,
             child: Text(
-              title,
-              style: TextStyle(fontFamily: Typo.bold, fontSize: 18.sp),
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontFamily: Typo.bold,
+                fontSize: 16.sp,
+              ),
             ),
           ),
           Expanded(
             child: Text(
               ": $value",
-              style: TextStyle(fontFamily: Typo.medium, fontSize: 18.sp),
+              style: TextStyle(fontFamily: Typo.medium, fontSize: 16.sp),
             ),
           ),
         ],
@@ -461,4 +623,29 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       ),
     );
   }
+}
+
+Widget _sectionCard(String title, List<Widget> children, {IconData? icon}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      20.verticalSpace,
+      Row(
+        children: [
+          if (icon != null) Icon(icon, size: 22),
+          if (icon != null) 8.widthBox,
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              fontFamily: Typo.playfairSemiBold,
+            ),
+          ),
+        ],
+      ),
+      12.verticalSpace,
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
+    ],
+  );
 }

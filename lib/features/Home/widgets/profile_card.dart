@@ -165,6 +165,7 @@ class _ProfileCardState extends State<ProfileCard> {
 
             // Tags
             Wrap(
+              runSpacing: 8.h,
               spacing: 8.w,
               children: List.generate(
                 widget.hobbies!.length,

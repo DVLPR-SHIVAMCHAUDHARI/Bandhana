@@ -100,7 +100,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             image: user.profileUrl1,
                             age: user.age?.toString() ?? "-",
                             district: user.district ?? "-",
-                            match: "${user.matchPercentage ?? 0}% match",
+                            match: "${user.matchPercentage ?? 0}",
                             name: user.fullname ?? "Unknown",
                             profession: user.profession ?? "-",
                             hobbies: user.hobbies!
